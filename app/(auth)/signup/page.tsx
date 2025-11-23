@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Sign Up - Simple",
-  description: "Page description",
+  title: "Регистрация — PreOffer",
+  description: "Создайте аккаунт, чтобы собирать вопросы и тренироваться в PreOffer",
 };
 
 export default function SignUp() {

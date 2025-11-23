@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Reset Password - Simple",
-  description: "Page description",
+  title: "Сброс пароля — PreOffer",
+  description: "Восстановите доступ к своему аккаунту PreOffer",
 };
 
 export default function ResetPassword() {

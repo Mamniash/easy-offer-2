@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Sign In - Simple",
-  description: "Page description",
+  title: "Вход — PreOffer",
+  description: "Войдите, чтобы продолжить подготовку в PreOffer",
 };
 
 import Link from "next/link";

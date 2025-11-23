@@ -1,6 +1,7 @@
 export const metadata = {
-  title: "Home - Simple",
-  description: "Page description",
+  title: "PreOffer — Подготовка к IT-собеседованию",
+  description:
+    "PreOffer помогает джунам и мидлам готовиться к IT-собеседованиям через частые вопросы и понятные ответы",
 };
 
 import Hero from "@/components/hero-home";
