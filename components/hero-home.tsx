@@ -26,42 +26,42 @@ export default function HeroHome() {
                   src={Avatar01}
                   width={32}
                   height={32}
-                  alt="Avatar 01"
+                  alt="Кандидаты"
                 />
                 <Image
                   className="box-content rounded-full border-2 border-gray-50"
                   src={Avatar02}
                   width={32}
                   height={32}
-                  alt="Avatar 01"
+                  alt="Спикеры"
                 />
                 <Image
                   className="box-content rounded-full border-2 border-gray-50"
                   src={Avatar03}
                   width={32}
                   height={32}
-                  alt="Avatar 02"
+                  alt="Эксперты"
                 />
                 <Image
                   className="box-content rounded-full border-2 border-gray-50"
                   src={Avatar04}
                   width={32}
                   height={32}
-                  alt="Avatar 03"
+                  alt="Сообщество"
                 />
                 <Image
                   className="box-content rounded-full border-2 border-gray-50"
                   src={Avatar05}
                   width={32}
                   height={32}
-                  alt="Avatar 04"
+                  alt="Отзывы"
                 />
                 <Image
                   className="box-content rounded-full border-2 border-gray-50"
                   src={Avatar06}
                   width={32}
                   height={32}
-                  alt="Avatar 05"
+                  alt="Наставники"
                 />
               </div>
             </div>
@@ -70,8 +70,8 @@ export default function HeroHome() {
               data-aos="zoom-y-out"
               data-aos-delay={150}
             >
-              The website builder you're <br className="max-lg:hidden" />
-              looking for
+              PreOffer: собеседования перестают<br className="max-lg:hidden" />
+              быть лотереей
             </h1>
             <div className="mx-auto max-w-3xl">
               <p
@@ -79,8 +79,10 @@ export default function HeroHome() {
                 data-aos="zoom-y-out"
                 data-aos-delay={300}
               >
-                Simple is a modern website builder powered by AI that changes
-                how companies create user interfaces together.
+                Платформа собирает реальные вопросы из последних собеседований,
+                показывает, что чаще спрашивают по роли и грейду, и помогает
+                закрыть пробелы быстрыми подсказками, видеоразборами и
+                симуляцией с AI-интервьюером.
               </p>
               <div className="relative before:absolute before:inset-0 before:border-y before:[border-image:linear-gradient(to_right,transparent,--theme(--color-slate-300/.8),transparent)1]">
                 <div
@@ -90,10 +92,10 @@ export default function HeroHome() {
                 >
                   <a
                     className="btn group mb-4 w-full bg-linear-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
-                    href="#0"
+                    href="#roles"
                   >
                     <span className="relative inline-flex items-center">
-                      Start Free Trial{" "}
+                      Подобрать вопросы для себя{" "}
                       <span className="ml-1 tracking-normal text-blue-300 transition-transform group-hover:translate-x-0.5">
                         -&gt;
                       </span>
@@ -101,9 +103,9 @@ export default function HeroHome() {
                   </a>
                   <a
                     className="btn w-full bg-white text-gray-800 shadow-sm hover:bg-gray-50 sm:ml-4 sm:w-auto"
-                    href="#0"
+                    href="#frontend"
                   >
-                    Learn More
+                    Смотреть пример списка
                   </a>
                 </div>
               </div>
@@ -123,26 +125,26 @@ export default function HeroHome() {
               </div>
               <div className="font-mono text-gray-500 [&_span]:opacity-0">
                 <span className="animate-[code-1_10s_infinite] text-gray-200">
-                  npm login
+                  Собираем вопросы
                 </span>{" "}
                 <span className="animate-[code-2_10s_infinite]">
-                  --registry=https://npm.pkg.github.com
+                  из реальных собеседований
                 </span>
                 <br />
                 <span className="animate-[code-3_10s_infinite]">
-                  --scope=@phanatic
+                  сортируем по частоте
                 </span>{" "}
                 <span className="animate-[code-4_10s_infinite]">
-                  Successfully logged-in.
+                  и уровню кандидата
                 </span>
                 <br />
                 <br />
                 <span className="animate-[code-5_10s_infinite] text-gray-200">
-                  npm publish
+                  Генерируем шпаргалку
                 </span>
                 <br />
                 <span className="animate-[code-6_10s_infinite]">
-                  Package published.
+                  и симуляцию интервью
                 </span>
               </div>
             </div>
