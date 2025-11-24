@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { directionGroups } from "@/lib/tracks";
+import TracksDirectory from "@/components/tracks-directory";
 
 export const metadata = {
   title: "Выбор направления | PreOffer",
@@ -26,10 +25,6 @@ export default function TracksLandingPage() {
                 подсказки. Карточки ниже — это черновые списки, их можно двигать и
                 дополнять под ваши команды.
               </p>
-              <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-600">
-                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                Демоданные — дальше будут реальные частоты и ответы
-              </div>
             </div>
             <div className="flex gap-4 rounded-2xl bg-gray-900 p-6 text-gray-100 shadow-lg">
               <div>
@@ -45,44 +40,7 @@ export default function TracksLandingPage() {
           </div>
         </div>
 
-        <div className="mt-14 space-y-10">
-          {directionGroups.map((group) => (
-            <div key={group.title} className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-1 rounded-full bg-blue-500/80" aria-hidden />
-                <div>
-                  <p className="text-sm uppercase tracking-[0.18em] text-gray-500">{group.title}</p>
-                  <h2 className="text-2xl font-semibold text-gray-900">Выбирайте трек в пару кликов</h2>
-                </div>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {group.items.map((item) => (
-                  <Link
-                    key={item.slug}
-                    href={`/tracks/${item.slug}`}
-                    className="group relative flex h-full flex-col justify-between rounded-xl border border-gray-200 bg-white px-5 py-6 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg"
-                  >
-                    <div className="absolute right-4 top-4 flex items-center gap-2 text-xs font-medium text-blue-600 opacity-0 transition group-hover:opacity-100">
-                      Перейти
-                      <span aria-hidden>→</span>
-                    </div>
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-900">{item.name}</h3>
-                        <p className="mt-1 text-sm text-gray-600">{item.description}</p>
-                      </div>
-                    </div>
-                    <div className="mt-5 flex items-center gap-3 text-sm text-gray-500">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-                      Заглушка: покажем карту вопросов и фильтры
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <TracksDirectory directionGroups={directionGroups} />
       </div>
     </section>
   );
