@@ -1,3 +1,5 @@
+import { questionData, type RawQuestion } from "./question-data";
+
 export type TrackQuestion = {
   id: string;
   question: string;
@@ -42,6 +44,7 @@ export const directionGroups: {
       { name: "Node.js", slug: "nodejs", description: "Node, сервисы, JS/TS" },
       { name: "iOS / Swift", slug: "ios", description: "Мобильная разработка" },
       { name: "Android", slug: "android", description: "Kotlin, Java, mobile" },
+      { name: "Flutter", slug: "flutter", description: "Dart, mobile" },
       { name: "Unity", slug: "unity", description: "Игровые проекты" },
       { name: "DevOps", slug: "devops", description: "CI/CD и инфраструктура" },
       { name: "Data Engineer", slug: "data-engineer", description: "ETL, DWH" },
@@ -75,38 +78,96 @@ export const directionGroups: {
   },
 ];
 
-const genericQuestions: TrackQuestion[] = [
+const normalizeId = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яё]+/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const frequencyToLevel = (frequency: number): TrackQuestion["level"] => {
+  if (frequency >= 70) return "junior";
+  if (frequency >= 40) return "middle";
+  return "senior";
+};
+
+const buildQuestions = (
+  items: RawQuestion[] | undefined,
+  category = "Основное"
+): TrackQuestion[] => {
+  if (!items?.length) return [];
+
+  return items.map(({ question, frequency, level, tags }) => ({
+    id: normalizeId(question),
+    question,
+    frequency,
+    level: level ?? frequencyToLevel(frequency),
+    category,
+    tags,
+  }));
+};
+
+const fallbackQuestions: TrackQuestion[] = [
   {
-    id: "intro",
-    question: "Расскажите про последний проект и вклад",
-    frequency: 72,
+    id: "about",
+    question: "Расскажи о себе и ключевых результатах",
+    frequency: 48,
     level: "junior",
     category: "Общее",
-    tags: ["софт", "продукт"],
-    answer:
-      "Дайте 3-4 предложения: контекст, ваша роль, ключевой результат, метрика. Закончите тем, что хотите развивать дальше.",
   },
   {
-    id: "risk",
-    question: "Как решали самый сложный инцидент за год?",
-    frequency: 41,
+    id: "project",
+    question: "Какой вклад внес в последний проект?",
+    frequency: 37,
     level: "middle",
     category: "Практика",
-    tags: ["инциденты", "решения"],
-    answer:
-      "Опишите что случилось, как диагностировали, кого привлекали и какой ранбук обновили. Укажите, что улучшили, чтобы не повторилось.",
   },
   {
-    id: "roadmap",
-    question: "Как приоритизируете задачи, когда всё горит?",
-    frequency: 28,
+    id: "priority",
+    question: "Как приоритизируешь задачи в сжатые сроки?",
+    frequency: 26,
     level: "senior",
     category: "Процессы",
-    tags: ["приоритизация"],
-    answer:
-      "Скажите про критерии: влияние, риск, дедлайны, зависимости. Покажите, как синхронизируете стейкхолдеров и фиксируете решения.",
   },
 ];
+
+const getQuestions = (slug: string, category?: string) => {
+  const data = buildQuestions(questionData[slug], category ?? "Основное");
+
+  return data.length ? data : fallbackQuestions;
+};
+
+const questionsByTrack = Object.fromEntries(
+  [
+    ["frontend", "Frontend"],
+    ["java", "Java"],
+    ["python", "Python"],
+    ["golang", "Golang"],
+    ["backend", "Backend"],
+    ["php", "PHP"],
+    ["csharp", "C#"],
+    ["cpp", "C/C++"],
+    ["1c", "1С"],
+    ["nodejs", "Node.js"],
+    ["ios", "iOS / Swift"],
+    ["android", "Android"],
+    ["flutter", "Flutter"],
+    ["unity", "Unity"],
+    ["devops", "DevOps"],
+    ["data-engineer", "Data Engineer"],
+    ["qa", "QA"],
+    ["qa-automation", "QA Automation"],
+    ["datascience", "Data Science"],
+    ["data-analyst", "Data Analyst"],
+    ["business-analyst", "Бизнес-анализ"],
+    ["system-analyst", "Системная аналитика"],
+    ["data-analytics", "Аналитика данных"],
+    ["product-analytics", "Продуктовая аналитика"],
+    ["product", "Product Management"],
+    ["pm", "Project Management"],
+    ["lead", "Team Lead"],
+  ].map(([slug, category]) => [slug, getQuestions(slug, category)])
+) as Record<string, TrackQuestion[]>;
 
 export const tracks: Track[] = [
   {
@@ -115,55 +176,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Вопросы по интерфейсам, браузеру и работе с UI",
     description:
-      "Подборка реальных вопросов с фронтенд-собеседований. Частоты основаны на последних интервью, чтобы было понятно, что спрашивают чаще всего.",
+      "Вопросы по JavaScript, браузеру и фреймворкам на основе реальных собеседований. Частоты помогают понять, что спрашивают чаще всего.",
     stats: {
-      questions: 1235,
+      questions: questionsByTrack.frontend.length,
       interviews: 749,
       updated: "Обновлено 2 недели назад",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: [
-      {
-        id: "about-yourself",
-        question: "Расскажи о себе и недавнем проекте",
-        frequency: 99,
-        level: "junior",
-        category: "Soft",
-        tags: ["общие", "софт-скиллы"],
-        answer:
-          "Держите фокус на кратком фоне, доменной экспертизе, зоне ответственности и конкретном результате. Завершите связкой с тем, что ищете дальше.",
-      },
-      {
-        id: "event-loop",
-        question: "Как работает Event Loop в браузере?",
-        frequency: 67,
-        level: "middle",
-        category: "JS",
-        tags: ["javascript", "runtime"],
-        answer:
-          "Опишите стек вызовов, очередь макро- и микрозадач, приоритет промисов и влияние рендеринга. Упомяните различия Node.js и браузеров, если их спрашивают.",
-      },
-      {
-        id: "cors",
-        question: "Что такое CORS и как его настроить?",
-        frequency: 38,
-        level: "middle",
-        category: "Network",
-        tags: ["http", "security"],
-        answer:
-          "CORS — механизм контроля междоменных запросов. Расскажите про заголовки Origin, Access-Control-Allow-*, preflight для методов, а также риски открытого wildcard.",
-      },
-      {
-        id: "react-hooks",
-        question: "В чем разница между useEffect и useLayoutEffect?",
-        frequency: 16,
-        level: "senior",
-        category: "React",
-        tags: ["react", "hooks"],
-        answer:
-          "useEffect срабатывает после рендера и отрисовки, useLayoutEffect блокирует отрисовку до выполнения, подходит для измерений DOM. Добавьте про риски мерцания и серверный рендеринг.",
-      },
-    ],
+    questions: questionsByTrack.frontend,
   },
   {
     slug: "backend",
@@ -171,14 +191,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "API, очереди, базы данных и отказоустойчивость",
     description:
-      "Заглушка: здесь будут свежие вопросы по бэкенду с частотами. Пока сохранили структуру и карточки, чтобы можно было пройтись по воронке.",
+      "Собрали популярные вопросы про проектирование API, очереди и работу с базами, чтобы можно было готовиться по свежим темам.",
     stats: {
-      questions: 860,
+      questions: questionsByTrack.backend.length,
       interviews: 540,
-      updated: "Обновление в работе",
+      updated: "Обновлено по последним интервью",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.backend,
   },
   {
     slug: "python",
@@ -186,14 +206,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Backend на Django/FastAPI и задачи с данными",
     description:
-      "Демо-страница для питона: покажем вопросы по асинхронности, ORM и пайплайнам данных.",
+      "Частотные вопросы про Python: синтаксис, асинхронность, базы данных и практику применения языка.",
     stats: {
-      questions: 730,
+      questions: questionsByTrack.python.length,
       interviews: 410,
-      updated: "Скоро обновим частоты",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle"],
-    questions: genericQuestions,
+    questions: questionsByTrack.python,
   },
   {
     slug: "golang",
@@ -201,14 +221,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Микросервисы, конкуррентность и сети",
     description:
-      "Плейсхолдер для Go — дизайн API, профилирование и подходы к написанию сервисов.",
+      "Список вопросов по Go: конкурентность, каналы, работа с памятью и практический опыт в сервисах.",
     stats: {
-      questions: 520,
+      questions: questionsByTrack.golang.length,
       interviews: 300,
-      updated: "В разработке",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.golang,
   },
   {
     slug: "php",
@@ -216,14 +236,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Symfony, Laravel и сервисы на PHP",
     description:
-      "Заглушка: здесь будут вопросы по фреймворкам, работе с БД и сервисной архитектуре на PHP.",
+      "Вопросы по PHP, фреймворкам, базам и архитектуре сервисов на основе реальных интервью.",
     stats: {
-      questions: 510,
+      questions: questionsByTrack.php.length,
       interviews: 290,
-      updated: "Обновляем демоданные",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.php,
   },
   {
     slug: "csharp",
@@ -231,14 +251,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: ".NET, сервисы и интеграции",
     description:
-      "Плейсхолдер для C#: вопросы про CLR, ASP.NET, очереди и паттерны в корпоративных сервисах.",
+      "Часто задаваемые вопросы по C#: CLR, многопоточность, паттерны и работа с базами.",
     stats: {
-      questions: 640,
+      questions: questionsByTrack.csharp.length,
       interviews: 360,
-      updated: "Скоро появятся частоты",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.csharp,
   },
   {
     slug: "cpp",
@@ -246,14 +266,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Системное программирование и перформанс",
     description:
-      "Демо-страница: вопросы про память, многопоточность, STL и работу с системными библиотеками.",
+      "Реальные вопросы по C/C++: память, STL, многопоточность и опыт системной разработки.",
     stats: {
-      questions: 430,
+      questions: questionsByTrack.cpp.length,
       interviews: 250,
-      updated: "В подготовке",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.cpp,
   },
   {
     slug: "1c",
@@ -261,14 +281,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Учетные системы, конфигурации и интеграции",
     description:
-      "Плейсхолдер под 1С: вопросы по платформе, доработкам, обмену данными и поддержке пользователей.",
+      "Частые вопросы по 1С: платформа, конфигурации, индексы, обмены и администрирование.",
     stats: {
-      questions: 300,
+      questions: questionsByTrack["1c"].length,
       interviews: 190,
-      updated: "Подгружаем свежие вопросы",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack["1c"],
   },
   {
     slug: "nodejs",
@@ -276,14 +296,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Node.js сервисы, очереди и JS/TS",
     description:
-      "Демо: вопросы про event loop, работу с БД, очередями и построение API на Node.js.",
+      "Список вопросов по Node.js: event loop, очереди, базы данных и работа с TypeScript.",
     stats: {
-      questions: 520,
+      questions: questionsByTrack.nodejs.length,
       interviews: 310,
-      updated: "Скоро обновим",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.nodejs,
   },
   {
     slug: "ios",
@@ -291,14 +311,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Мобильная разработка под iOS",
     description:
-      "Плейсхолдер: вопросы про Swift, жизненный цикл, архитектуры и работу с сетью.",
+      "Вопросы по Swift, жизненному циклу, архитектурам и работе с сетью на iOS собеседованиях.",
     stats: {
-      questions: 410,
+      questions: questionsByTrack.ios.length,
       interviews: 230,
-      updated: "Готовим частоты",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.ios,
   },
   {
     slug: "android",
@@ -306,14 +326,29 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Android, Kotlin и Java",
     description:
-      "Демо-страница: вопросы по жизненному циклу, архитектурам, потокам и тестированию Android-приложений.",
+      "Подборка вопросов по Android: жизненный цикл, архитектуры, корутины и тестирование приложений.",
     stats: {
-      questions: 430,
+      questions: questionsByTrack.android.length,
       interviews: 240,
-      updated: "Обновление в пути",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.android,
+  },
+  {
+    slug: "flutter",
+    title: "Flutter",
+    group: "Программирование",
+    hero: "Flutter, Dart и создание кроссплатформенных приложений",
+    description:
+      "Частые вопросы по Flutter: виджеты, изоляты, null safety, менеджмент состояния и опыт проектов.",
+    stats: {
+      questions: questionsByTrack.flutter.length,
+      interviews: 180,
+      updated: "Обновлено по демо-набору",
+    },
+    roles: ["Junior", "Middle", "Senior"],
+    questions: questionsByTrack.flutter,
   },
   {
     slug: "unity",
@@ -321,14 +356,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Игровые проекты на Unity",
     description:
-      "Заглушка для Unity: вопросы про сцены, оптимизацию, физику и работу с ассетами.",
+      "Вопросы по Unity: жизненный цикл, оптимизация, графика, паттерны и организация командной работы.",
     stats: {
-      questions: 320,
+      questions: questionsByTrack.unity.length,
       interviews: 170,
-      updated: "Скоро дополним",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle"],
-    questions: genericQuestions,
+    questions: questionsByTrack.unity,
   },
   {
     slug: "devops",
@@ -336,14 +371,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "CI/CD, контейнеры и облачная инфраструктура",
     description:
-      "Пока демо: здесь будет список вопросов про Kubernetes, observability и автоматизацию поставки.",
+      "Вопросы по DevOps: Docker, Kubernetes, CI/CD, мониторинг и практика автоматизации.",
     stats: {
-      questions: 640,
+      questions: questionsByTrack.devops.length,
       interviews: 380,
-      updated: "Готовим данные",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.devops,
   },
   {
     slug: "java",
@@ -351,55 +386,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "Вопросы по JVM, Spring и архитектуре сервисов",
     description:
-      "Сборник сеньорских и мидл вопросов: от сборки мусора до проектирования модулей. Частоты основаны на реальных технических интервью.",
+      "Полный список частых вопросов по Java, Spring, коллекциям, многопоточности и архитектуре сервисов.",
     stats: {
-      questions: 980,
+      questions: questionsByTrack.java.length,
       interviews: 610,
       updated: "Обновлено 5 дней назад",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: [
-      {
-        id: "jvm-memory",
-        question: "Как устроена память JVM и когда случается GC pause?",
-        frequency: 58,
-        level: "middle",
-        category: "JVM",
-        tags: ["gc", "performance"],
-        answer:
-          "Опишите кучи, стеки потоков, метаспейс. Расскажите про young/old generation, stop-the-world, популярные сборщики (G1, ZGC) и какие метрики смотреть в профайлере.",
-      },
-      {
-        id: "spring-beans",
-        question: "Какие есть скоупы бинов в Spring и когда какой выбрать?",
-        frequency: 42,
-        level: "junior",
-        category: "Spring",
-        tags: ["spring", "di"],
-        answer:
-          "singleton, prototype, request, session и custom. Укажите, что веб-скоупы работают только в web-контексте, и приведите пример, зачем нужен prototype (например, stateful компонент).",
-      },
-      {
-        id: "transactions",
-        question: "Как работает @Transactional и что такое propagation?",
-        frequency: 34,
-        level: "middle",
-        category: "Spring",
-        tags: ["transactions", "spring"],
-        answer:
-          "Расскажите про прокси, checked/unchecked исключения, isolation levels и сценарии REQUIRES_NEW/REQUIRED. Добавьте, почему аннотации на private методах не сработают.",
-      },
-      {
-        id: "microservices",
-        question: "Какие плюсы и минусы у микросервисной архитектуры?",
-        frequency: 27,
-        level: "senior",
-        category: "Architecture",
-        tags: ["architecture", "design"],
-        answer:
-          "Отметьте независимые релизы, масштабирование по домену, но усложнение наблюдаемости и контрактов. Упомяните монорепы, сервис-меш и тестирование контрактов.",
-      },
-    ],
+    questions: questionsByTrack.java,
   },
   {
     slug: "qa",
@@ -407,14 +401,14 @@ export const tracks: Track[] = [
     group: "Тестирование",
     hero: "Manual QA, кейсы и баг-репорты",
     description:
-      "Демо-страница: вопросы про тест-дизайн, артефакты, приоритеты и работу с багами.",
+      "Полный список вопросов для QA: тест-дизайн, документация, процессы и работа с багами.",
     stats: {
-      questions: 380,
+      questions: questionsByTrack.qa.length,
       interviews: 210,
-      updated: "Готовим частоты",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle"],
-    questions: genericQuestions,
+    questions: questionsByTrack.qa,
   },
   {
     slug: "qa-automation",
@@ -422,14 +416,14 @@ export const tracks: Track[] = [
     group: "Тестирование",
     hero: "Автотесты, фреймворки и пайплайны",
     description:
-      "Плейсхолдер: вопросы про выбор инструментов, структуру тестов, стабов и интеграцию в CI.",
+      "Вопросы для AQA: фреймворки, REST, БД, подходы к тест-дизайну и интеграции в CI/CD.",
     stats: {
-      questions: 420,
+      questions: questionsByTrack["qa-automation"].length,
       interviews: 230,
-      updated: "Скоро дополнение",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack["qa-automation"],
   },
   {
     slug: "datascience",
@@ -437,14 +431,14 @@ export const tracks: Track[] = [
     group: "Аналитика и данные",
     hero: "ML-модели, метрики качества и продакшен пайплайны",
     description:
-      "Плейсхолдер: выведем сюда топовые вопросы по ML, метрикам и экспериментам.",
+      "Вопросы по Data Science: метрики, модели, эксперименты и вывод в прод.",
     stats: {
-      questions: 560,
+      questions: questionsByTrack.datascience.length,
       interviews: 320,
-      updated: "Запланировано обновление",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.datascience,
   },
   {
     slug: "data-analyst",
@@ -452,14 +446,14 @@ export const tracks: Track[] = [
     group: "Аналитика и данные",
     hero: "Отчеты, SQL и проверка гипотез",
     description:
-      "Демо-карточка: вопросы про SQL, дашборды, метрики и исследования данных.",
+      "Вопросы по аналитике данных: SQL, визуализации, метрики и проверка гипотез.",
     stats: {
-      questions: 520,
+      questions: questionsByTrack["data-analyst"].length,
       interviews: 310,
-      updated: "Частоты обновляются",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle"],
-    questions: genericQuestions,
+    questions: questionsByTrack["data-analyst"],
   },
   {
     slug: "business-analyst",
@@ -467,14 +461,14 @@ export const tracks: Track[] = [
     group: "Аналитика и данные",
     hero: "Требования, процессы и документация",
     description:
-      "Плейсхолдер: вопросы про сбор требований, BPMN, интеграции и согласование со стейкхолдерами.",
+      "Вопросы по бизнес-анализу: требования, процессы, коммуникации со стейкхолдерами и документация.",
     stats: {
-      questions: 400,
+      questions: questionsByTrack["business-analyst"].length,
       interviews: 220,
-      updated: "Скоро", 
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack["business-analyst"],
   },
   {
     slug: "system-analyst",
@@ -482,14 +476,14 @@ export const tracks: Track[] = [
     group: "Аналитика и данные",
     hero: "Интеграции, схемы и API",
     description:
-      "Демо: вопросы по диаграммам, контрактам, последовательностям и требованиям к системам.",
+      "Вопросы по системному анализу: интеграции, требования, архитектуры и работа с командами.",
     stats: {
-      questions: 430,
+      questions: questionsByTrack["system-analyst"].length,
       interviews: 240,
-      updated: "Готовим обновление",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack["system-analyst"],
   },
   {
     slug: "data-analytics",
@@ -497,14 +491,14 @@ export const tracks: Track[] = [
     group: "Аналитика и данные",
     hero: "Метрики, отчеты и исследования",
     description:
-      "Заглушка: вопросы про построение метрик, исследование данных и визуализацию.",
+      "Вопросы по аналитике данных: метрики, отчеты, статистика и подготовка данных.",
     stats: {
-      questions: 410,
+      questions: questionsByTrack["data-analytics"].length,
       interviews: 230,
-      updated: "Добавим частоты",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle"],
-    questions: genericQuestions,
+    questions: questionsByTrack["data-analytics"],
   },
   {
     slug: "data-engineer",
@@ -512,14 +506,14 @@ export const tracks: Track[] = [
     group: "Программирование",
     hero: "ETL, хранилища и потоковые системы",
     description:
-      "Демо-страница для data engineering: вопросы про архитектуру данных, очереди и оптимизацию запросов.",
+      "Вопросы для дата-инженеров: DWH, очереди, индексы, стриминг и архитектура данных.",
     stats: {
-      questions: 610,
+      questions: questionsByTrack["data-engineer"].length,
       interviews: 350,
-      updated: "Частоты обновляются",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack["data-engineer"],
   },
   {
     slug: "product-analytics",
@@ -527,14 +521,14 @@ export const tracks: Track[] = [
     group: "Аналитика и данные",
     hero: "Метрики, когортный анализ и эксперименты",
     description:
-      "Плейсхолдер для продуктовых аналитиков: будем показывать популярные кейсы, формулы и разборы результативности.",
+      "Вопросы по продуктовой аналитике: A/B тесты, метрики, интерпретация результатов и SQL.",
     stats: {
-      questions: 480,
+      questions: questionsByTrack["product-analytics"].length,
       interviews: 300,
-      updated: "Демо обновления",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle"],
-    questions: genericQuestions,
+    questions: questionsByTrack["product-analytics"],
   },
   {
     slug: "product",
@@ -542,55 +536,14 @@ export const tracks: Track[] = [
     group: "Управление",
     hero: "Грейдовые вопросы про стратегию, приоритизацию и метрики",
     description:
-      "Набор продуктовых вопросов с отсортированной частотой. Подойдет, чтобы быстро вспомнить фреймворки и собрать структуру ответов перед интервью.",
+      "Вопросы для продуктовых менеджеров: стратегия, приоритизация, исследования и работа с командами.",
     stats: {
-      questions: 420,
+      questions: questionsByTrack.product.length,
       interviews: 260,
       updated: "Обновлено 3 дня назад",
     },
     roles: ["Junior", "Middle", "Senior", "Lead"],
-    questions: [
-      {
-        id: "north-star",
-        question: "Как выбрать North Star Metric для продукта?",
-        frequency: 52,
-        level: "middle",
-        category: "Metrics",
-        tags: ["metrica", "product"],
-        answer:
-          "Оттолкнитесь от value moment и повторяемости. Укажите роль input/output метрик, связь с ретеншном и why-not метрики, которые защищают продукт от перформанс-скривлений.",
-      },
-      {
-        id: "prioritization",
-        question: "Какими фреймворками приоритизации пользуетесь?",
-        frequency: 45,
-        level: "junior",
-        category: "Process",
-        tags: ["prioritization"],
-        answer:
-          "ICE, RICE, MoSCoW, Kano — приведите примеры, почему выбираете конкретный. Добавьте caveats: субъективность скоринга, необходимость калибровки и проверки гипотез на данных.",
-      },
-      {
-        id: "experiments",
-        question: "Как ставите A/B эксперименты и интерпретируете результаты?",
-        frequency: 33,
-        level: "middle",
-        category: "Experiments",
-        tags: ["a/b", "analytics"],
-        answer:
-          "Опишите гипотезу, выбор метрик, минимальный эффект, размер выборки, период, сегментацию и guardrail метрики. Укажите, что делать при остановке и как раскатывать победителя.",
-      },
-      {
-        id: "team",
-        question: "Как строите работу с командой разработки и дизайна?",
-        frequency: 24,
-        level: "senior",
-        category: "Leadership",
-        tags: ["team", "process"],
-        answer:
-          "Пройдитесь по ритуалам, синкам, roadmap, триажу задач и как принимаете продуктовые решения. Отдельно — как снимаете риски, помогаете росту и договариваетесь о критериях качества.",
-      },
-    ],
+    questions: questionsByTrack.product,
   },
   {
     slug: "pm",
@@ -598,14 +551,14 @@ export const tracks: Track[] = [
     group: "Управление",
     hero: "Риски, сроки, коммуникация со стейкхолдерами",
     description:
-      "Демо-карточка: здесь соберем вопросы про планирование, ресурсы и управление ожиданиями.",
+      "Вопросы для проектных менеджеров: планирование, риски, коммуникации и работа с командой.",
     stats: {
-      questions: 300,
+      questions: questionsByTrack.pm.length,
       interviews: 180,
-      updated: "Обновление в процессе",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Junior", "Middle", "Senior"],
-    questions: genericQuestions,
+    questions: questionsByTrack.pm,
   },
   {
     slug: "lead",
@@ -613,14 +566,14 @@ export const tracks: Track[] = [
     group: "Управление",
     hero: "Лидерство, архитектура и найм",
     description:
-      "Плейсхолдер странички тимлида: вопросы по управлению командой, техническим решениям и планированию.",
+      "Ключевые вопросы для тимлидов: процессы, управление, архитектурные решения и рост команды.",
     stats: {
-      questions: 350,
+      questions: questionsByTrack.lead.length,
       interviews: 200,
-      updated: "Скоро добавим частоты",
+      updated: "Обновлено по демо-набору",
     },
     roles: ["Senior", "Lead"],
-    questions: genericQuestions,
+    questions: questionsByTrack.lead,
   },
 ];
 
