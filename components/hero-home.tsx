@@ -101,12 +101,6 @@ export default function HeroHome() {
                       </span>
                     </span>
                   </a>
-                  <a
-                    className="btn w-full bg-white text-gray-800 shadow-sm hover:bg-gray-50 sm:ml-4 sm:w-auto"
-                    href="/tracks"
-                  >
-                    Идти дальше по воронке
-                  </a>
                 </div>
               </div>
             </div>
@@ -140,7 +134,7 @@ export default function HeroHome() {
                 <br />
                 <br />
                 <span className="animate-[code-5_10s_infinite] text-gray-200">
-                  Симуляция с AI-интервьюером
+                  Живые прогоны с карьерным экспертом
                 </span>
                 <br />
                 <span className="animate-[code-6_10s_infinite]">

@@ -39,7 +39,7 @@ export default function Cta() {
                 href="/tracks"
               >
                 <span className="relative inline-flex items-center">
-                  Идти дальше по воронке{" "}
+                  Попробовать бесплатно{" "}
                   <span className="ml-1 tracking-normal text-blue-300 transition-transform group-hover:translate-x-0.5">
                     -&gt;
                   </span>
