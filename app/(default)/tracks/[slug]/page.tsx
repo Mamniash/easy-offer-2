@@ -4,8 +4,11 @@ import { notFound } from "next/navigation";
 import TrackDetail from "@/components/tracks/track-detail";
 import { getTrack } from "@/lib/tracks";
 
-export function generateMetadata({ params }: { params: { slug: string } }) {
-  const track = getTrack(params.slug);
+type TrackParams = Promise<{ slug: string }>;
+
+export async function generateMetadata({ params }: { params: TrackParams }) {
+  const { slug } = await params;
+  const track = getTrack(slug);
 
   if (!track) return {};
 
@@ -15,8 +18,9 @@ export function generateMetadata({ params }: { params: { slug: string } }) {
   };
 }
 
-export default function TrackPage({ params }: { params: { slug: string } }) {
-  const track = getTrack(params.slug);
+export default async function TrackPage({ params }: { params: TrackParams }) {
+  const { slug } = await params;
+  const track = getTrack(slug);
 
   if (!track) {
     notFound();

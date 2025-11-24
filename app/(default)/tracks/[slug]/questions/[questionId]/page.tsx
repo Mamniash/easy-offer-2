@@ -3,12 +3,15 @@ import { notFound } from "next/navigation";
 
 import { getQuestion } from "@/lib/tracks";
 
-export function generateMetadata({
+type QuestionParams = Promise<{ slug: string; questionId: string }>;
+
+export async function generateMetadata({
   params,
 }: {
-  params: { slug: string; questionId: string };
+  params: QuestionParams;
 }) {
-  const entry = getQuestion(params.slug, params.questionId);
+  const { slug, questionId } = await params;
+  const entry = getQuestion(slug, questionId);
 
   if (!entry) return {};
 
@@ -18,12 +21,13 @@ export function generateMetadata({
   };
 }
 
-export default function QuestionPage({
+export default async function QuestionPage({
   params,
 }: {
-  params: { slug: string; questionId: string };
+  params: QuestionParams;
 }) {
-  const entry = getQuestion(params.slug, params.questionId);
+  const { slug, questionId } = await params;
+  const entry = getQuestion(slug, questionId);
 
   if (!entry) {
     notFound();
