@@ -89,7 +89,7 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
                 </div>
                 <div className="mt-5 flex items-center gap-3 text-sm text-gray-500">
                   <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-                  Заглушка: покажем карту вопросов и фильтры
+                  Внутри — ключевые темы и примеры вопросов по направлению
                 </div>
               </Link>
             ))}
