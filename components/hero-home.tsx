@@ -91,7 +91,7 @@ export default function HeroHome() {
                   data-aos-delay={450}
                 >
                   <a
-                    className="btn group mb-4 w-full bg-linear-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
+                    className="btn group w-full bg-linear-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] sm:w-auto"
                     href="/tracks"
                   >
                     <span className="relative inline-flex items-center">
@@ -100,12 +100,6 @@ export default function HeroHome() {
                         -&gt;
                       </span>
                     </span>
-                  </a>
-                  <a
-                    className="btn w-full bg-white text-gray-800 shadow-sm hover:bg-gray-50 sm:ml-4 sm:w-auto"
-                    href="/tracks"
-                  >
-                    Идти дальше по воронке
                   </a>
                 </div>
               </div>
@@ -140,7 +134,7 @@ export default function HeroHome() {
                 <br />
                 <br />
                 <span className="animate-[code-5_10s_infinite] text-gray-200">
-                  Симуляция с AI-интервьюером
+                  Тренировки с карьерным экспертом
                 </span>
                 <br />
                 <span className="animate-[code-6_10s_infinite]">

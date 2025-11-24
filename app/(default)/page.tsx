@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "PreOffer — подготовка к собеседованиям",
+  title: "PreOffer",
   description: "Платформа для уверенной подготовки к IT-собеседованиям",
 };
 

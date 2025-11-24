@@ -92,7 +92,8 @@ export default async function QuestionPage({
         <div className="mt-6 rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-4 text-sm text-gray-600">
           <p className="font-semibold text-gray-800">Дальше по воронке</p>
           <p className="mt-1 text-gray-600">
-            Здесь появится кнопка на симуляцию интервью с AI и быстрый чек-лист на подготовку. Пока это демо, но стилистика останется единой.
+            Здесь появится кнопка на симуляцию интервью с экспертом и быстрый чек-лист на подготовку. Пока это демо, но
+            стилистика останется единой.
           </p>
         </div>
       </div>

@@ -5,7 +5,7 @@ export default function LargeTestimonial() {
   return (
     <section>
       <div className="mx-auto max-w-2xl px-4 sm:px-6">
-        <div className="py-12 md:py-20">
+        <div className="py-10 md:py-16">
           <div className="space-y-3 text-center">
             <div className="relative inline-flex">
               <svg
@@ -29,10 +29,10 @@ export default function LargeTestimonial() {
                 alt="Large testimonial"
               />
             </div>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-xl font-semibold leading-relaxed text-gray-900 md:text-2xl">
               "PreOffer помог собрать фокусный список тем и перестать
-              зубрить всё подряд. После симуляций с AI-интервьюером ответы
-              звучат увереннее, и я вижу прогресс каждую неделю."
+              зубрить всё подряд. После симуляций с экспертом ответы звучат
+              увереннее, и я вижу прогресс каждую неделю."
             </p>
             <div className="text-sm font-medium text-gray-500">
               <span className="text-gray-700">Александра, Middle QA</span>{" "}
