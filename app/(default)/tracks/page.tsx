@@ -2,7 +2,7 @@ import { directionGroups } from "@/lib/tracks";
 import TracksDirectory from "@/components/tracks-directory";
 
 export const metadata = {
-  title: "Выбор направления | PreOffer",
+  title: "PreOffer — подготовка к собеседованиям",
   description:
     "Собрали направления и профессии, чтобы перейти к вопросам и подготовке. Выберите трек и смотрите частые вопросы.",
 };
