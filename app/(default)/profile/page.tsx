@@ -50,10 +50,7 @@ export default function ProfilePage() {
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mb-8 space-y-3">
-        <p className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">
-          Мой кабинет
-        </p>
+      <div className="mb-8 mt-10 space-y-3">
         <h1 className="text-4xl font-bold leading-tight text-gray-900">
           Профиль пользователя
         </h1>
@@ -91,7 +88,9 @@ export default function ProfilePage() {
                 Дата регистрации
               </p>
               <p className="mt-1 text-sm font-medium text-gray-900">
-                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString("ru-RU") : "—"}
+                {user?.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString("ru-RU")
+                  : "—"}
               </p>
             </div>
           </div>
@@ -118,8 +117,11 @@ export default function ProfilePage() {
               Контакты
             </h2>
             <p className="mt-2 text-sm text-gray-700">
-              Если появятся вопросы — пиши на <span className="font-semibold text-gray-900">support@preoffer.ru</span> или в чат
-              поддержки. Мы ответим максимально быстро.
+              Если появятся вопросы — пиши на{" "}
+              <span className="font-semibold text-gray-900">
+                support@preoffer.ru
+              </span>{" "}
+              или в чат поддержки. Мы ответим максимально быстро.
             </p>
           </div>
 
@@ -128,8 +130,8 @@ export default function ProfilePage() {
               Что дальше?
             </h2>
             <p className="mt-2 text-sm text-gray-700">
-              Следи за прогрессом, обновляй данные профиля и продолжай тренировки.
-              Новые функции появятся здесь самыми первыми.
+              Следи за прогрессом, обновляй данные профиля и продолжай
+              тренировки. Новые функции появятся здесь самыми первыми.
             </p>
           </div>
         </div>
