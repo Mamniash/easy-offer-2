@@ -95,14 +95,30 @@ export default function TrackDetail({ track }: { track: Track }) {
                   </div>
                 </div>
               </div>
-              <div className="w-full max-w-md">
-                <div className="h-2 rounded-full bg-gray-100">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-400"
-                    style={{ width: `${question.frequency}%` }}
-                  />
+              <div className="w-full max-w-md rounded-xl bg-gray-900/95 px-4 py-3 text-white shadow-inner ring-1 ring-black/5">
+                <div className="flex items-center gap-4 md:gap-5">
+                  <div className="relative h-16 w-3 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="absolute bottom-0 w-full rounded-full bg-gradient-to-t from-amber-400 via-pink-500 to-indigo-500"
+                      style={{ height: `${Math.min(question.frequency, 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-white/60">Шанс услышать</p>
+                    <div className="mt-1 flex items-center gap-3">
+                      <span className="text-3xl font-semibold leading-none">{question.frequency}%</span>
+                      <div className="relative flex-1">
+                        <div className="h-2 rounded-full bg-white/10">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500"
+                            style={{ width: `${Math.min(question.frequency, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-white/50">По собеседованиям</p>
+                  </div>
                 </div>
-                <p className="mt-2 text-right text-xs font-medium text-gray-500">Частота по собеседованиям</p>
               </div>
             </div>
           </Link>
