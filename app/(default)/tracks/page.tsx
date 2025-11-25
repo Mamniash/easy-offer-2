@@ -26,15 +26,15 @@ export default function TracksLandingPage() {
                 дополнять под задачи вашей команды.
               </p>
             </div>
-            <div className="flex gap-4 rounded-2xl bg-gray-900 p-6 text-gray-100 shadow-lg">
-              <div>
+            <div className="flex gap-6 rounded-2xl bg-gray-900 p-6 text-gray-100 shadow-lg">
+              <div className="flex flex-col items-center text-center">
                 <p className="text-sm text-gray-400">Направлений</p>
                 <p className="text-4xl font-semibold">{directionGroups.flatMap((g) => g.items).length}</p>
               </div>
               <div className="h-12 w-px bg-gray-700/60" aria-hidden="true" />
-              <div>
-                <p className="text-sm text-gray-400">Вопросов в демо</p>
-                <p className="text-4xl font-semibold">12 345</p>
+              <div className="flex flex-col items-center text-center">
+                <p className="text-sm text-gray-400">Вопросов</p>
+                <p className="text-4xl font-semibold">12&nbsp;956</p>
               </div>
             </div>
           </div>
