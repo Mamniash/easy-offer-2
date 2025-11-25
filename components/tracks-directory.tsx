@@ -87,10 +87,6 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
                     <p className="mt-1 text-sm text-gray-600">{item.description}</p>
                   </div>
                 </div>
-                <div className="mt-5 flex items-center gap-3 text-sm text-gray-500">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-                  Внутри — ключевые темы и примеры вопросов по направлению
-                </div>
               </Link>
             ))}
           </div>
