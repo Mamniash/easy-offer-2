@@ -71,16 +71,24 @@ export default function TrackDetail({ track }: { track: Track }) {
             href={`/tracks/${track.slug}/questions/${question.id}`}
             className="group block px-6 py-5 transition hover:bg-blue-50/60"
           >
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden />
-                  {question.frequency}%
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-start gap-4 md:items-center">
+                <div className="flex items-center gap-3 rounded-2xl bg-gray-900/95 px-4 py-3 text-white shadow-lg ring-1 ring-gray-800">
+                  <div className="relative h-14 w-4 overflow-hidden rounded-full bg-gray-800/80">
+                    <div
+                      className="absolute inset-0 bg-gradient-to-b from-emerald-300 via-sky-400 to-blue-600"
+                      aria-hidden
+                    />
+                  </div>
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-gray-300">Шанс услышать</span>
+                    <span className="text-2xl font-bold">{question.frequency}%</span>
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm uppercase tracking-[0.16em] text-gray-500">{question.category}</p>
                   <p className="text-lg font-semibold text-gray-900 group-hover:text-blue-700">{question.question}</p>
-                  <div className="mt-1 flex flex-wrap gap-2 text-xs text-gray-500">
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-500">
                     <span className="rounded-full bg-white px-3 py-1 font-medium text-gray-600 shadow-sm ring-1 ring-gray-200">
                       {levelLabels[question.level as LevelFilter] ?? question.level}
                     </span>
@@ -96,13 +104,16 @@ export default function TrackDetail({ track }: { track: Track }) {
                 </div>
               </div>
               <div className="w-full max-w-md">
-                <div className="h-2 rounded-full bg-gray-100">
+                <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+                  <span>Частота по собеседованиям</span>
+                  <span className="text-gray-800">{question.frequency}%</span>
+                </div>
+                <div className="mt-3 h-3 rounded-full bg-gray-100 ring-1 ring-gray-200">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-400"
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-sky-500 to-blue-600 shadow-[0_0_0_1px_rgba(255,255,255,0.4)]"
                     style={{ width: `${question.frequency}%` }}
                   />
                 </div>
-                <p className="mt-2 text-right text-xs font-medium text-gray-500">Частота по собеседованиям</p>
               </div>
             </div>
           </Link>
