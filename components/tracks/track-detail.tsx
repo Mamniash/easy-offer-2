@@ -8,6 +8,8 @@ import { supabase } from "@/lib/supabaseClient";
 
 const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
+const AUTHORIZED_QUESTIONS_LIMIT = 50;
+const PRO_EMAILS = ["mamniashvili2003@gmail.com", "pokrasov.04@mail.ru"];
 
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
@@ -16,6 +18,7 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isProUser, setIsProUser] = useState(false);
   const listTopRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -35,7 +38,10 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       if (!isMounted) return;
 
+      const userEmail = session?.user.email?.toLowerCase();
+
       setIsAuthorized(Boolean(session?.user));
+      setIsProUser(Boolean(userEmail && PRO_EMAILS.includes(userEmail)));
     };
 
     fetchSession();
@@ -45,7 +51,10 @@ export default function TrackDetail({ track }: { track: Track }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
+      const userEmail = session?.user.email?.toLowerCase();
+
       setIsAuthorized(Boolean(session?.user));
+      setIsProUser(Boolean(userEmail && PRO_EMAILS.includes(userEmail)));
     });
 
     return () => {
@@ -55,9 +64,11 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, []);
 
   const filteredQuestions = useMemo(() => {
-    const availableQuestions = isAuthorized
-      ? questions
-      : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
+    const availableQuestions = !isAuthorized
+      ? questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT)
+      : isProUser
+        ? questions
+        : questions.slice(0, AUTHORIZED_QUESTIONS_LIMIT);
     const normalizedSearch = search.trim().toLowerCase();
 
     if (!normalizedSearch) return availableQuestions;
@@ -65,9 +76,9 @@ export default function TrackDetail({ track }: { track: Track }) {
     return availableQuestions.filter((question) =>
       question.question.toLowerCase().includes(normalizedSearch)
     );
-  }, [isAuthorized, questions, search]);
+  }, [isAuthorized, isProUser, questions, search]);
 
-  const totalPages = isAuthorized
+  const totalPages = isProUser
     ? Math.max(
         1,
         Math.ceil(
@@ -78,7 +89,7 @@ export default function TrackDetail({ track }: { track: Track }) {
 
   const loadPage = useCallback(
     async (nextPage: number) => {
-      if (!isAuthorized) return;
+      if (!isProUser) return;
       if (nextPage === page || nextPage < 1 || nextPage > totalPages) return;
 
       setIsLoadingPage(true);
@@ -105,7 +116,7 @@ export default function TrackDetail({ track }: { track: Track }) {
         setIsLoadingPage(false);
       }
     },
-    [isAuthorized, page, totalPages, track.slug]
+    [isProUser, page, totalPages, track.slug]
   );
 
   const paginationItems = useMemo(() => {
@@ -136,9 +147,12 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, [page, totalPages]);
 
   const isEmptyState = !isLoadingPage && filteredQuestions.length === 0;
-  const hasPagination = isAuthorized && totalPages > 1;
+  const hasPagination = isProUser && totalPages > 1;
   const visibleQuestionsCount = isAuthorized
-    ? totalQuestions
+    ? Math.min(
+        totalQuestions,
+        isProUser ? totalQuestions : AUTHORIZED_QUESTIONS_LIMIT
+      )
     : Math.min(totalQuestions, UNAUTHORIZED_QUESTIONS_LIMIT);
 
   return (
@@ -253,11 +267,11 @@ export default function TrackDetail({ track }: { track: Track }) {
         </div>
       )}
 
-      {!isAuthorized && (
+      {!isAuthorized ? (
         <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
           <p className="text-base font-semibold">Хотите видеть больше вопросов?</p>
           <p className="text-sm text-gray-600">
-            Авторизуйтесь, чтобы открыть полный список вопросов по этому направлению.
+            Авторизуйтесь, чтобы открыть расширенный доступ к вопросам по этому направлению.
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-1">
             <Link
@@ -274,6 +288,15 @@ export default function TrackDetail({ track }: { track: Track }) {
             </Link>
           </div>
         </div>
+      ) : (
+        !isProUser && (
+          <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
+            <p className="text-base font-semibold">Нужен полный доступ?</p>
+            <p className="text-sm text-gray-600">
+              Оформите PRO, чтобы открыть все вопросы и пагинацию. Друзья, оформите подписку!
+            </p>
+          </div>
+        )
       )}
     </div>
   );
