@@ -92,13 +92,22 @@ export default function TrackDetail({ track }: { track: Track }) {
       )
     : 1;
 
+  const scrollToFirstQuestion = useCallback(() => {
+    requestAnimationFrame(() => {
+      listTopRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, []);
+
   const loadPage = useCallback(
     async (nextPage: number) => {
       if (!isAuthorized) return;
       if (nextPage === page || nextPage < 1 || nextPage > totalPages) return;
 
       setIsLoadingPage(true);
-      listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToFirstQuestion();
 
       try {
         const response = await fetch(
@@ -121,7 +130,7 @@ export default function TrackDetail({ track }: { track: Track }) {
         setIsLoadingPage(false);
       }
     },
-    [isAuthorized, page, totalPages, track.slug]
+    [isAuthorized, page, scrollToFirstQuestion, totalPages, track.slug]
   );
 
   const paginationItems = useMemo(() => {
