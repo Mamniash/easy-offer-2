@@ -148,9 +148,9 @@ export default async function QuestionPage({
                 </p>
               ) : (
                 <p className="mt-2 text-gray-700">
-                  Сейчас мы подтягиваем только текст вопроса из базы. Позже здесь
-                  появится структурированный разбор, чек-листы и ссылки на
-                  материалы.
+                  Пока здесь только формулировка вопроса. Мы не стали
+                  придумывать ответ наугад — разбор появится, когда подготовим
+                  нормальный материал.
                 </p>
               )}
             </div>
@@ -158,7 +158,10 @@ export default async function QuestionPage({
             {videoItems.length > 0 && (
               <aside className="mt-6 md:mt-0 md:pl-2">
                 <div className="flex items-center gap-2">
-                  <div className="h-5 w-1 rounded-full bg-blue-600" aria-hidden />
+                  <div
+                    className="h-5 w-1 rounded-full bg-blue-600"
+                    aria-hidden
+                  />
                   <p className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-800">
                     Источники
                   </p>
