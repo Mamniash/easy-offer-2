@@ -105,7 +105,7 @@ export default async function QuestionPage({
 
   return (
     <section className="pb-20 pt-32 md:pt-40">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
           <div className="flex items-center justify-between gap-4">
             <Link
@@ -128,27 +128,35 @@ export default async function QuestionPage({
             {question.question}
           </h1>
 
-          <div className="mt-6 rounded-xl bg-gray-50 p-6 ring-1 ring-gray-200">
-            <p className="text-lg font-semibold text-gray-900">
-              Ответ и разбор
-            </p>
+          <div
+            className={`mt-6 ${
+              videoItems.length > 0
+                ? "md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:gap-8"
+                : ""
+            }`}
+          >
+            <div className="rounded-xl bg-gray-50 p-6 ring-1 ring-gray-200">
+              <p className="text-lg font-semibold text-gray-900">
+                Ответ и разбор
+              </p>
 
-            {question.answer_raw &&
-            question.answer_raw !== "EMPTY" &&
-            question.answer_raw !== "error" ? (
-              <p className="mt-3 whitespace-pre-line text-gray-700">
-                {question.answer_raw}
-              </p>
-            ) : (
-              <p className="mt-2 text-gray-700">
-                Сейчас мы подтягиваем только текст вопроса из базы. Позже здесь
-                появится структурированный разбор, чек-листы и ссылки на
-                материалы.
-              </p>
-            )}
+              {question.answer_raw &&
+              question.answer_raw !== "EMPTY" &&
+              question.answer_raw !== "error" ? (
+                <p className="mt-3 whitespace-pre-line text-gray-700">
+                  {question.answer_raw}
+                </p>
+              ) : (
+                <p className="mt-2 text-gray-700">
+                  Сейчас мы подтягиваем только текст вопроса из базы. Позже здесь
+                  появится структурированный разбор, чек-листы и ссылки на
+                  материалы.
+                </p>
+              )}
+            </div>
 
             {videoItems.length > 0 && (
-              <div className="mt-6">
+              <aside className="mt-6 md:mt-0 md:pl-2">
                 <div className="flex items-center gap-2">
                   <div className="h-5 w-1 rounded-full bg-blue-600" aria-hidden />
                   <p className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-800">
@@ -156,16 +164,16 @@ export default async function QuestionPage({
                   </p>
                 </div>
 
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="mt-4 flex flex-col gap-3">
                   {videoItems.map((video) => (
                     <a
                       key={video.url}
                       href={video.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="group flex h-full items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                      className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
                     >
-                      <div className="relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200">
+                      <div className="relative h-20 w-28 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200">
                         {video.thumbnail ? (
                           <img
                             src={video.thumbnail}
@@ -180,7 +188,7 @@ export default async function QuestionPage({
                         )}
 
                         <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition group-hover:bg-black/40">
-                          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow ring-1 ring-gray-200">
+                          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow ring-1 ring-gray-200">
                             ▶
                           </span>
                         </div>
@@ -203,7 +211,7 @@ export default async function QuestionPage({
                     </a>
                   ))}
                 </div>
-              </div>
+              </aside>
             )}
           </div>
         </div>
