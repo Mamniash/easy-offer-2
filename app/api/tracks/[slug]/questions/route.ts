@@ -1,3 +1,4 @@
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import {
@@ -6,9 +7,10 @@ import {
 } from "@/lib/questions";
 
 export async function GET(
-  request: Request,
-  { params }: { params: { slug: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params;
   const { searchParams } = new URL(request.url);
   const page = Number(searchParams.get("page") ?? "1");
   const perPage = Number(searchParams.get("perPage") ?? "50");
@@ -17,7 +19,7 @@ export async function GET(
   const safePerPage = Number.isFinite(perPage) && perPage > 0 ? perPage : 50;
 
   const { questions, total } = await getQuestionsByDirection(
-    params.slug,
+    slug,
     safePage,
     safePerPage
   );
