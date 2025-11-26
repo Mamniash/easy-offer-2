@@ -9,10 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
 const AUTHORIZED_QUESTIONS_LIMIT = 50;
-const PRO_EMAILS = [
-  "mamniashvili2003@gmail.com",
-  "pokrasov.04@mail.ru",
-];
+const PRO_EMAILS = ["mamniashvili2003@gmail.com", "pokrasov.04@mail.ru"];
 
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
@@ -94,9 +91,15 @@ export default function TrackDetail({ track }: { track: Track }) {
 
   const scrollToFirstQuestion = useCallback(() => {
     requestAnimationFrame(() => {
-      listTopRef.current?.scrollIntoView({
+      if (!listTopRef.current) return;
+
+      const offset = 120;
+      const rect = listTopRef.current.getBoundingClientRect();
+      const targetTop = window.scrollY + rect.top - offset;
+
+      window.scrollTo({
+        top: targetTop,
         behavior: "smooth",
-        block: "start",
       });
     });
   }, []);
@@ -116,7 +119,9 @@ export default function TrackDetail({ track }: { track: Track }) {
         );
 
         if (!response.ok) {
-          throw new Error(`Не удалось загрузить вопросы: ${response.statusText}`);
+          throw new Error(
+            `Не удалось загрузить вопросы: ${response.statusText}`
+          );
         }
 
         const payload = await response.json();
@@ -176,7 +181,9 @@ export default function TrackDetail({ track }: { track: Track }) {
           {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
         </p>
         <label className="relative md:w-auto">
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            🔍
+          </span>
           <input
             type="search"
             value={search}
@@ -189,7 +196,9 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       <div ref={listTopRef} className="divide-y divide-gray-200">
         {isLoadingPage
-          ? Array.from({ length: 6 }).map((_, index) => <QuestionSkeleton key={index} />)
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <QuestionSkeleton key={index} />
+            ))
           : filteredQuestions.map((question) => (
               <Link
                 key={question.id}
@@ -199,11 +208,16 @@ export default function TrackDetail({ track }: { track: Track }) {
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white">
-                      <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden />
+                      <span
+                        className="h-2 w-2 rounded-full bg-emerald-400"
+                        aria-hidden
+                      />
                       {question.frequency}%
                     </div>
                     <div>
-                      <p className="text-sm uppercase tracking-[0.16em] text-gray-500">{question.category}</p>
+                      <p className="text-sm uppercase tracking-[0.16em] text-gray-500">
+                        {question.category}
+                      </p>
                       <p className="text-lg font-semibold text-gray-900 group-hover:text-blue-700">
                         {question.question}
                       </p>
@@ -216,7 +230,9 @@ export default function TrackDetail({ track }: { track: Track }) {
                         style={{ width: `${question.frequency}%` }}
                       />
                     </div>
-                    <p className="mt-2 text-right text-xs font-medium text-gray-500">Частота по собеседованиям</p>
+                    <p className="mt-2 text-right text-xs font-medium text-gray-500">
+                      Частота по собеседованиям
+                    </p>
                   </div>
                 </div>
               </Link>
@@ -283,7 +299,9 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       {!isAuthorized && (
         <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
-          <p className="text-base font-semibold">Хотите видеть больше вопросов?</p>
+          <p className="text-base font-semibold">
+            Хотите видеть больше вопросов?
+          </p>
           <p className="text-sm text-gray-600">
             Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению.
           </p>
@@ -308,10 +326,12 @@ export default function TrackDetail({ track }: { track: Track }) {
         <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
           <p className="text-base font-semibold">Нужен полный доступ?</p>
           <p className="text-sm text-gray-600">
-            Оформите PRO-подписку, чтобы снять ограничение и видеть все вопросы по направлению.
+            Оформите PRO-подписку, чтобы снять ограничение и видеть все вопросы
+            по направлению.
           </p>
           <p className="text-xs text-gray-500">
-            PRO-доступ сейчас включен для выбранных аккаунтов. Оставьте заявку, и мы подключим подписку.
+            PRO-доступ сейчас включен для выбранных аккаунтов. Оставьте заявку,
+            и мы подключим подписку.
           </p>
         </div>
       )}
