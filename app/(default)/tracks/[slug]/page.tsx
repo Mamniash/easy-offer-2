@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import TrackDetail from "@/components/tracks/track-detail";
-import { getTrack } from "@/lib/tracks";
+import { getTrack, type Track, type TrackQuestion } from "@/lib/tracks";
 import { getQuestionsByDirection } from "@/lib/questions";
 
 type TrackParams = Promise<{ slug: string }>;
@@ -28,29 +28,46 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
     notFound();
   }
 
-  // 👇 тянем первые 50 вопросов по этому направлению из Supabase
+  // Всегда тянем вопросы из Supabase
   const page = 1;
-  const perPage = 50;
-  const { questions, total } = await getQuestionsByDirection(
+  const perPage = 20;
+  const { questions: dbQuestions, total } = await getQuestionsByDirection(
     slug,
     page,
     perPage
   );
-  const questionsToRender =
-    questions.length > 0
-      ? questions
-      : track.questions.map((item) => ({
-          id: item.id,
-          question: item.question,
-          direction: track.title,
-          chance: `${item.frequency}%`,
-          answer_raw: item.answer ?? null,
-          videos: null,
-        }));
-  const totalPages = Math.max(
-    1,
-    Math.ceil((questions.length > 0 ? total : questionsToRender.length) / perPage)
-  );
+
+  const mappedQuestions: TrackQuestion[] = dbQuestions.map((q) => {
+    const match = q.chance.match(/(\d+)/);
+    const frequency = match ? Number(match[1]) : 0;
+
+    let level: TrackQuestion["level"];
+    if (frequency >= 70) level = "junior";
+    else if (frequency >= 40) level = "middle";
+    else level = "senior";
+
+    return {
+      id: String(q.id), // id из БД -> в URL /tracks/:slug/questions/:id
+      question: q.question,
+      frequency,
+      level,
+      category: q.direction,
+      answer: q.answer_raw ?? undefined,
+    };
+  });
+
+  const questionsCount = total ?? mappedQuestions.length;
+  const interviewsCount = questionsCount * 4; // условный множитель, как раньше
+
+  const trackForRender: Track = {
+    ...track,
+    stats: {
+      ...track.stats,
+      questions: questionsCount,
+      interviews: interviewsCount,
+    },
+    questions: mappedQuestions,
+  };
 
   return (
     <section className="pb-20 pt-32 md:pt-40">
@@ -65,15 +82,17 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
                 <span aria-hidden>←</span> Назад к направлениям
               </Link>
               <p className="text-sm uppercase tracking-[0.2em] text-gray-500">
-                {track.group}
+                {trackForRender.group}
               </p>
               <h1 className="text-4xl font-bold text-gray-900 md:text-5xl">
-                {track.title}
+                {trackForRender.title}
               </h1>
-              <p className="text-lg text-gray-700">{track.hero}</p>
-              <p className="text-sm text-gray-500">{track.description}</p>
+              <p className="text-lg text-gray-700">{trackForRender.hero}</p>
+              <p className="text-sm text-gray-500">
+                {trackForRender.description}
+              </p>
               <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                {track.roles.map((role) => (
+                {trackForRender.roles.map((role) => (
                   <span
                     key={role}
                     className="rounded-full bg-blue-50 px-3 py-1 font-semibold text-blue-600 ring-1 ring-blue-100"
@@ -87,19 +106,19 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
               <div>
                 <p className="text-sm text-gray-400">Вопросов</p>
                 <p className="text-3xl font-semibold">
-                  {track.stats.questions.toLocaleString("ru-RU")}
+                  {trackForRender.stats.questions.toLocaleString("ru-RU")}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-400">Собеседований</p>
                 <p className="text-3xl font-semibold">
-                  {track.stats.interviews.toLocaleString("ru-RU")}
+                  {trackForRender.stats.interviews.toLocaleString("ru-RU")}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-400">Обновление</p>
                 <p className="text-lg font-semibold text-emerald-300">
-                  {track.stats.updated}
+                  {trackForRender.stats.updated}
                 </p>
               </div>
               <div>
@@ -110,48 +129,8 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
           </div>
         </div>
 
-        {/* старый компонент, который рисует демо-структуру */}
-        <TrackDetail track={track} />
-
-        {/* 👇 список реальных вопросов из Supabase */}
-        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Частые вопросы из базы
-            </h2>
-            <span className="text-sm text-gray-500">
-              Показаны первые {questionsToRender.length} из {questions.length > 0 ? total : questionsToRender.length}
-            </span>
-          </div>
-
-          <ul className="divide-y divide-gray-100">
-            {questionsToRender.map((q) => (
-              <li key={q.id} className="py-4">
-                <Link
-                  href={`/tracks/${slug}/questions/${q.id}`}
-                  className="flex items-start justify-between gap-4"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{q.question}</p>
-                    {q.answer_raw && (
-                      <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-                        {q.answer_raw}
-                      </p>
-                    )}
-                  </div>
-                  <span className="shrink-0 rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white">
-                    {q.chance}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* простейшая пагинация, пока без кнопок вперёд/назад, чисто инфа */}
-          <div className="mt-4 text-sm text-gray-500">
-            Страница {page} из {totalPages}
-          </div>
-        </div>
+        {/* Старый дизайн, но теперь внутри только Supabase-вопросы */}
+        <TrackDetail track={trackForRender} />
       </div>
     </section>
   );

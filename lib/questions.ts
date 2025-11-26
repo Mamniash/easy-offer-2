@@ -1,29 +1,103 @@
 // lib/questions.ts
 import { supabase } from "@/lib/supabaseClient";
-import { getTrack } from "./tracks";
 
 export type QuestionRow = {
   id: number;
   question: string;
-  direction: string; // "Frontend" и т.п.
-  chance: string; // "22%" — как в таблице
+  direction: string; // "Frontend", "Java", "QA Manual" и т.д.
+  chance: string; // "99%"
   answer_raw: string | null;
   videos: string | null;
 };
 
-// утилита, чтобы из slug сделать значение direction в БД
-// если у тебя в таблице direction уже "frontend" / "qa" и т.п. —
-// можешь просто вернуть slug как есть.
-function slugToDirection(slug: string): string {
-  const track = getTrack(slug);
+// Маппинг slug (из URL) -> direction (строка в колонке direction в БД)
+const SLUG_TO_DIRECTION: Record<string, string> = {
+  // разработка
+  frontend: "Frontend",
+  "frontend-developer": "Frontend",
 
-  if (track) {
-    return track.title;
-  }
+  java: "Java",
+  "java-developer": "Java",
 
-  if (!slug) return slug;
+  python: "Python",
+  "python-developer": "Python",
 
-  return slug.charAt(0).toUpperCase() + slug.slice(1);
+  golang: "Golang",
+  "golang-developer": "Golang",
+
+  php: "PHP",
+  "php-developer": "PHP",
+
+  csharp: "C#",
+  "c-sharp-developer": "C#",
+
+  cpp: "C++",
+  "c-plus-developer": "C++",
+
+  "1c": "1C",
+  "1c-developer": "1C",
+
+  nodejs: "Node.js",
+  "nodejs-developer": "Node.js",
+
+  ios: "iOS",
+  "ios-developer": "iOS",
+
+  android: "Android",
+  "android-developer": "Android",
+
+  flutter: "Flutter",
+  "flutter-developer": "Flutter",
+
+  unity: "Unity",
+  "unity-developer": "Unity",
+
+  devops: "DevOps",
+
+  "data-engineer": "Data Engineer",
+
+  // тестирование
+  qa: "QA Manual",
+  "qa-testirovshik": "QA Manual",
+
+  "qa-automation": "QA Automation",
+
+  // DS / аналитика
+  datascience: "Data Scientist",
+  "data-scientist": "Data Scientist",
+
+  "business-analyst": "Business Analyst",
+  "system-analyst": "System Analyst",
+
+  "data-analyst": "Data Analyst",
+  "data-analytics": "Data Analyst",
+
+  "product-analytics": "Product Analyst",
+
+  // менеджмент — тут маппим на те названия, которые у тебя в таблице
+  pm: "IT Project Manager",
+  "it-project-manager": "IT Project Manager",
+
+  product: "IT Product Manager",
+  "it-product-manger": "IT Product Manager",
+
+  // про Team Lead в CSV не уверен, на всякий случай
+  lead: "Team Lead",
+};
+
+export function slugToDirection(slug: string): string {
+  return SLUG_TO_DIRECTION[slug] ?? slug;
+}
+
+// videos: "url1 | url2 | url3" -> ["url1", "url2", "url3"]
+export function parseVideosField(videos: string | null): string[] {
+  if (!videos) return [];
+  if (videos === "EMPTY" || videos === "error") return [];
+
+  return videos
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 /**
@@ -33,19 +107,9 @@ function slugToDirection(slug: string): string {
 export async function getQuestionsByDirection(
   slug: string,
   page = 1,
-  perPage = 50
+  perPage = 20
 ): Promise<{ questions: QuestionRow[]; total: number }> {
   const direction = slugToDirection(slug);
-  const possibleDirections = Array.from(
-    new Set([
-      direction,
-      slug,
-      direction.toLowerCase(),
-      direction.toUpperCase(),
-      slug.toLowerCase(),
-      slug.toUpperCase(),
-    ])
-  );
 
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
@@ -53,7 +117,7 @@ export async function getQuestionsByDirection(
   const { data, error, count } = await supabase
     .from("questions")
     .select("*", { count: "exact" })
-    .in("direction", possibleDirections)
+    .eq("direction", direction)
     .order("id", { ascending: true })
     .range(from, to);
 
@@ -69,7 +133,7 @@ export async function getQuestionsByDirection(
 }
 
 /**
- * Получить один вопрос по его id.
+ * Получить один вопрос по id.
  */
 export async function getQuestionById(id: number): Promise<QuestionRow | null> {
   const { data, error } = await supabase
