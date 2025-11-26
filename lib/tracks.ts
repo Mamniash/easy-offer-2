@@ -290,16 +290,6 @@ const baseTracks: Omit<Track, "questions">[] = [
     stats: { questions: 0, interviews: 0, updated: "Обновлено сегодня" },
     roles: ["Junior", "Middle", "Senior"],
   },
-  {
-    slug: "lead",
-    title: "Team Lead",
-    group: "Управление",
-    hero: "Лидерство, архитектура и найм",
-    description:
-      "Темы по управлению командой и техническому лиду. Дополните своим списком вопросов.",
-    stats: { questions: 0, interviews: 0, updated: "Обновлено сегодня" },
-    roles: ["Senior", "Lead"],
-  },
 ];
 
 export const tracks: Track[] = baseTracks.map((t) => ({
@@ -462,11 +452,6 @@ export const directionGroups: {
         name: "Product Management",
         slug: "product",
         description: "Дискавери, гипотезы, рост и метрики",
-      },
-      {
-        name: "Team Lead",
-        slug: "lead",
-        description: "Команда, архитектура, процессы и наставничество",
       },
     ],
   },

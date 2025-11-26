@@ -1,4 +1,5 @@
 // app/(default)/tracks/page.tsx
+import { getQuestionsTotal } from "@/lib/questions";
 import { directionGroups } from "@/lib/tracks";
 import TracksDirectory from "@/components/tracks-directory";
 
@@ -8,7 +9,10 @@ export const metadata = {
     "Собрали направления и профессии, чтобы перейти к вопросам и подготовке. Выберите трек и смотрите частые вопросы.",
 };
 
-export default function TracksLandingPage() {
+export default async function TracksLandingPage() {
+  const totalDirections = directionGroups.flatMap((g) => g.items).length;
+  const totalQuestions = await getQuestionsTotal();
+
   return (
     <section className="pb-20 pt-32 md:pt-40">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -32,14 +36,14 @@ export default function TracksLandingPage() {
             <div className="flex gap-6 rounded-2xl bg-gray-900 p-6 text-gray-100 shadow-lg">
               <div className="flex flex-col items-center text-center">
                 <p className="text-sm text-gray-400">Направлений</p>
-                <p className="text-4xl font-semibold">
-                  {directionGroups.flatMap((g) => g.items).length}
-                </p>
+                <p className="text-4xl font-semibold">{totalDirections}</p>
               </div>
               <div className="h-12 w-px bg-gray-700/60" aria-hidden="true" />
               <div className="flex flex-col items-center text-center">
                 <p className="text-sm text-gray-400">Вопросов</p>
-                <p className="text-4xl font-semibold">12&nbsp;956</p>
+                <p className="text-4xl font-semibold">
+                  {totalQuestions.toLocaleString("ru-RU")}
+                </p>
               </div>
             </div>
           </div>
