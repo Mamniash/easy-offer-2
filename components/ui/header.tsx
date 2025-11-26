@@ -84,7 +84,7 @@ export default function Header() {
   const isHomePage = pathname === "/";
   const positionClasses = isHomePage
     ? "fixed top-2 md:top-6"
-    : "relative mt-4 md:mt-6";
+    : "relative mt-3 md:mt-4";
 
   return (
     <header className={`${positionClasses} z-30 w-full`}>
