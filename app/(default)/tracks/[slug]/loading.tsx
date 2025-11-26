@@ -1,6 +1,6 @@
 export default function TrackLoading() {
   return (
-    <section className="pb-20 pt-32 md:pt-40">
+    <section className="pb-20 pt-20 md:pt-28">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
           <div className="animate-pulse flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

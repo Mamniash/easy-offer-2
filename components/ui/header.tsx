@@ -82,7 +82,9 @@ export default function Header() {
   const userInitial = user?.name?.[0] || user?.email?.[0] || "";
 
   const isHomePage = pathname === "/";
-  const positionClasses = isHomePage ? "fixed top-2 md:top-6" : "relative";
+  const positionClasses = isHomePage
+    ? "fixed top-2 md:top-6"
+    : "relative mt-4 md:mt-6";
 
   return (
     <header className={`${positionClasses} z-30 w-full`}>
