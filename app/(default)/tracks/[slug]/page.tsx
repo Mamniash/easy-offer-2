@@ -76,16 +76,6 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
               <p className="text-sm text-gray-500">
                 {trackForRender.description}
               </p>
-              <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                {trackForRender.roles.map((role) => (
-                  <span
-                    key={role}
-                    className="rounded-full bg-blue-50 px-3 py-1 font-semibold text-blue-600 ring-1 ring-blue-100"
-                  >
-                    {role}
-                  </span>
-                ))}
-              </div>
             </div>
             <div className="grid grid-cols-2 gap-3 rounded-xl bg-gray-900 p-6 text-gray-100 shadow-lg">
               <div>
