@@ -81,8 +81,6 @@ const SLUG_TO_DIRECTION: Record<string, string> = {
   product: "IT Product Manager",
   "it-product-manger": "IT Product Manager",
 
-  // про Team Lead в CSV не уверен, на всякий случай
-  lead: "Team Lead",
 };
 
 export function slugToDirection(slug: string): string {
@@ -130,6 +128,19 @@ export async function getQuestionsByDirection(
     questions: (data ?? []) as QuestionRow[],
     total: count ?? 0,
   };
+}
+
+export async function getQuestionsTotal(): Promise<number> {
+  const { count, error } = await supabase
+    .from("questions")
+    .select("id", { count: "exact", head: true });
+
+  if (error) {
+    console.error("[getQuestionsTotal] Supabase error:", error);
+    return 0;
+  }
+
+  return count ?? 0;
 }
 
 /**

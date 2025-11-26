@@ -1,5 +1,6 @@
 // app/(default)/tracks/page.tsx
 import { directionGroups } from "@/lib/tracks";
+import { getQuestionsTotal } from "@/lib/questions";
 import TracksDirectory from "@/components/tracks-directory";
 
 export const metadata = {
@@ -8,7 +9,11 @@ export const metadata = {
     "Собрали направления и профессии, чтобы перейти к вопросам и подготовке. Выберите трек и смотрите частые вопросы.",
 };
 
-export default function TracksLandingPage() {
+const numberFormatter = new Intl.NumberFormat("ru-RU");
+
+export default async function TracksLandingPage() {
+  const totalQuestions = await getQuestionsTotal();
+
   return (
     <section className="pb-20 pt-32 md:pt-40">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -39,7 +44,9 @@ export default function TracksLandingPage() {
               <div className="h-12 w-px bg-gray-700/60" aria-hidden="true" />
               <div className="flex flex-col items-center text-center">
                 <p className="text-sm text-gray-400">Вопросов</p>
-                <p className="text-4xl font-semibold">12&nbsp;956</p>
+                <p className="text-4xl font-semibold">
+                  {numberFormatter.format(totalQuestions)}
+                </p>
               </div>
             </div>
           </div>
