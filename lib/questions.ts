@@ -1,5 +1,6 @@
 // lib/questions.ts
 import { supabase } from "@/lib/supabaseClient";
+import type { TrackQuestion } from "@/lib/tracks";
 
 export type QuestionRow = {
   id: number;
@@ -9,6 +10,28 @@ export type QuestionRow = {
   answer_raw: string | null;
   videos: string | null;
 };
+
+/**
+ * Преобразуем строку из БД в объект, который удобно показывать на фронте.
+ */
+export function mapQuestionRowToTrackQuestion(row: QuestionRow): TrackQuestion {
+  const match = row.chance.match(/(\d+)/);
+  const frequency = match ? Number(match[1]) : 0;
+
+  let level: "junior" | "middle" | "senior";
+  if (frequency >= 70) level = "junior";
+  else if (frequency >= 40) level = "middle";
+  else level = "senior";
+
+  return {
+    id: String(row.id),
+    question: row.question,
+    frequency,
+    level,
+    category: row.direction,
+    answer: row.answer_raw ?? undefined,
+  };
+}
 
 // Маппинг slug (из URL) -> direction (строка в колонке direction в БД)
 const SLUG_TO_DIRECTION: Record<string, string> = {
@@ -104,7 +127,7 @@ export function parseVideosField(videos: string | null): string[] {
 export async function getQuestionsByDirection(
   slug: string,
   page = 1,
-  perPage = 20
+  perPage = 50
 ): Promise<{ questions: QuestionRow[]; total: number }> {
   const direction = slugToDirection(slug);
 
