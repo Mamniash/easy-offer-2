@@ -1,5 +1,6 @@
 // lib/questions.ts
 import { supabase } from "@/lib/supabaseClient";
+import { getTrack } from "./tracks";
 
 export type QuestionRow = {
   id: number;
@@ -14,8 +15,14 @@ export type QuestionRow = {
 // если у тебя в таблице direction уже "frontend" / "qa" и т.п. —
 // можешь просто вернуть slug как есть.
 function slugToDirection(slug: string): string {
+  const track = getTrack(slug);
+
+  if (track) {
+    return track.title;
+  }
+
   if (!slug) return slug;
-  // пример: "frontend" -> "Frontend"
+
   return slug.charAt(0).toUpperCase() + slug.slice(1);
 }
 
@@ -29,6 +36,16 @@ export async function getQuestionsByDirection(
   perPage = 50
 ): Promise<{ questions: QuestionRow[]; total: number }> {
   const direction = slugToDirection(slug);
+  const possibleDirections = Array.from(
+    new Set([
+      direction,
+      slug,
+      direction.toLowerCase(),
+      direction.toUpperCase(),
+      slug.toLowerCase(),
+      slug.toUpperCase(),
+    ])
+  );
 
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
@@ -36,7 +53,7 @@ export async function getQuestionsByDirection(
   const { data, error, count } = await supabase
     .from("questions")
     .select("*", { count: "exact" })
-    .eq("direction", direction)
+    .in("direction", possibleDirections)
     .order("id", { ascending: true })
     .range(from, to);
 

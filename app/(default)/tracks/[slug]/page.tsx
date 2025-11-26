@@ -36,7 +36,21 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
     page,
     perPage
   );
-  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const questionsToRender =
+    questions.length > 0
+      ? questions
+      : track.questions.map((item) => ({
+          id: item.id,
+          question: item.question,
+          direction: track.title,
+          chance: `${item.frequency}%`,
+          answer_raw: item.answer ?? null,
+          videos: null,
+        }));
+  const totalPages = Math.max(
+    1,
+    Math.ceil((questions.length > 0 ? total : questionsToRender.length) / perPage)
+  );
 
   return (
     <section className="pb-20 pt-32 md:pt-40">
@@ -106,12 +120,12 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
               Частые вопросы из базы
             </h2>
             <span className="text-sm text-gray-500">
-              Показаны первые {questions.length} из {total}
+              Показаны первые {questionsToRender.length} из {questions.length > 0 ? total : questionsToRender.length}
             </span>
           </div>
 
           <ul className="divide-y divide-gray-100">
-            {questions.map((q) => (
+            {questionsToRender.map((q) => (
               <li key={q.id} className="py-4">
                 <Link
                   href={`/tracks/${slug}/questions/${q.id}`}
