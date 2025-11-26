@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import TrackDetail from "@/components/tracks/track-detail";
 import { getTrack, type Track, type TrackQuestion } from "@/lib/tracks";
-import { getQuestionsByDirection } from "@/lib/questions";
+import { getQuestionsByDirection, mapQuestionRowToTrackQuestion } from "@/lib/questions";
 
 type TrackParams = Promise<{ slug: string }>;
 
@@ -30,31 +30,16 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
 
   // Всегда тянем вопросы из Supabase
   const page = 1;
-  const perPage = 20;
+  const perPage = 50;
   const { questions: dbQuestions, total } = await getQuestionsByDirection(
     slug,
     page,
     perPage
   );
 
-  const mappedQuestions: TrackQuestion[] = dbQuestions.map((q) => {
-    const match = q.chance.match(/(\d+)/);
-    const frequency = match ? Number(match[1]) : 0;
-
-    let level: TrackQuestion["level"];
-    if (frequency >= 70) level = "junior";
-    else if (frequency >= 40) level = "middle";
-    else level = "senior";
-
-    return {
-      id: String(q.id), // id из БД -> в URL /tracks/:slug/questions/:id
-      question: q.question,
-      frequency,
-      level,
-      category: q.direction,
-      answer: q.answer_raw ?? undefined,
-    };
-  });
+  const mappedQuestions: TrackQuestion[] = dbQuestions.map(
+    mapQuestionRowToTrackQuestion
+  );
 
   const questionsCount = total ?? mappedQuestions.length;
   const interviewsCount = questionsCount * 4; // условный множитель, как раньше
@@ -123,7 +108,7 @@ export default async function TrackPage({ params }: { params: TrackParams }) {
               </div>
               <div>
                 <p className="text-sm text-gray-400">Фокус</p>
-                <p className="text-lg font-semibold">Частота × грейд</p>
+                <p className="text-lg font-semibold">Частота × темы</p>
               </div>
             </div>
           </div>

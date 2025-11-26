@@ -1,5 +1,6 @@
 // lib/questions.ts
 import { supabase } from "@/lib/supabaseClient";
+import type { TrackQuestion } from "@/lib/tracks";
 
 export type QuestionRow = {
   id: number;
@@ -9,6 +10,28 @@ export type QuestionRow = {
   answer_raw: string | null;
   videos: string | null;
 };
+
+/**
+ * Преобразуем строку из БД в объект, который удобно показывать на фронте.
+ */
+export function mapQuestionRowToTrackQuestion(row: QuestionRow): TrackQuestion {
+  const match = row.chance.match(/(\d+)/);
+  const frequency = match ? Number(match[1]) : 0;
+
+  let level: "junior" | "middle" | "senior";
+  if (frequency >= 70) level = "junior";
+  else if (frequency >= 40) level = "middle";
+  else level = "senior";
+
+  return {
+    id: String(row.id),
+    question: row.question,
+    frequency,
+    level,
+    category: row.direction,
+    answer: row.answer_raw ?? undefined,
+  };
+}
 
 // Маппинг slug (из URL) -> direction (строка в колонке direction в БД)
 const SLUG_TO_DIRECTION: Record<string, string> = {
@@ -80,9 +103,6 @@ const SLUG_TO_DIRECTION: Record<string, string> = {
 
   product: "IT Product Manager",
   "it-product-manger": "IT Product Manager",
-
-  // про Team Lead в CSV не уверен, на всякий случай
-  lead: "Team Lead",
 };
 
 export function slugToDirection(slug: string): string {
@@ -107,7 +127,7 @@ export function parseVideosField(videos: string | null): string[] {
 export async function getQuestionsByDirection(
   slug: string,
   page = 1,
-  perPage = 20
+  perPage = 50
 ): Promise<{ questions: QuestionRow[]; total: number }> {
   const direction = slugToDirection(slug);
 
@@ -130,6 +150,19 @@ export async function getQuestionsByDirection(
     questions: (data ?? []) as QuestionRow[],
     total: count ?? 0,
   };
+}
+
+export async function getQuestionsTotal(): Promise<number> {
+  const { count, error } = await supabase
+    .from("questions")
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    console.error("[getQuestionsTotal] Supabase error:", error);
+    return 0;
+  }
+
+  return count ?? 0;
 }
 
 /**
