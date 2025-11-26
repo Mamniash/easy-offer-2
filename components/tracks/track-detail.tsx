@@ -8,6 +8,11 @@ import { supabase } from "@/lib/supabaseClient";
 
 const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
+const AUTHORIZED_QUESTIONS_LIMIT = 50;
+const PRO_EMAILS = [
+  "mamniashvili2003@gmail.com",
+  "pokrasov.04@mail.ru",
+];
 
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
@@ -16,6 +21,7 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isPro, setIsPro] = useState(false);
   const listTopRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -35,7 +41,11 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       if (!isMounted) return;
 
+      const email = session?.user?.email?.toLowerCase();
+      const hasPro = email ? PRO_EMAILS.includes(email) : false;
+
       setIsAuthorized(Boolean(session?.user));
+      setIsPro(hasPro);
     };
 
     fetchSession();
@@ -45,7 +55,11 @@ export default function TrackDetail({ track }: { track: Track }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
+      const email = session?.user?.email?.toLowerCase();
+      const hasPro = email ? PRO_EMAILS.includes(email) : false;
+
       setIsAuthorized(Boolean(session?.user));
+      setIsPro(hasPro);
     });
 
     return () => {
@@ -55,9 +69,11 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, []);
 
   const filteredQuestions = useMemo(() => {
-    const availableQuestions = isAuthorized
+    const availableQuestions = isPro
       ? questions
-      : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
+      : isAuthorized
+        ? questions.slice(0, AUTHORIZED_QUESTIONS_LIMIT)
+        : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
     const normalizedSearch = search.trim().toLowerCase();
 
     if (!normalizedSearch) return availableQuestions;
@@ -67,7 +83,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     );
   }, [isAuthorized, questions, search]);
 
-  const totalPages = isAuthorized
+  const totalPages = isPro
     ? Math.max(
         1,
         Math.ceil(
@@ -136,10 +152,13 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, [page, totalPages]);
 
   const isEmptyState = !isLoadingPage && filteredQuestions.length === 0;
-  const hasPagination = isAuthorized && totalPages > 1;
-  const visibleQuestionsCount = isAuthorized
+  const hasPagination = isPro && totalPages > 1;
+  const visibleQuestionsCount = isPro
     ? totalQuestions
-    : Math.min(totalQuestions, UNAUTHORIZED_QUESTIONS_LIMIT);
+    : Math.min(
+        totalQuestions,
+        isAuthorized ? AUTHORIZED_QUESTIONS_LIMIT : UNAUTHORIZED_QUESTIONS_LIMIT
+      );
 
   return (
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -257,7 +276,7 @@ export default function TrackDetail({ track }: { track: Track }) {
         <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
           <p className="text-base font-semibold">Хотите видеть больше вопросов?</p>
           <p className="text-sm text-gray-600">
-            Авторизуйтесь, чтобы открыть полный список вопросов по этому направлению.
+            Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению.
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-1">
             <Link
@@ -273,6 +292,18 @@ export default function TrackDetail({ track }: { track: Track }) {
               Зарегистрироваться
             </Link>
           </div>
+        </div>
+      )}
+
+      {isAuthorized && !isPro && (
+        <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
+          <p className="text-base font-semibold">Нужен полный доступ?</p>
+          <p className="text-sm text-gray-600">
+            Оформите PRO-подписку, чтобы снять ограничение и видеть все вопросы по направлению.
+          </p>
+          <p className="text-xs text-gray-500">
+            PRO-доступ сейчас включен для выбранных аккаунтов. Оставьте заявку, и мы подключим подписку.
+          </p>
         </div>
       )}
     </div>
