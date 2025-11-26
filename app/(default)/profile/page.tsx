@@ -56,7 +56,7 @@ export default function ProfilePage() {
         </h1>
         <p className="text-base text-gray-600">
           Здесь собрана краткая информация о твоей учетной записи и быстрые
-          действия. Всё рядом и в одном стиле.
+          действия.
         </p>
       </div>
 
