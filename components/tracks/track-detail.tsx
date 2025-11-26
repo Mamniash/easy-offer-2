@@ -24,6 +24,14 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [isPro, setIsPro] = useState(false);
   const listTopRef = useRef<HTMLDivElement | null>(null);
 
+  const scrollToQuestionsTop = useCallback(() => {
+    listTopRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "nearest",
+    });
+  }, []);
+
   useEffect(() => {
     setQuestions(track.questions);
     setTotalQuestions(track.stats.questions);
@@ -98,7 +106,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       if (nextPage === page || nextPage < 1 || nextPage > totalPages) return;
 
       setIsLoadingPage(true);
-      listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToQuestionsTop();
 
       try {
         const response = await fetch(
@@ -121,8 +129,14 @@ export default function TrackDetail({ track }: { track: Track }) {
         setIsLoadingPage(false);
       }
     },
-    [isAuthorized, page, totalPages, track.slug]
+    [isAuthorized, page, scrollToQuestionsTop, totalPages, track.slug]
   );
+
+  useEffect(() => {
+    if (isLoadingPage) {
+      scrollToQuestionsTop();
+    }
+  }, [isLoadingPage, scrollToQuestionsTop]);
 
   const paginationItems = useMemo(() => {
     if (totalPages <= 6) {
