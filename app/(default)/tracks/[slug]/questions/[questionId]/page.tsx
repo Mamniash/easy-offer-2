@@ -61,6 +61,48 @@ export default async function QuestionPage({
     track?.title ?? question.direction ?? slugToDirection(slug);
   const videos = parseVideosField(question.videos);
 
+  const videoItems = videos.map((url, index) => {
+    try {
+      const parsedUrl = new URL(url);
+      const host = parsedUrl.hostname.replace(/^www\./, "");
+
+      const pathSegments = parsedUrl.pathname.split("/").filter(Boolean);
+      const youtubeIdFromPath = host.includes("youtu.be")
+        ? pathSegments[0]
+        : null;
+      const youtubeIdFromParams = parsedUrl.searchParams.get("v");
+      const youtubeId = youtubeIdFromParams || youtubeIdFromPath;
+
+      const thumbnail = youtubeId
+        ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`
+        : null;
+
+      const titleCandidate = parsedUrl.searchParams.get("title");
+      const readableFromPath = pathSegments[pathSegments.length - 1];
+      const fallbackTitle = titleCandidate
+        ? titleCandidate
+        : readableFromPath && readableFromPath.length > 6
+          ? decodeURIComponent(readableFromPath).replace(/[-_]+/g, " ")
+          : `Видео ${index + 1}`;
+
+      return {
+        host,
+        thumbnail,
+        title: fallbackTitle,
+        url,
+      };
+    } catch (error) {
+      console.error("[question-page] Failed to parse video URL", url, error);
+
+      return {
+        host: "Источник",
+        thumbnail: null,
+        title: `Видео ${index + 1}`,
+        url,
+      };
+    }
+  });
+
   return (
     <section className="pb-20 pt-32 md:pt-40">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
@@ -105,36 +147,65 @@ export default async function QuestionPage({
               </p>
             )}
 
-            {videos.length > 0 && (
-              <div className="mt-4">
-                <p className="text-sm font-semibold text-gray-800">
-                  Видео по теме:
-                </p>
-                <ul className="mt-2 space-y-1 text-sm">
-                  {videos.map((url, index) => (
-                    <li key={url}>
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        Видео {index + 1}
-                      </a>
-                    </li>
+            {videoItems.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-1 rounded-full bg-blue-600" aria-hidden />
+                  <p className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-800">
+                    Источники
+                  </p>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {videoItems.map((video) => (
+                    <a
+                      key={video.url}
+                      href={video.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group flex h-full items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                    >
+                      <div className="relative h-20 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200">
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt="Превью видео"
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-gray-500">
+                            🎬
+                          </div>
+                        )}
+
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition group-hover:bg-black/40">
+                          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow ring-1 ring-gray-200">
+                            ▶
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <p className="truncate text-sm font-semibold text-gray-900">
+                          {video.title}
+                        </p>
+                        <p className="mt-1 truncate text-xs text-gray-500">
+                          {video.host}
+                        </p>
+                        <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-100">
+                          Смотреть
+                          <span aria-hidden className="text-xs">
+                            ↗
+                          </span>
+                        </span>
+                      </div>
+                    </a>
                   ))}
-                </ul>
+                </div>
               </div>
             )}
           </div>
-        </div>
-
-        <div className="mt-6 rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-4 text-sm text-gray-600">
-          <p className="font-semibold text-gray-800">Что будет дальше</p>
-          <p className="mt-1 text-gray-600">
-            На этой странице потом появится симуляция интервью, заметки,
-            собственные конспекты и кнопка «добавить в мой план подготовки».
-          </p>
         </div>
       </div>
     </section>
