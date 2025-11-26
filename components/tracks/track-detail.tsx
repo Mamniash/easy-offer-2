@@ -113,60 +113,16 @@ export default function TrackDetail({ track }: { track: Track }) {
               className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
             />
           </label>
-          <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-700">
-            <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+          <div className="flex items-center gap-3 rounded-xl bg-gray-900 px-4 py-2 text-sm text-white shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm font-semibold">
               {totalQuestions.toLocaleString("ru-RU")}
-            </span>
-            вопросов в направлении
+            </div>
+            <div className="leading-tight">
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-300">Вопросов в направлении</p>
+              <p className="font-semibold">Обновляем список по мере изучения</p>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
-        <div className="text-sm text-gray-600">
-          Страница {page} из {totalPages}
-        </div>
-        <nav className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 p-1 text-sm shadow-sm" aria-label="Пагинация вопросов">
-          <button
-            type="button"
-            onClick={() => loadPage(page - 1)}
-            disabled={page === 1 || isLoadingPage}
-            className="rounded-full px-3 py-1 font-semibold text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:text-gray-400"
-            aria-label="Предыдущая страница"
-          >
-            ←
-          </button>
-          {paginationItems.map((item, index) =>
-            item === "ellipsis" ? (
-              <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
-                …
-              </span>
-            ) : (
-              <button
-                key={item}
-                type="button"
-                onClick={() => loadPage(item)}
-                disabled={isLoadingPage}
-                className={`rounded-full px-3 py-1 font-semibold transition ${
-                  page === item
-                    ? "bg-white text-gray-900 shadow"
-                    : "text-gray-600 hover:bg-white hover:text-gray-900"
-                } disabled:cursor-not-allowed disabled:text-gray-400`}
-              >
-                {item}
-              </button>
-            )
-          )}
-          <button
-            type="button"
-            onClick={() => loadPage(page + 1)}
-            disabled={page === totalPages || isLoadingPage}
-            className="rounded-full px-3 py-1 font-semibold text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:text-gray-400"
-            aria-label="Следующая страница"
-          >
-            →
-          </button>
-        </nav>
       </div>
 
       <div className="divide-y divide-gray-200">
@@ -209,6 +165,56 @@ export default function TrackDetail({ track }: { track: Track }) {
             Нет вопросов по запросу. Попробуйте изменить формулировку поиска.
           </div>
         )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
+        <div className="text-sm text-gray-700">
+          Страница {page} из {totalPages}
+        </div>
+        <nav
+          className="flex items-center gap-1 rounded-full border border-gray-200 bg-white p-1 text-sm shadow-sm"
+          aria-label="Пагинация вопросов"
+        >
+          <button
+            type="button"
+            onClick={() => loadPage(page - 1)}
+            disabled={page === 1 || isLoadingPage}
+            className="rounded-full px-3 py-1 font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
+            aria-label="Предыдущая страница"
+          >
+            ←
+          </button>
+          {paginationItems.map((item, index) =>
+            item === "ellipsis" ? (
+              <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
+                …
+              </span>
+            ) : (
+              <button
+                key={item}
+                type="button"
+                onClick={() => loadPage(item)}
+                disabled={isLoadingPage}
+                className={`rounded-full px-3 py-1 font-semibold transition ${
+                  page === item
+                    ? "bg-gray-900 text-white shadow"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                } disabled:cursor-not-allowed disabled:text-gray-400`}
+              >
+                {item}
+              </button>
+            )
+          )}
+          <button
+            type="button"
+            onClick={() => loadPage(page + 1)}
+            disabled={page === totalPages || isLoadingPage}
+            className="rounded-full px-3 py-1 font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
+            aria-label="Следующая страница"
+          >
+            →
+          </button>
+        </nav>
       </div>
     </div>
   );
