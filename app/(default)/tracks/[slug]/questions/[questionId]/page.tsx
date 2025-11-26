@@ -104,7 +104,7 @@ export default async function QuestionPage({
   });
 
   return (
-    <section className="pb-20 pt-32 md:pt-40">
+    <section className="pb-20 pt-16 md:pt-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-lg">
           <div className="flex items-center justify-between gap-4">
