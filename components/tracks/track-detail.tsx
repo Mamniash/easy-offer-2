@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { Track } from "@/lib/tracks";
 
@@ -13,6 +13,7 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const listTopRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setQuestions(track.questions);
@@ -41,6 +42,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       if (nextPage === page || nextPage < 1 || nextPage > totalPages) return;
 
       setIsLoadingPage(true);
+      listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
       try {
         const response = await fetch(
@@ -99,7 +101,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex flex-col gap-3 border-b border-gray-200 px-6 py-5 md:flex-row md:items-center md:justify-between">
         <p className="text-base font-semibold text-gray-900 md:text-lg">
-          Вуаля — {totalQuestions.toLocaleString("ru-RU")} вопросов
+          {totalQuestions.toLocaleString("ru-RU")} вопросов
         </p>
         <label className="relative md:w-auto">
           <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
@@ -113,7 +115,7 @@ export default function TrackDetail({ track }: { track: Track }) {
         </label>
       </div>
 
-      <div className="divide-y divide-gray-200">
+      <div ref={listTopRef} className="divide-y divide-gray-200">
         {isLoadingPage
           ? Array.from({ length: 6 }).map((_, index) => <QuestionSkeleton key={index} />)
           : filteredQuestions.map((question) => (
