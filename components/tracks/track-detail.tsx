@@ -97,23 +97,11 @@ export default function TrackDetail({ track }: { track: Track }) {
 
   return (
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex flex-col gap-4 border-b border-gray-200 px-6 py-5 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-col gap-3">
-          <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-gray-500">Фильтры</p>
-            <p className="text-lg font-semibold text-gray-900">Частые вопросы по темам</p>
-          </div>
-          <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-900/5 px-4 py-3 shadow-inner">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-900 text-sm font-semibold text-white shadow-sm">
-              {totalQuestions.toLocaleString("ru-RU")}
-            </div>
-            <div className="leading-tight text-gray-900">
-              <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Количество доступных вопросов</p>
-              <p className="text-sm font-semibold">{totalQuestions.toLocaleString("ru-RU")} по темам</p>
-            </div>
-          </div>
-        </div>
-        <label className="relative">
+      <div className="flex flex-col gap-3 border-b border-gray-200 px-6 py-5 md:flex-row md:items-center md:justify-between">
+        <p className="text-base font-semibold text-gray-900 md:text-lg">
+          Вуаля — {totalQuestions.toLocaleString("ru-RU")} вопросов
+        </p>
+        <label className="relative md:w-auto">
           <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           <input
             type="search"
