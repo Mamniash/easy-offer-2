@@ -14,7 +14,7 @@ export default async function TracksLandingPage() {
   const totalQuestions = await getQuestionsTotal();
 
   return (
-    <section className="pb-20 pt-16 md:pt-24">
+    <section className="pb-20 pt-8 md:pt-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/90 p-10 shadow-xl backdrop-blur">
           <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.08),transparent_25%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.1),transparent_26%)]" />

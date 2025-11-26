@@ -1,6 +1,6 @@
 export default function TrackLoading() {
   return (
-    <section className="pb-20 pt-16 md:pt-24">
+    <section className="pb-20 pt-8 md:pt-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
           <div className="animate-pulse flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -14,7 +14,10 @@ export default function TrackLoading() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {Array.from({ length: 4 }).map((_, index) => (
-                  <div key={index} className="h-8 w-28 rounded-full bg-gray-200" />
+                  <div
+                    key={index}
+                    className="h-8 w-28 rounded-full bg-gray-200"
+                  />
                 ))}
               </div>
             </div>
