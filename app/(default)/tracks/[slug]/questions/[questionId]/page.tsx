@@ -4,6 +4,15 @@ import { notFound } from "next/navigation";
 import { getQuestionById } from "@/lib/questions";
 import { getTrack } from "@/lib/tracks";
 
+type FallbackQuestion = {
+  id: string;
+  question: string;
+  chance?: string;
+  answer_raw?: string;
+  videos?: string | null;
+  direction?: string;
+};
+
 type QuestionParams = Promise<{ slug: string; questionId: string }>;
 
 function extractNumericId(questionIdParam: string): number | null {
@@ -13,23 +22,49 @@ function extractNumericId(questionIdParam: string): number | null {
   return Number.isFinite(id) ? id : null;
 }
 
+function findFallbackQuestion(
+  slug: string,
+  questionIdParam: string,
+  numericId: number | null,
+  trackQuestions: { id: string; question: string; frequency?: number }[] = [],
+): FallbackQuestion | null {
+  const candidates = trackQuestions.filter((question) => {
+    if (question.id === questionIdParam) return true;
+    if (numericId == null) return false;
+    return question.id === `${slug}-${numericId}` || question.id.endsWith(`-${numericId}`);
+  });
+
+  if (candidates.length === 0) return null;
+
+  const fallback = candidates[0];
+  const chance = fallback.frequency ? `${fallback.frequency}%` : undefined;
+
+  return {
+    id: fallback.id,
+    question: fallback.question,
+    chance,
+    direction: slug,
+  };
+}
+
 export async function generateMetadata({ params }: { params: QuestionParams }) {
   const { slug, questionId } = await params;
   const numericId = extractNumericId(questionId);
 
-  if (numericId == null) return {};
+  const track = getTrack(slug);
+  const question = numericId != null ? await getQuestionById(numericId) : null;
+  const fallbackQuestion = track
+    ? findFallbackQuestion(slug, questionId, numericId, track.questions)
+    : null;
+  const finalQuestion = question ?? fallbackQuestion;
 
-  const [question, track] = await Promise.all([
-    getQuestionById(numericId),
-    Promise.resolve(getTrack(slug)),
-  ]);
-
-  if (!question || !track) return {};
+  if (!finalQuestion || !track) return {};
 
   return {
-    title: `${question.question} | PreOffer`,
+    title: `${finalQuestion.question} | PreOffer`,
     description:
-      question.answer_raw ?? `Вопрос из направления ${track.title} на PreOffer`,
+      finalQuestion.answer_raw ??
+      `Вопрос из направления ${track.title} на PreOffer`,
   };
 }
 
@@ -45,12 +80,18 @@ export default async function QuestionPage({
     notFound();
   }
 
-  const [question, track] = await Promise.all([
-    getQuestionById(numericId),
-    Promise.resolve(getTrack(slug)),
+  const track = getTrack(slug);
+  const [question] = await Promise.all([
+    numericId != null ? getQuestionById(numericId) : Promise.resolve(null),
   ]);
 
-  if (!question || !track) {
+  const fallbackQuestion = track
+    ? findFallbackQuestion(slug, questionId, numericId, track.questions)
+    : null;
+
+  const finalQuestion = question ?? fallbackQuestion;
+
+  if (!finalQuestion || !track) {
     notFound();
   }
 
@@ -67,16 +108,16 @@ export default async function QuestionPage({
             </Link>
 
             <span className="rounded-full bg-gray-900 px-3 py-1 text-xs font-semibold text-white">
-              {question.chance || "—"} частота
+              {finalQuestion.chance || "—"} частота
             </span>
           </div>
 
           <p className="mt-3 text-sm uppercase tracking-[0.2em] text-gray-500">
-            {track?.title ?? question.direction}
+            {track.title ?? finalQuestion.direction}
           </p>
 
           <h1 className="mt-2 text-3xl font-bold text-gray-900 md:text-4xl">
-            {question.question}
+            {finalQuestion.question}
           </h1>
 
           <div className="mt-6 rounded-xl bg-gray-50 p-6 ring-1 ring-gray-200">
@@ -89,20 +130,20 @@ export default async function QuestionPage({
               структурированные ответы, чек-листы и ссылки на разборы.
             </p>
 
-            {question.answer_raw && (
+            {finalQuestion.answer_raw && (
               <p className="mt-4 text-sm text-gray-600">
                 Черновой источник ответа:{" "}
-                <span className="font-mono">{question.answer_raw}</span>
+                <span className="font-mono">{finalQuestion.answer_raw}</span>
               </p>
             )}
 
-            {question.videos && question.videos !== "EMPTY" && (
+            {finalQuestion.videos && finalQuestion.videos !== "EMPTY" && (
               <div className="mt-4">
                 <p className="text-sm font-semibold text-gray-800">
                   Видео по теме:
                 </p>
                 <a
-                  href={question.videos}
+                  href={finalQuestion.videos}
                   target="_blank"
                   rel="noreferrer"
                   className="text-sm text-blue-600 underline"
