@@ -19,6 +19,9 @@ const PRO_EMAILS = ["mamniashvili2003@gmail.com", "pokrasov.04@mail.ru"];
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [debouncedSkills, setDebouncedSkills] = useState<string[]>([]);
+  const [isSkillsOpen, setIsSkillsOpen] = useState(false);
   const [questions, setQuestions] = useState(track.questions);
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
@@ -40,6 +43,9 @@ export default function TrackDetail({ track }: { track: Track }) {
     setPage(1);
     setSearch("");
     setSelectedSkills([]);
+    setDebouncedSearch("");
+    setDebouncedSkills([]);
+    setIsSkillsOpen(false);
     setIsFetchingFiltered(false);
     setFilteredFetchPage(1);
     setHasMoreFilteredPages(true);
@@ -142,9 +148,23 @@ export default function TrackDetail({ track }: { track: Track }) {
     [track.slug]
   );
 
-  const normalizedSearch = search.trim().toLowerCase();
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearch(search);
+      setDebouncedSkills(selectedSkills);
+    }, 2000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [search, selectedSkills]);
+
+  const isFilterPending =
+    search !== debouncedSearch ||
+    selectedSkills.length !== debouncedSkills.length ||
+    selectedSkills.some((skill) => !debouncedSkills.includes(skill));
+
+  const normalizedSearch = debouncedSearch.trim().toLowerCase();
   const hasActiveFilters =
-    normalizedSearch.length > 0 || selectedSkills.length > 0;
+    normalizedSearch.length > 0 || debouncedSkills.length > 0;
 
   const filteredQuestions = useMemo(() => {
     const availableQuestions = isPro
@@ -154,7 +174,7 @@ export default function TrackDetail({ track }: { track: Track }) {
         : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
 
     const activeSkillFilters = skillFilters.filter((filter) =>
-      selectedSkills.includes(filter.id)
+      debouncedSkills.includes(filter.id)
     );
 
     return availableQuestions.filter((question) => {
@@ -177,7 +197,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     isPro,
     normalizedSearch,
     questions,
-    selectedSkills,
+    debouncedSkills,
     skillFilters,
   ]);
 
@@ -394,39 +414,66 @@ export default function TrackDetail({ track }: { track: Track }) {
         </p>
         <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
           {skillFilters.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-              <span className="font-medium text-gray-700">Навыки:</span>
-              {skillFilters.map((filter) => {
-                const isActive = selectedSkills.includes(filter.id);
-                return (
-                  <button
-                    key={filter.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedSkills((prev) =>
-                        prev.includes(filter.id)
-                          ? prev.filter((id) => id !== filter.id)
-                          : [...prev, filter.id]
+            <div className="relative text-sm text-gray-600">
+              <button
+                type="button"
+                onClick={() => setIsSkillsOpen((prev) => !prev)}
+                className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
+                  selectedSkills.length > 0
+                    ? "border-blue-600 bg-blue-50 text-blue-700"
+                    : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
+                }`}
+              >
+                Навыки
+                {selectedSkills.length > 0 && (
+                  <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">
+                    {selectedSkills.length}
+                  </span>
+                )}
+                <span className="text-gray-400">
+                  {isSkillsOpen ? "▲" : "▼"}
+                </span>
+              </button>
+              {isSkillsOpen && (
+                <div className="absolute left-0 top-full z-10 mt-2 w-[min(360px,90vw)] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
+                  <div className="flex flex-wrap gap-2">
+                    {skillFilters.map((filter) => {
+                      const isActive = selectedSkills.includes(filter.id);
+                      return (
+                        <button
+                          key={filter.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSkills((prev) =>
+                              prev.includes(filter.id)
+                                ? prev.filter((id) => id !== filter.id)
+                                : [...prev, filter.id]
+                            );
+                          }}
+                          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                            isActive
+                              ? "border-blue-600 bg-blue-50 text-blue-700"
+                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
+                          }`}
+                        >
+                          {filter.label}
+                        </button>
                       );
-                    }}
-                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                      isActive
-                        ? "border-blue-600 bg-blue-50 text-blue-700"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                );
-              })}
-              {selectedSkills.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedSkills([])}
-                  className="text-xs font-semibold text-blue-600 hover:text-blue-700"
-                >
-                  Сбросить
-                </button>
+                    })}
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                    <span>Выберите навыки для фильтрации</span>
+                    {selectedSkills.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSkills([])}
+                        className="font-semibold text-blue-600 hover:text-blue-700"
+                      >
+                        Сбросить
+                      </button>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -444,6 +491,11 @@ export default function TrackDetail({ track }: { track: Track }) {
           </label>
         </div>
       </div>
+      {isFilterPending && (
+        <div className="border-b border-gray-200 bg-gray-50 px-6 py-2 text-xs text-gray-500">
+          Обновляем результаты… Подождите пару секунд.
+        </div>
+      )}
 
       <div ref={listTopRef} className="divide-y divide-gray-200">
         {isLoadingPage || (isFetchingFiltered && paginatedQuestions.length === 0)
