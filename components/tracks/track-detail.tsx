@@ -442,75 +442,76 @@ export default function TrackDetail({ track }: { track: Track }) {
           )}
 
           <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
-          {skillFilters.length > 0 && (
-            <Popover className="relative text-sm text-gray-600">
-              <Popover.Button
-                className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
-                  selectedSkills.length > 0
-                    ? "border-blue-600 bg-blue-50 text-blue-700"
-                    : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
-                }`}
-              >
-                Навыки
-                {selectedSkills.length > 0 && (
-                  <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">
-                    {selectedSkills.length}
-                  </span>
-                )}
-                <span className="text-gray-400">▾</span>
-              </Popover.Button>
-              <Popover.Panel className="absolute left-0 top-full z-10 mt-2 w-[min(360px,90vw)] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
-                <div className="flex flex-wrap gap-2">
-                  {skillFilters.map((filter) => {
-                    const isActive = selectedSkills.includes(filter.id);
-                    return (
-                      <button
-                        key={filter.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedSkills((prev) =>
-                            prev.includes(filter.id)
-                              ? prev.filter((id) => id !== filter.id)
-                              : [...prev, filter.id]
-                          );
-                        }}
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                          isActive
-                            ? "border-blue-600 bg-blue-50 text-blue-700"
-                            : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
-                        }`}
-                      >
-                        {filter.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                {selectedSkills.length > 0 && (
-                  <div className="mt-3 flex justify-end text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedSkills([])}
-                      className="font-semibold text-blue-600 hover:text-blue-700"
-                    >
-                      Сбросить
-                    </button>
+            {skillFilters.length > 0 && (
+              <Popover className="relative text-sm text-gray-600">
+                <Popover.Button
+                  className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
+                    selectedSkills.length > 0
+                      ? "border-blue-600 bg-blue-50 text-blue-700"
+                      : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
+                  }`}
+                >
+                  Навыки
+                  {selectedSkills.length > 0 && (
+                    <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">
+                      {selectedSkills.length}
+                    </span>
+                  )}
+                  <span className="text-gray-400">▾</span>
+                </Popover.Button>
+                <Popover.Panel className="absolute left-0 top-full z-10 mt-2 w-[min(360px,90vw)] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
+                  <div className="flex flex-wrap gap-2">
+                    {skillFilters.map((filter) => {
+                      const isActive = selectedSkills.includes(filter.id);
+                      return (
+                        <button
+                          key={filter.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSkills((prev) =>
+                              prev.includes(filter.id)
+                                ? prev.filter((id) => id !== filter.id)
+                                : [...prev, filter.id]
+                            );
+                          }}
+                          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                            isActive
+                              ? "border-blue-600 bg-blue-50 text-blue-700"
+                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
+                          }`}
+                        >
+                          {filter.label}
+                        </button>
+                      );
+                    })}
                   </div>
-                )}
-              </Popover.Panel>
-            </Popover>
-          )}
-          <label className="relative md:w-auto">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-              🔍
-            </span>
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Найти вопрос"
-              className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
-            />
-          </label>
+                  {selectedSkills.length > 0 && (
+                    <div className="mt-3 flex justify-end text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSkills([])}
+                        className="font-semibold text-blue-600 hover:text-blue-700"
+                      >
+                        Сбросить
+                      </button>
+                    </div>
+                  )}
+                </Popover.Panel>
+              </Popover>
+            )}
+            <label className="relative md:w-auto">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                🔍
+              </span>
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Найти вопрос"
+                className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
+              />
+            </label>
+          </div>
         </div>
       </div>
       {isFilterPending && (
