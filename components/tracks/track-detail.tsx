@@ -261,19 +261,10 @@ export default function TrackDetail({ track }: { track: Track }) {
       return;
     }
 
-    if (questions.length > QUESTIONS_PER_PAGE || page !== 1) {
-      setQuestions(track.questions);
-      setTotalQuestions(track.stats.questions);
-      setPage(1);
-    }
-  }, [
-    hasActiveFilters,
-    isPro,
-    page,
-    questions.length,
-    track.questions,
-    track.stats.questions,
-  ]);
+    setQuestions(track.questions);
+    setTotalQuestions(track.stats.questions);
+    setPage(1);
+  }, [hasActiveFilters, isPro, track.questions, track.stats.questions]);
 
   useEffect(() => {
     if (!hasActiveFilters) return;
