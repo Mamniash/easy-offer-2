@@ -20,15 +20,11 @@ const PRO_EMAILS = ["mamniashvili2003@gmail.com", "pokrasov.04@mail.ru"];
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [debouncedSkills, setDebouncedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
-  const [filteredFetchPage, setFilteredFetchPage] = useState(1);
-  const [hasMoreFilteredPages, setHasMoreFilteredPages] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -43,11 +39,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     setPage(1);
     setSearch("");
     setSelectedSkills([]);
-    setDebouncedSearch("");
-    setDebouncedSkills([]);
     setIsFetchingFiltered(false);
-    setFilteredFetchPage(1);
-    setHasMoreFilteredPages(true);
   }, [track]);
 
   useEffect(() => {
@@ -147,26 +139,12 @@ export default function TrackDetail({ track }: { track: Track }) {
     [track.slug]
   );
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setDebouncedSearch(search);
-      setDebouncedSkills(selectedSkills);
-    }, 2000);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [search, selectedSkills]);
-
-  const isFilterPending =
-    search !== debouncedSearch ||
-    selectedSkills.length !== debouncedSkills.length ||
-    selectedSkills.some((skill) => !debouncedSkills.includes(skill));
-
-  const normalizedSearch = debouncedSearch.trim().toLowerCase();
+  const normalizedSearch = search.trim().toLowerCase();
   const hasActiveFilters =
-    normalizedSearch.length > 0 || debouncedSkills.length > 0;
+    normalizedSearch.length > 0 || selectedSkills.length > 0;
   const appliedSkillFilters = useMemo(
-    () => skillFilters.filter((filter) => debouncedSkills.includes(filter.id)),
-    [debouncedSkills, skillFilters]
+    () => skillFilters.filter((filter) => selectedSkills.includes(filter.id)),
+    [selectedSkills, skillFilters]
   );
 
   const filteredQuestions = useMemo(() => {
@@ -208,74 +186,56 @@ export default function TrackDetail({ track }: { track: Track }) {
     return filteredQuestions.slice(startIndex, endIndex);
   }, [filteredQuestions, hasActiveFilters, page]);
 
-  const fetchNextFilteredPage = useCallback(async () => {
+  const fetchAllQuestions = useCallback(async () => {
     if (!isAuthorized || !isPro) return;
-    if (isFetchingFiltered || !hasMoreFilteredPages) return;
+    if (isFetchingFiltered) return;
 
     setIsFetchingFiltered(true);
 
     try {
-      const nextPage = filteredFetchPage + 1;
-      const response = await fetch(
-        `/api/tracks/${track.slug}/questions?page=${nextPage}&perPage=${QUESTIONS_PER_PAGE}`,
-        { cache: "no-store" }
-      );
+      const fetchedQuestions: Track["questions"] = [];
+      let currentPage = 1;
+      let hasMore = true;
 
-      if (!response.ok) {
-        throw new Error(
-          `Не удалось загрузить вопросы: ${response.statusText}`
+      while (hasMore) {
+        const response = await fetch(
+          `/api/tracks/${track.slug}/questions?page=${currentPage}&perPage=${QUESTIONS_PER_PAGE}`,
+          { cache: "no-store" }
         );
+
+        if (!response.ok) {
+          throw new Error(
+            `Не удалось загрузить вопросы: ${response.statusText}`
+          );
+        }
+
+        const payload = await response.json();
+        const nextPageQuestions = payload.questions ?? [];
+
+        fetchedQuestions.push(...nextPageQuestions);
+
+        hasMore = nextPageQuestions.length === QUESTIONS_PER_PAGE;
+        currentPage += 1;
+
+        if (!hasMore) {
+          setTotalQuestions((prev) => payload.total ?? prev);
+        }
       }
 
-      const payload = await response.json();
-      const nextPageQuestions = payload.questions ?? [];
-
-      setQuestions((prev) => [...prev, ...nextPageQuestions]);
-      setFilteredFetchPage(nextPage);
-      setHasMoreFilteredPages(nextPageQuestions.length === QUESTIONS_PER_PAGE);
-      setTotalQuestions((prev) => payload.total ?? prev);
+      setQuestions(fetchedQuestions);
+      setPage(1);
     } catch (error) {
-      console.error("[TrackDetail] Ошибка подгрузки вопросов", error);
+      console.error("[TrackDetail] Ошибка загрузки всех вопросов", error);
     } finally {
       setIsFetchingFiltered(false);
     }
-  }, [
-    filteredFetchPage,
-    hasMoreFilteredPages,
-    isAuthorized,
-    isFetchingFiltered,
-    isPro,
-    track.slug,
-  ]);
-
-  const ensureFilteredPageFilled = useCallback(async () => {
-    if (!hasActiveFilters || !isAuthorized || !isPro) return;
-    if (!hasMoreFilteredPages || isFetchingFiltered) return;
-
-    const needed = page * QUESTIONS_PER_PAGE;
-
-    if (filteredQuestions.length >= needed) return;
-
-    await fetchNextFilteredPage();
-  }, [
-    fetchNextFilteredPage,
-    filteredQuestions.length,
-    hasActiveFilters,
-    hasMoreFilteredPages,
-    isAuthorized,
-    isFetchingFiltered,
-    isPro,
-    page,
-  ]);
+  }, [isAuthorized, isFetchingFiltered, isPro, track.slug]);
 
   useEffect(() => {
     if (!isPro) return;
 
     if (hasActiveFilters) {
-      setQuestions(track.questions);
-      setFilteredFetchPage(1);
-      setHasMoreFilteredPages(true);
-      setPage(1);
+      fetchAllQuestions();
       return;
     }
 
@@ -286,17 +246,14 @@ export default function TrackDetail({ track }: { track: Track }) {
 
   useEffect(() => {
     if (!hasActiveFilters) return;
-    ensureFilteredPageFilled();
-  }, [ensureFilteredPageFilled, hasActiveFilters, page]);
+  }, [hasActiveFilters]);
 
   const totalPages = isPro
     ? Math.max(
         1,
         Math.ceil(
           (hasActiveFilters
-            ? hasMoreFilteredPages
-              ? Math.max(filteredQuestions.length, page * QUESTIONS_PER_PAGE)
-              : filteredQuestions.length
+            ? filteredQuestions.length
             : totalQuestions || filteredQuestions.length || 1) /
             QUESTIONS_PER_PAGE
         )
@@ -413,7 +370,7 @@ export default function TrackDetail({ track }: { track: Track }) {
               <span className="font-semibold text-gray-900">Фильтры:</span>
               {normalizedSearch && (
                 <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                  Поиск: “{debouncedSearch}”
+                  Поиск: “{search}”
                 </span>
               )}
               {appliedSkillFilters.map((filter) => (
@@ -514,12 +471,6 @@ export default function TrackDetail({ track }: { track: Track }) {
           </div>
         </div>
       </div>
-      {isFilterPending && (
-        <div className="border-b border-gray-200 bg-gray-50 px-6 py-2 text-xs text-gray-500">
-          Обновляем результаты… Подождите пару секунд.
-        </div>
-      )}
-
       <div ref={listTopRef} className="divide-y divide-gray-200">
         {isLoadingPage || (isFetchingFiltered && paginatedQuestions.length === 0)
           ? Array.from({ length: 6 }).map((_, index) => (
