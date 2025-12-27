@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import QuestionMarkPanel from "@/components/questions/question-mark-panel";
 import {
   getQuestionById,
   parseVideosField,
@@ -127,6 +128,8 @@ export default async function QuestionPage({
           <h1 className="mt-2 text-3xl font-bold text-gray-900 md:text-4xl">
             {question.question}
           </h1>
+
+          <QuestionMarkPanel questionId={question.id} />
 
           <div
             className={`mt-6 ${

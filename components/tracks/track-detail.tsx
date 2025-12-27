@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  defaultQuestionMarkState,
+  type QuestionMarkState,
+} from "@/lib/question-marks";
 import type { Track } from "@/lib/tracks";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -19,6 +23,10 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [questionMarks, setQuestionMarks] = useState<
+    Record<string, QuestionMarkState>
+  >({});
   const listTopRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -42,6 +50,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       const hasPro = email ? PRO_EMAILS.includes(email) : false;
 
       setIsAuthorized(Boolean(session?.user));
+      setUserId(session?.user?.id ?? null);
       setIsPro(hasPro);
     };
 
@@ -56,6 +65,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       const hasPro = email ? PRO_EMAILS.includes(email) : false;
 
       setIsAuthorized(Boolean(session?.user));
+      setUserId(session?.user?.id ?? null);
       setIsPro(hasPro);
     });
 
@@ -64,6 +74,60 @@ export default function TrackDetail({ track }: { track: Track }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchQuestionMarks = async () => {
+      if (!userId) {
+        if (isMounted) {
+          setQuestionMarks({});
+          setIsLoadingMarks(false);
+        }
+        return;
+      }
+
+      const questionIds = questions
+        .map((question) => Number(question.id))
+        .filter((value) => Number.isFinite(value));
+
+      if (questionIds.length === 0) {
+        setQuestionMarks({});
+          return;
+        }
+
+      const { data, error } = await supabase
+        .from("question_marks")
+        .select("question_id,favorite,known,unknown")
+        .eq("user_id", userId)
+        .in("question_id", questionIds);
+
+      if (!isMounted) return;
+
+      if (error) {
+        console.error("[TrackDetail] Failed to load question marks", error);
+        return;
+      }
+
+      const nextMarks: Record<string, QuestionMarkState> = {};
+
+      (data ?? []).forEach((mark) => {
+        nextMarks[String(mark.question_id)] = {
+          favorite: Boolean(mark.favorite),
+          known: Boolean(mark.known),
+          unknown: Boolean(mark.unknown),
+        };
+      });
+
+      setQuestionMarks(nextMarks);
+    };
+
+    fetchQuestionMarks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [questions, userId]);
 
   const filteredQuestions = useMemo(() => {
     const availableQuestions = isPro
@@ -200,42 +264,14 @@ export default function TrackDetail({ track }: { track: Track }) {
               <QuestionSkeleton key={index} />
             ))
           : filteredQuestions.map((question) => (
-              <Link
+              <QuestionRow
                 key={question.id}
-                href={`/tracks/${track.slug}/questions/${question.id}`}
-                className="group block px-6 py-5 transition hover:bg-blue-50/60"
-              >
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white">
-                      <span
-                        className="h-2 w-2 rounded-full bg-emerald-400"
-                        aria-hidden
-                      />
-                      {question.frequency}%
-                    </div>
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.16em] text-gray-500">
-                        {question.category}
-                      </p>
-                      <p className="text-lg font-semibold text-gray-900 group-hover:text-blue-700">
-                        {question.question}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="w-full max-w-md">
-                    <div className="h-2 rounded-full bg-gray-100">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-400"
-                        style={{ width: `${question.frequency}%` }}
-                      />
-                    </div>
-                    <p className="mt-2 text-right text-xs font-medium text-gray-500">
-                      Частота по собеседованиям
-                    </p>
-                  </div>
-                </div>
-              </Link>
+                question={question}
+                slug={track.slug}
+                markState={
+                  questionMarks[question.id] ?? defaultQuestionMarkState
+                }
+              />
             ))}
 
         {isEmptyState && (
@@ -356,5 +392,65 @@ function QuestionSkeleton() {
         </div>
       </div>
     </div>
+  );
+}
+
+type QuestionRowProps = {
+  question: Track["questions"][number];
+  slug: Track["slug"];
+  markState: QuestionMarkState;
+};
+
+function QuestionRow({ question, slug, markState }: QuestionRowProps) {
+  const statusDotClassName = markState.known
+    ? "bg-emerald-400"
+    : markState.unknown
+      ? "bg-rose-400"
+      : "bg-gray-300";
+
+  return (
+    <Link
+      href={`/tracks/${slug}/questions/${question.id}`}
+      className="group block px-6 py-5 transition hover:bg-blue-50/60"
+    >
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white">
+            <span
+              className={`h-2 w-2 rounded-full ${statusDotClassName}`}
+              aria-hidden
+            />
+            {question.frequency}%
+          </div>
+          <div>
+            <p className="text-sm uppercase tracking-[0.16em] text-gray-500">
+              {question.category}
+            </p>
+            <p className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-700">
+              {question.question}
+              {markState.favorite && (
+                <span
+                  className="text-base text-yellow-500"
+                  aria-label="В избранном"
+                >
+                  ★
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+        <div className="w-full max-w-md">
+          <div className="h-2 rounded-full bg-gray-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-400"
+              style={{ width: `${question.frequency}%` }}
+            />
+          </div>
+          <p className="mt-2 text-right text-xs font-medium text-gray-500">
+            Частота по собеседованиям
+          </p>
+        </div>
+      </div>
+    </Link>
   );
 }
