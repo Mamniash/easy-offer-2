@@ -23,6 +23,7 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [isFetchingAll, setIsFetchingAll] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -37,6 +38,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     setPage(1);
     setSearch("");
     setSelectedSkills([]);
+    setIsFetchingAll(false);
   }, [track]);
 
   useEffect(() => {
@@ -136,13 +138,16 @@ export default function TrackDetail({ track }: { track: Track }) {
     [track.slug]
   );
 
+  const normalizedSearch = search.trim().toLowerCase();
+  const hasActiveFilters =
+    normalizedSearch.length > 0 || selectedSkills.length > 0;
+
   const filteredQuestions = useMemo(() => {
     const availableQuestions = isPro
       ? questions
       : isAuthorized
         ? questions.slice(0, AUTHORIZED_QUESTIONS_LIMIT)
         : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
-    const normalizedSearch = search.trim().toLowerCase();
 
     const activeSkillFilters = skillFilters.filter((filter) =>
       selectedSkills.includes(filter.id)
@@ -163,13 +168,100 @@ export default function TrackDetail({ track }: { track: Track }) {
         filter.keywords.some((keyword) => combinedText.includes(keyword))
       );
     });
-  }, [isAuthorized, questions, search, selectedSkills, skillFilters]);
+  }, [
+    isAuthorized,
+    isPro,
+    normalizedSearch,
+    questions,
+    selectedSkills,
+    skillFilters,
+  ]);
+
+  const paginatedQuestions = useMemo(() => {
+    if (!hasActiveFilters) return filteredQuestions;
+
+    const startIndex = (page - 1) * QUESTIONS_PER_PAGE;
+    const endIndex = startIndex + QUESTIONS_PER_PAGE;
+
+    return filteredQuestions.slice(startIndex, endIndex);
+  }, [filteredQuestions, hasActiveFilters, page]);
+
+  const fetchAllQuestions = useCallback(async () => {
+    if (!isAuthorized || !isPro) return;
+    if (isFetchingAll) return;
+
+    setIsFetchingAll(true);
+
+    try {
+      const fetchedQuestions: Track["questions"] = [];
+      let currentPage = 1;
+      let hasMore = true;
+
+      while (hasMore) {
+        const response = await fetch(
+          `/api/tracks/${track.slug}/questions?page=${currentPage}&perPage=${QUESTIONS_PER_PAGE}`,
+          { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Не удалось загрузить вопросы: ${response.statusText}`
+          );
+        }
+
+        const payload = await response.json();
+        const nextPageQuestions = payload.questions ?? [];
+
+        fetchedQuestions.push(...nextPageQuestions);
+
+        hasMore = nextPageQuestions.length === QUESTIONS_PER_PAGE;
+        currentPage += 1;
+
+        if (!hasMore) {
+          setTotalQuestions((prev) => payload.total ?? prev);
+        }
+      }
+
+      setQuestions(fetchedQuestions);
+      setPage(1);
+    } catch (error) {
+      console.error("[TrackDetail] Ошибка загрузки всех вопросов", error);
+    } finally {
+      setIsFetchingAll(false);
+    }
+  }, [isAuthorized, isFetchingAll, isPro, track.slug]);
+
+  useEffect(() => {
+    if (!isPro) return;
+
+    if (hasActiveFilters) {
+      fetchAllQuestions();
+      return;
+    }
+
+    if (questions.length > QUESTIONS_PER_PAGE || page !== 1) {
+      setQuestions(track.questions);
+      setTotalQuestions(track.stats.questions);
+      setPage(1);
+    }
+  }, [
+    fetchAllQuestions,
+    hasActiveFilters,
+    isPro,
+    page,
+    questions.length,
+    track.questions,
+    track.stats.questions,
+  ]);
 
   const totalPages = isPro
     ? Math.max(
         1,
         Math.ceil(
-          (totalQuestions || filteredQuestions.length || 1) / QUESTIONS_PER_PAGE
+          (hasActiveFilters
+            ? filteredQuestions.length
+            : totalQuestions || filteredQuestions.length || 1) /
+            QUESTIONS_PER_PAGE
         )
       )
     : 1;
@@ -192,6 +284,11 @@ export default function TrackDetail({ track }: { track: Track }) {
   const loadPage = useCallback(
     async (nextPage: number) => {
       if (!isAuthorized) return;
+      if (hasActiveFilters) {
+        if (nextPage < 1 || nextPage > totalPages) return;
+        setPage(nextPage);
+        return;
+      }
       if (nextPage === page || nextPage < 1 || nextPage > totalPages) return;
 
       setIsLoadingPage(true);
@@ -220,7 +317,14 @@ export default function TrackDetail({ track }: { track: Track }) {
         setIsLoadingPage(false);
       }
     },
-    [isAuthorized, page, scrollToFirstQuestion, totalPages, track.slug]
+    [
+      hasActiveFilters,
+      isAuthorized,
+      page,
+      scrollToFirstQuestion,
+      totalPages,
+      track.slug,
+    ]
   );
 
   const paginationItems = useMemo(() => {
@@ -250,11 +354,14 @@ export default function TrackDetail({ track }: { track: Track }) {
     return items;
   }, [page, totalPages]);
 
-  const isEmptyState = !isLoadingPage && filteredQuestions.length === 0;
+  const isEmptyState = !isLoadingPage && paginatedQuestions.length === 0;
   const hasPagination = isPro && totalPages > 1;
   const visibleQuestionsCount = isPro
-    ? totalQuestions
+    ? hasActiveFilters
+      ? filteredQuestions.length
+      : totalQuestions
     : Math.min(
+        filteredQuestions.length,
         totalQuestions,
         isAuthorized ? AUTHORIZED_QUESTIONS_LIMIT : UNAUTHORIZED_QUESTIONS_LIMIT
       );
@@ -319,11 +426,11 @@ export default function TrackDetail({ track }: { track: Track }) {
       </div>
 
       <div ref={listTopRef} className="divide-y divide-gray-200">
-        {isLoadingPage
+        {isLoadingPage || isFetchingAll
           ? Array.from({ length: 6 }).map((_, index) => (
               <QuestionSkeleton key={index} />
             ))
-          : filteredQuestions.map((question) => (
+          : paginatedQuestions.map((question) => (
               <QuestionRow
                 key={question.id}
                 question={question}
