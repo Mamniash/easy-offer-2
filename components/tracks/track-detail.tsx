@@ -406,6 +406,11 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
     : markState.unknown
       ? "bg-rose-400"
       : "bg-gray-300";
+  const statusPillClassName = markState.known
+    ? "shadow-[0_0_0_3px_rgba(16,185,129,0.2)]"
+    : markState.unknown
+      ? "shadow-[0_0_0_3px_rgba(244,63,94,0.2)]"
+      : "";
 
   return (
     <Link
@@ -414,7 +419,9 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white">
+          <div
+            className={`flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white ${statusPillClassName}`}
+          >
             <span
               className={`h-2 w-2 rounded-full ${statusDotClassName}`}
               aria-hidden
