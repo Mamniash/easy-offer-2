@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { Popover } from "@headlessui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   defaultQuestionMarkState,
   type QuestionMarkState,
 } from "@/lib/question-marks";
+import { getTrackSkillFilters } from "@/lib/track-skill-filters";
 import type { Track } from "@/lib/tracks";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -17,10 +19,12 @@ const PRO_EMAILS = ["mamniashvili2003@gmail.com", "pokrasov.04@mail.ru"];
 
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -34,6 +38,8 @@ export default function TrackDetail({ track }: { track: Track }) {
     setTotalQuestions(track.stats.questions);
     setPage(1);
     setSearch("");
+    setSelectedSkills([]);
+    setIsFetchingFiltered(false);
   }, [track]);
 
   useEffect(() => {
@@ -128,26 +134,128 @@ export default function TrackDetail({ track }: { track: Track }) {
     };
   }, [questions, userId]);
 
+  const skillFilters = useMemo(
+    () => getTrackSkillFilters(track.slug),
+    [track.slug]
+  );
+
+  const normalizedSearch = search.trim().toLowerCase();
+  const hasActiveFilters =
+    normalizedSearch.length > 0 || selectedSkills.length > 0;
+  const appliedSkillFilters = useMemo(
+    () => skillFilters.filter((filter) => selectedSkills.includes(filter.id)),
+    [selectedSkills, skillFilters]
+  );
+
   const filteredQuestions = useMemo(() => {
     const availableQuestions = isPro
       ? questions
       : isAuthorized
         ? questions.slice(0, AUTHORIZED_QUESTIONS_LIMIT)
         : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
-    const normalizedSearch = search.trim().toLowerCase();
 
-    if (!normalizedSearch) return availableQuestions;
+    return availableQuestions.filter((question) => {
+      const normalizedQuestion = question.question.toLowerCase();
+      const normalizedAnswer = question.answer?.toLowerCase() ?? "";
+      const combinedText = `${normalizedQuestion} ${normalizedAnswer}`;
 
-    return availableQuestions.filter((question) =>
-      question.question.toLowerCase().includes(normalizedSearch)
-    );
-  }, [isAuthorized, questions, search]);
+      if (normalizedSearch && !combinedText.includes(normalizedSearch)) {
+        return false;
+      }
+
+      if (appliedSkillFilters.length === 0) return true;
+
+      return appliedSkillFilters.some((filter) =>
+        filter.keywords.some((keyword) => combinedText.includes(keyword))
+      );
+    });
+  }, [
+    isAuthorized,
+    isPro,
+    normalizedSearch,
+    questions,
+    appliedSkillFilters,
+  ]);
+
+  const paginatedQuestions = useMemo(() => {
+    if (!hasActiveFilters) return filteredQuestions;
+
+    const startIndex = (page - 1) * QUESTIONS_PER_PAGE;
+    const endIndex = startIndex + QUESTIONS_PER_PAGE;
+
+    return filteredQuestions.slice(startIndex, endIndex);
+  }, [filteredQuestions, hasActiveFilters, page]);
+
+  const fetchAllQuestions = useCallback(async () => {
+    if (!isAuthorized || !isPro) return;
+    if (isFetchingFiltered) return;
+
+    setIsFetchingFiltered(true);
+
+    try {
+      const fetchedQuestions: Track["questions"] = [];
+      let currentPage = 1;
+      let hasMore = true;
+
+      while (hasMore) {
+        const response = await fetch(
+          `/api/tracks/${track.slug}/questions?page=${currentPage}&perPage=${QUESTIONS_PER_PAGE}`,
+          { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Не удалось загрузить вопросы: ${response.statusText}`
+          );
+        }
+
+        const payload = await response.json();
+        const nextPageQuestions = payload.questions ?? [];
+
+        fetchedQuestions.push(...nextPageQuestions);
+
+        hasMore = nextPageQuestions.length === QUESTIONS_PER_PAGE;
+        currentPage += 1;
+
+        if (!hasMore) {
+          setTotalQuestions((prev) => payload.total ?? prev);
+        }
+      }
+
+      setQuestions(fetchedQuestions);
+      setPage(1);
+    } catch (error) {
+      console.error("[TrackDetail] Ошибка загрузки всех вопросов", error);
+    } finally {
+      setIsFetchingFiltered(false);
+    }
+  }, [isAuthorized, isFetchingFiltered, isPro, track.slug]);
+
+  useEffect(() => {
+    if (!isPro) return;
+
+    if (hasActiveFilters) {
+      fetchAllQuestions();
+      return;
+    }
+
+    setQuestions(track.questions);
+    setTotalQuestions(track.stats.questions);
+    setPage(1);
+  }, [hasActiveFilters, isPro, track.questions, track.stats.questions]);
+
+  useEffect(() => {
+    if (!hasActiveFilters) return;
+  }, [hasActiveFilters]);
 
   const totalPages = isPro
     ? Math.max(
         1,
         Math.ceil(
-          (totalQuestions || filteredQuestions.length || 1) / QUESTIONS_PER_PAGE
+          (hasActiveFilters
+            ? filteredQuestions.length
+            : totalQuestions || filteredQuestions.length || 1) /
+            QUESTIONS_PER_PAGE
         )
       )
     : 1;
@@ -170,6 +278,11 @@ export default function TrackDetail({ track }: { track: Track }) {
   const loadPage = useCallback(
     async (nextPage: number) => {
       if (!isAuthorized) return;
+      if (hasActiveFilters) {
+        if (nextPage < 1 || nextPage > totalPages) return;
+        setPage(nextPage);
+        return;
+      }
       if (nextPage === page || nextPage < 1 || nextPage > totalPages) return;
 
       setIsLoadingPage(true);
@@ -198,7 +311,14 @@ export default function TrackDetail({ track }: { track: Track }) {
         setIsLoadingPage(false);
       }
     },
-    [isAuthorized, page, scrollToFirstQuestion, totalPages, track.slug]
+    [
+      hasActiveFilters,
+      isAuthorized,
+      page,
+      scrollToFirstQuestion,
+      totalPages,
+      track.slug,
+    ]
   );
 
   const paginationItems = useMemo(() => {
@@ -228,11 +348,15 @@ export default function TrackDetail({ track }: { track: Track }) {
     return items;
   }, [page, totalPages]);
 
-  const isEmptyState = !isLoadingPage && filteredQuestions.length === 0;
+  const isEmptyState =
+    !isLoadingPage && !isFetchingFiltered && paginatedQuestions.length === 0;
   const hasPagination = isPro && totalPages > 1;
   const visibleQuestionsCount = isPro
-    ? totalQuestions
+    ? hasActiveFilters
+      ? filteredQuestions.length
+      : totalQuestions
     : Math.min(
+        filteredQuestions.length,
         totalQuestions,
         isAuthorized ? AUTHORIZED_QUESTIONS_LIMIT : UNAUTHORIZED_QUESTIONS_LIMIT
       );
@@ -240,29 +364,119 @@ export default function TrackDetail({ track }: { track: Track }) {
   return (
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex flex-col gap-3 border-b border-gray-200 px-6 py-5 md:flex-row md:items-center md:justify-between">
-        <p className="text-base font-semibold text-gray-900 md:text-lg">
-          {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
-        </p>
-        <label className="relative md:w-auto">
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-            🔍
-          </span>
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Найти вопрос"
-            className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
-          />
-        </label>
-      </div>
+        <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          {hasActiveFilters ? (
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+              <span className="font-semibold text-gray-900">Фильтры:</span>
+              {normalizedSearch && (
+                <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                  Поиск: “{search}”
+                </span>
+              )}
+              {appliedSkillFilters.map((filter) => (
+                <span
+                  key={filter.id}
+                  className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700"
+                >
+                  {filter.label}
+                </span>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setSelectedSkills([]);
+                }}
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+              >
+                Сбросить
+              </button>
+            </div>
+          ) : (
+            <p className="text-base font-semibold text-gray-900 md:text-lg">
+              {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
+            </p>
+          )}
 
+          <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
+            {skillFilters.length > 0 && (
+              <Popover className="relative text-sm text-gray-600">
+                <Popover.Button
+                  className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
+                    selectedSkills.length > 0
+                      ? "border-blue-600 bg-blue-50 text-blue-700"
+                      : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
+                  }`}
+                >
+                  Навыки
+                  {selectedSkills.length > 0 && (
+                    <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">
+                      {selectedSkills.length}
+                    </span>
+                  )}
+                  <span className="text-gray-400">▾</span>
+                </Popover.Button>
+                <Popover.Panel className="absolute left-0 top-full z-10 mt-2 w-[min(360px,90vw)] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
+                  <div className="flex flex-wrap gap-2">
+                    {skillFilters.map((filter) => {
+                      const isActive = selectedSkills.includes(filter.id);
+                      return (
+                        <button
+                          key={filter.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedSkills((prev) =>
+                              prev.includes(filter.id)
+                                ? prev.filter((id) => id !== filter.id)
+                                : [...prev, filter.id]
+                            );
+                          }}
+                          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                            isActive
+                              ? "border-blue-600 bg-blue-50 text-blue-700"
+                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
+                          }`}
+                        >
+                          {filter.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedSkills.length > 0 && (
+                    <div className="mt-3 flex justify-end text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSkills([])}
+                        className="font-semibold text-blue-600 hover:text-blue-700"
+                      >
+                        Сбросить
+                      </button>
+                    </div>
+                  )}
+                </Popover.Panel>
+              </Popover>
+            )}
+            <label className="relative md:w-auto">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                🔍
+              </span>
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Найти вопрос"
+                className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
       <div ref={listTopRef} className="divide-y divide-gray-200">
-        {isLoadingPage
+        {isLoadingPage || (isFetchingFiltered && paginatedQuestions.length === 0)
           ? Array.from({ length: 6 }).map((_, index) => (
               <QuestionSkeleton key={index} />
             ))
-          : filteredQuestions.map((question) => (
+          : paginatedQuestions.map((question) => (
               <QuestionRow
                 key={question.id}
                 question={question}
