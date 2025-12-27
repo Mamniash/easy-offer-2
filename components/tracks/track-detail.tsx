@@ -23,7 +23,9 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [isFetchingAll, setIsFetchingAll] = useState(false);
+  const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
+  const [filteredFetchPage, setFilteredFetchPage] = useState(1);
+  const [hasMoreFilteredPages, setHasMoreFilteredPages] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -38,7 +40,9 @@ export default function TrackDetail({ track }: { track: Track }) {
     setPage(1);
     setSearch("");
     setSelectedSkills([]);
-    setIsFetchingAll(false);
+    setIsFetchingFiltered(false);
+    setFilteredFetchPage(1);
+    setHasMoreFilteredPages(true);
   }, [track]);
 
   useEffect(() => {
@@ -186,56 +190,74 @@ export default function TrackDetail({ track }: { track: Track }) {
     return filteredQuestions.slice(startIndex, endIndex);
   }, [filteredQuestions, hasActiveFilters, page]);
 
-  const fetchAllQuestions = useCallback(async () => {
+  const fetchNextFilteredPage = useCallback(async () => {
     if (!isAuthorized || !isPro) return;
-    if (isFetchingAll) return;
+    if (isFetchingFiltered || !hasMoreFilteredPages) return;
 
-    setIsFetchingAll(true);
+    setIsFetchingFiltered(true);
 
     try {
-      const fetchedQuestions: Track["questions"] = [];
-      let currentPage = 1;
-      let hasMore = true;
+      const nextPage = filteredFetchPage + 1;
+      const response = await fetch(
+        `/api/tracks/${track.slug}/questions?page=${nextPage}&perPage=${QUESTIONS_PER_PAGE}`,
+        { cache: "no-store" }
+      );
 
-      while (hasMore) {
-        const response = await fetch(
-          `/api/tracks/${track.slug}/questions?page=${currentPage}&perPage=${QUESTIONS_PER_PAGE}`,
-          { cache: "no-store" }
+      if (!response.ok) {
+        throw new Error(
+          `Не удалось загрузить вопросы: ${response.statusText}`
         );
-
-        if (!response.ok) {
-          throw new Error(
-            `Не удалось загрузить вопросы: ${response.statusText}`
-          );
-        }
-
-        const payload = await response.json();
-        const nextPageQuestions = payload.questions ?? [];
-
-        fetchedQuestions.push(...nextPageQuestions);
-
-        hasMore = nextPageQuestions.length === QUESTIONS_PER_PAGE;
-        currentPage += 1;
-
-        if (!hasMore) {
-          setTotalQuestions((prev) => payload.total ?? prev);
-        }
       }
 
-      setQuestions(fetchedQuestions);
-      setPage(1);
+      const payload = await response.json();
+      const nextPageQuestions = payload.questions ?? [];
+
+      setQuestions((prev) => [...prev, ...nextPageQuestions]);
+      setFilteredFetchPage(nextPage);
+      setHasMoreFilteredPages(nextPageQuestions.length === QUESTIONS_PER_PAGE);
+      setTotalQuestions((prev) => payload.total ?? prev);
     } catch (error) {
-      console.error("[TrackDetail] Ошибка загрузки всех вопросов", error);
+      console.error("[TrackDetail] Ошибка подгрузки вопросов", error);
     } finally {
-      setIsFetchingAll(false);
+      setIsFetchingFiltered(false);
     }
-  }, [isAuthorized, isFetchingAll, isPro, track.slug]);
+  }, [
+    filteredFetchPage,
+    hasMoreFilteredPages,
+    isAuthorized,
+    isFetchingFiltered,
+    isPro,
+    track.slug,
+  ]);
+
+  const ensureFilteredPageFilled = useCallback(async () => {
+    if (!hasActiveFilters || !isAuthorized || !isPro) return;
+    if (!hasMoreFilteredPages || isFetchingFiltered) return;
+
+    const needed = page * QUESTIONS_PER_PAGE;
+
+    if (filteredQuestions.length >= needed) return;
+
+    await fetchNextFilteredPage();
+  }, [
+    fetchNextFilteredPage,
+    filteredQuestions.length,
+    hasActiveFilters,
+    hasMoreFilteredPages,
+    isAuthorized,
+    isFetchingFiltered,
+    isPro,
+    page,
+  ]);
 
   useEffect(() => {
     if (!isPro) return;
 
     if (hasActiveFilters) {
-      fetchAllQuestions();
+      setQuestions(track.questions);
+      setFilteredFetchPage(1);
+      setHasMoreFilteredPages(true);
+      setPage(1);
       return;
     }
 
@@ -245,7 +267,6 @@ export default function TrackDetail({ track }: { track: Track }) {
       setPage(1);
     }
   }, [
-    fetchAllQuestions,
     hasActiveFilters,
     isPro,
     page,
@@ -254,12 +275,19 @@ export default function TrackDetail({ track }: { track: Track }) {
     track.stats.questions,
   ]);
 
+  useEffect(() => {
+    if (!hasActiveFilters) return;
+    ensureFilteredPageFilled();
+  }, [ensureFilteredPageFilled, hasActiveFilters, page]);
+
   const totalPages = isPro
     ? Math.max(
         1,
         Math.ceil(
           (hasActiveFilters
-            ? filteredQuestions.length
+            ? hasMoreFilteredPages
+              ? Math.max(filteredQuestions.length, page * QUESTIONS_PER_PAGE)
+              : filteredQuestions.length
             : totalQuestions || filteredQuestions.length || 1) /
             QUESTIONS_PER_PAGE
         )
@@ -354,7 +382,8 @@ export default function TrackDetail({ track }: { track: Track }) {
     return items;
   }, [page, totalPages]);
 
-  const isEmptyState = !isLoadingPage && paginatedQuestions.length === 0;
+  const isEmptyState =
+    !isLoadingPage && !isFetchingFiltered && paginatedQuestions.length === 0;
   const hasPagination = isPro && totalPages > 1;
   const visibleQuestionsCount = isPro
     ? hasActiveFilters
@@ -426,7 +455,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       </div>
 
       <div ref={listTopRef} className="divide-y divide-gray-200">
-        {isLoadingPage || isFetchingAll
+        {isLoadingPage || (isFetchingFiltered && paginatedQuestions.length === 0)
           ? Array.from({ length: 6 }).map((_, index) => (
               <QuestionSkeleton key={index} />
             ))
