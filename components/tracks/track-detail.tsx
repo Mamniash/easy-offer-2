@@ -7,6 +7,7 @@ import {
   defaultQuestionMarkState,
   type QuestionMarkState,
 } from "@/lib/question-marks";
+import { getTrackSkillFilters } from "@/lib/track-skill-filters";
 import type { Track } from "@/lib/tracks";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -17,6 +18,7 @@ const PRO_EMAILS = ["mamniashvili2003@gmail.com", "pokrasov.04@mail.ru"];
 
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
@@ -34,6 +36,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     setTotalQuestions(track.stats.questions);
     setPage(1);
     setSearch("");
+    setSelectedSkills([]);
   }, [track]);
 
   useEffect(() => {
@@ -128,6 +131,11 @@ export default function TrackDetail({ track }: { track: Track }) {
     };
   }, [questions, userId]);
 
+  const skillFilters = useMemo(
+    () => getTrackSkillFilters(track.slug),
+    [track.slug]
+  );
+
   const filteredQuestions = useMemo(() => {
     const availableQuestions = isPro
       ? questions
@@ -136,12 +144,26 @@ export default function TrackDetail({ track }: { track: Track }) {
         : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
     const normalizedSearch = search.trim().toLowerCase();
 
-    if (!normalizedSearch) return availableQuestions;
-
-    return availableQuestions.filter((question) =>
-      question.question.toLowerCase().includes(normalizedSearch)
+    const activeSkillFilters = skillFilters.filter((filter) =>
+      selectedSkills.includes(filter.id)
     );
-  }, [isAuthorized, questions, search]);
+
+    return availableQuestions.filter((question) => {
+      const normalizedQuestion = question.question.toLowerCase();
+      const normalizedAnswer = question.answer?.toLowerCase() ?? "";
+      const combinedText = `${normalizedQuestion} ${normalizedAnswer}`;
+
+      if (normalizedSearch && !combinedText.includes(normalizedSearch)) {
+        return false;
+      }
+
+      if (activeSkillFilters.length === 0) return true;
+
+      return activeSkillFilters.some((filter) =>
+        filter.keywords.some((keyword) => combinedText.includes(keyword))
+      );
+    });
+  }, [isAuthorized, questions, search, selectedSkills, skillFilters]);
 
   const totalPages = isPro
     ? Math.max(
@@ -243,18 +265,57 @@ export default function TrackDetail({ track }: { track: Track }) {
         <p className="text-base font-semibold text-gray-900 md:text-lg">
           {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
         </p>
-        <label className="relative md:w-auto">
-          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-            🔍
-          </span>
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Найти вопрос"
-            className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
-          />
-        </label>
+        <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
+          {skillFilters.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+              <span className="font-medium text-gray-700">Навыки:</span>
+              {skillFilters.map((filter) => {
+                const isActive = selectedSkills.includes(filter.id);
+                return (
+                  <button
+                    key={filter.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedSkills((prev) =>
+                        prev.includes(filter.id)
+                          ? prev.filter((id) => id !== filter.id)
+                          : [...prev, filter.id]
+                      );
+                    }}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                      isActive
+                        ? "border-blue-600 bg-blue-50 text-blue-700"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                );
+              })}
+              {selectedSkills.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedSkills([])}
+                  className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                >
+                  Сбросить
+                </button>
+              )}
+            </div>
+          )}
+          <label className="relative md:w-auto">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              🔍
+            </span>
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Найти вопрос"
+              className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
+            />
+          </label>
+        </div>
       </div>
 
       <div ref={listTopRef} className="divide-y divide-gray-200">
