@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Popover } from "@headlessui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -21,7 +22,6 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [debouncedSkills, setDebouncedSkills] = useState<string[]>([]);
-  const [isSkillsOpen, setIsSkillsOpen] = useState(false);
   const [questions, setQuestions] = useState(track.questions);
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
@@ -45,7 +45,6 @@ export default function TrackDetail({ track }: { track: Track }) {
     setSelectedSkills([]);
     setDebouncedSearch("");
     setDebouncedSkills([]);
-    setIsSkillsOpen(false);
     setIsFetchingFiltered(false);
     setFilteredFetchPage(1);
     setHasMoreFilteredPages(true);
@@ -165,6 +164,10 @@ export default function TrackDetail({ track }: { track: Track }) {
   const normalizedSearch = debouncedSearch.trim().toLowerCase();
   const hasActiveFilters =
     normalizedSearch.length > 0 || debouncedSkills.length > 0;
+  const appliedSkillFilters = useMemo(
+    () => skillFilters.filter((filter) => debouncedSkills.includes(filter.id)),
+    [debouncedSkills, skillFilters]
+  );
 
   const filteredQuestions = useMemo(() => {
     const availableQuestions = isPro
@@ -172,10 +175,6 @@ export default function TrackDetail({ track }: { track: Track }) {
       : isAuthorized
         ? questions.slice(0, AUTHORIZED_QUESTIONS_LIMIT)
         : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
-
-    const activeSkillFilters = skillFilters.filter((filter) =>
-      debouncedSkills.includes(filter.id)
-    );
 
     return availableQuestions.filter((question) => {
       const normalizedQuestion = question.question.toLowerCase();
@@ -186,9 +185,9 @@ export default function TrackDetail({ track }: { track: Track }) {
         return false;
       }
 
-      if (activeSkillFilters.length === 0) return true;
+      if (appliedSkillFilters.length === 0) return true;
 
-      return activeSkillFilters.some((filter) =>
+      return appliedSkillFilters.some((filter) =>
         filter.keywords.some((keyword) => combinedText.includes(keyword))
       );
     });
@@ -197,8 +196,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     isPro,
     normalizedSearch,
     questions,
-    debouncedSkills,
-    skillFilters,
+    appliedSkillFilters,
   ]);
 
   const paginatedQuestions = useMemo(() => {
@@ -409,15 +407,44 @@ export default function TrackDetail({ track }: { track: Track }) {
   return (
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex flex-col gap-3 border-b border-gray-200 px-6 py-5 md:flex-row md:items-center md:justify-between">
-        <p className="text-base font-semibold text-gray-900 md:text-lg">
-          {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
-        </p>
-        <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
-          {skillFilters.length > 0 && (
-            <div className="relative text-sm text-gray-600">
+        <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          {hasActiveFilters ? (
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+              <span className="font-semibold text-gray-900">Фильтры:</span>
+              {normalizedSearch && (
+                <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                  Поиск: “{debouncedSearch}”
+                </span>
+              )}
+              {appliedSkillFilters.map((filter) => (
+                <span
+                  key={filter.id}
+                  className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700"
+                >
+                  {filter.label}
+                </span>
+              ))}
               <button
                 type="button"
-                onClick={() => setIsSkillsOpen((prev) => !prev)}
+                onClick={() => {
+                  setSearch("");
+                  setSelectedSkills([]);
+                }}
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+              >
+                Сбросить
+              </button>
+            </div>
+          ) : (
+            <p className="text-base font-semibold text-gray-900 md:text-lg">
+              {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
+            </p>
+          )}
+
+          <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
+          {skillFilters.length > 0 && (
+            <Popover className="relative text-sm text-gray-600">
+              <Popover.Button
                 className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
                   selectedSkills.length > 0
                     ? "border-blue-600 bg-blue-50 text-blue-700"
@@ -430,52 +457,47 @@ export default function TrackDetail({ track }: { track: Track }) {
                     {selectedSkills.length}
                   </span>
                 )}
-                <span className="text-gray-400">
-                  {isSkillsOpen ? "▲" : "▼"}
-                </span>
-              </button>
-              {isSkillsOpen && (
-                <div className="absolute left-0 top-full z-10 mt-2 w-[min(360px,90vw)] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
-                  <div className="flex flex-wrap gap-2">
-                    {skillFilters.map((filter) => {
-                      const isActive = selectedSkills.includes(filter.id);
-                      return (
-                        <button
-                          key={filter.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedSkills((prev) =>
-                              prev.includes(filter.id)
-                                ? prev.filter((id) => id !== filter.id)
-                                : [...prev, filter.id]
-                            );
-                          }}
-                          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                            isActive
-                              ? "border-blue-600 bg-blue-50 text-blue-700"
-                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
-                          }`}
-                        >
-                          {filter.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                    <span>Выберите навыки для фильтрации</span>
-                    {selectedSkills.length > 0 && (
+                <span className="text-gray-400">▾</span>
+              </Popover.Button>
+              <Popover.Panel className="absolute left-0 top-full z-10 mt-2 w-[min(360px,90vw)] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
+                <div className="flex flex-wrap gap-2">
+                  {skillFilters.map((filter) => {
+                    const isActive = selectedSkills.includes(filter.id);
+                    return (
                       <button
+                        key={filter.id}
                         type="button"
-                        onClick={() => setSelectedSkills([])}
-                        className="font-semibold text-blue-600 hover:text-blue-700"
+                        onClick={() => {
+                          setSelectedSkills((prev) =>
+                            prev.includes(filter.id)
+                              ? prev.filter((id) => id !== filter.id)
+                              : [...prev, filter.id]
+                          );
+                        }}
+                        className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                          isActive
+                            ? "border-blue-600 bg-blue-50 text-blue-700"
+                            : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
+                        }`}
                       >
-                        Сбросить
+                        {filter.label}
                       </button>
-                    )}
-                  </div>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
+                {selectedSkills.length > 0 && (
+                  <div className="mt-3 flex justify-end text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSkills([])}
+                      className="font-semibold text-blue-600 hover:text-blue-700"
+                    >
+                      Сбросить
+                    </button>
+                  </div>
+                )}
+              </Popover.Panel>
+            </Popover>
           )}
           <label className="relative md:w-auto">
             <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
