@@ -82,7 +82,6 @@ export default function TrackDetail({ track }: { track: Track }) {
       if (!userId) {
         if (isMounted) {
           setQuestionMarks({});
-          setIsLoadingMarks(false);
         }
         return;
       }
