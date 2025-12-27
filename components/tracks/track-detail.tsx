@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import QuestionMarkButtons from "@/components/questions/question-mark-buttons";
+import {
+  defaultQuestionMarkState,
+  getNextQuestionMarkState,
+  type QuestionMarkField,
+  type QuestionMarkState,
+} from "@/lib/question-marks";
 import type { Track } from "@/lib/tracks";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -19,6 +26,11 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [questionMarks, setQuestionMarks] = useState<
+    Record<string, QuestionMarkState>
+  >({});
+  const [isLoadingMarks, setIsLoadingMarks] = useState(false);
   const listTopRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -42,6 +54,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       const hasPro = email ? PRO_EMAILS.includes(email) : false;
 
       setIsAuthorized(Boolean(session?.user));
+      setUserId(session?.user?.id ?? null);
       setIsPro(hasPro);
     };
 
@@ -56,6 +69,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       const hasPro = email ? PRO_EMAILS.includes(email) : false;
 
       setIsAuthorized(Boolean(session?.user));
+      setUserId(session?.user?.id ?? null);
       setIsPro(hasPro);
     });
 
@@ -64,6 +78,103 @@ export default function TrackDetail({ track }: { track: Track }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchQuestionMarks = async () => {
+      if (!userId) {
+        if (isMounted) {
+          setQuestionMarks({});
+          setIsLoadingMarks(false);
+        }
+        return;
+      }
+
+      const questionIds = questions
+        .map((question) => Number(question.id))
+        .filter((value) => Number.isFinite(value));
+
+      if (questionIds.length === 0) {
+        setQuestionMarks({});
+        setIsLoadingMarks(false);
+        return;
+      }
+
+      setIsLoadingMarks(true);
+
+      const { data, error } = await supabase
+        .from("question_marks")
+        .select("question_id,favorite,known,unknown")
+        .eq("user_id", userId)
+        .in("question_id", questionIds);
+
+      if (!isMounted) return;
+
+      if (error) {
+        console.error("[TrackDetail] Failed to load question marks", error);
+        setIsLoadingMarks(false);
+        return;
+      }
+
+      const nextMarks: Record<string, QuestionMarkState> = {};
+
+      (data ?? []).forEach((mark) => {
+        nextMarks[String(mark.question_id)] = {
+          favorite: Boolean(mark.favorite),
+          known: Boolean(mark.known),
+          unknown: Boolean(mark.unknown),
+        };
+      });
+
+      setQuestionMarks(nextMarks);
+      setIsLoadingMarks(false);
+    };
+
+    fetchQuestionMarks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [questions, userId]);
+
+  const handleMarkToggle = useCallback(
+    async (questionId: string, field: QuestionMarkField) => {
+      if (!userId) return;
+
+      const numericQuestionId = Number(questionId);
+
+      if (!Number.isFinite(numericQuestionId)) return;
+
+      const current = questionMarks[questionId] ?? defaultQuestionMarkState;
+      const nextState = getNextQuestionMarkState(current, field);
+
+      setQuestionMarks((prev) => ({
+        ...prev,
+        [questionId]: nextState,
+      }));
+
+      const { error } = await supabase.from("question_marks").upsert(
+        {
+          user_id: userId,
+          question_id: numericQuestionId,
+          favorite: nextState.favorite,
+          known: nextState.known,
+          unknown: nextState.unknown,
+        },
+        { onConflict: "user_id,question_id" }
+      );
+
+      if (error) {
+        console.error("[TrackDetail] Failed to save question mark", error);
+        setQuestionMarks((prev) => ({
+          ...prev,
+          [questionId]: current,
+        }));
+      }
+    },
+    [questionMarks, userId]
+  );
 
   const filteredQuestions = useMemo(() => {
     const availableQuestions = isPro
@@ -233,6 +344,21 @@ export default function TrackDetail({ track }: { track: Track }) {
                     <p className="mt-2 text-right text-xs font-medium text-gray-500">
                       Частота по собеседованиям
                     </p>
+                    {isAuthorized && (
+                      <div className="mt-3 flex justify-end">
+                        <QuestionMarkButtons
+                          value={
+                            questionMarks[question.id] ??
+                            defaultQuestionMarkState
+                          }
+                          onToggle={(field) =>
+                            handleMarkToggle(question.id, field)
+                          }
+                          disabled={isLoadingMarks}
+                          stopPropagation
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </Link>
