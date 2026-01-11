@@ -165,14 +165,24 @@ export default function TrackDetail({ track }: { track: Track }) {
     });
   }, [normalizedSearch, questions, appliedSkillFilters]);
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      (hasActiveFilters
+        ? filteredQuestions.length
+        : totalQuestions || filteredQuestions.length || 1) / QUESTIONS_PER_PAGE
+    )
+  );
+  const shouldPaginate = totalPages > 1;
+
   const paginatedQuestions = useMemo(() => {
-    if (!hasActiveFilters || !isPro) return filteredQuestions;
+    if (!shouldPaginate) return filteredQuestions;
 
     const startIndex = (page - 1) * QUESTIONS_PER_PAGE;
     const endIndex = startIndex + QUESTIONS_PER_PAGE;
 
     return filteredQuestions.slice(startIndex, endIndex);
-  }, [filteredQuestions, hasActiveFilters, page]);
+  }, [filteredQuestions, page, shouldPaginate]);
 
   const fetchAllQuestions = useCallback(async () => {
     if (isFetchingAll) return;
@@ -244,18 +254,6 @@ export default function TrackDetail({ track }: { track: Track }) {
     if (!hasActiveFilters) return;
   }, [hasActiveFilters]);
 
-  const totalPages = isPro
-    ? Math.max(
-        1,
-        Math.ceil(
-          (hasActiveFilters
-            ? filteredQuestions.length
-            : totalQuestions || filteredQuestions.length || 1) /
-            QUESTIONS_PER_PAGE
-        )
-      )
-    : 1;
-
   const scrollToFirstQuestion = useCallback(() => {
     requestAnimationFrame(() => {
       if (!listTopRef.current) return;
@@ -273,7 +271,6 @@ export default function TrackDetail({ track }: { track: Track }) {
 
   const loadPage = useCallback(
     async (nextPage: number) => {
-      if (!isAuthorized) return;
       if (hasActiveFilters) {
         if (nextPage < 1 || nextPage > totalPages) return;
         setPage(nextPage);
@@ -309,7 +306,6 @@ export default function TrackDetail({ track }: { track: Track }) {
     },
     [
       hasActiveFilters,
-      isAuthorized,
       page,
       scrollToFirstQuestion,
       totalPages,
@@ -346,7 +342,7 @@ export default function TrackDetail({ track }: { track: Track }) {
 
   const isEmptyState =
     !isLoadingPage && !isFetchingAll && paginatedQuestions.length === 0;
-  const hasPagination = isPro && totalPages > 1;
+  const hasPagination = totalPages > 1;
   const questionLimit = isAuthorized
     ? AUTHORIZED_QUESTIONS_LIMIT
     : UNAUTHORIZED_QUESTIONS_LIMIT;
@@ -482,7 +478,11 @@ export default function TrackDetail({ track }: { track: Track }) {
               <QuestionSkeleton key={index} />
             ))
           : paginatedQuestions.map((question, index) => {
-              const isLocked = shouldLockQuestions && index >= questionLimit;
+              const globalIndex = shouldPaginate
+                ? (page - 1) * QUESTIONS_PER_PAGE + index
+                : index;
+              const isLocked =
+                shouldLockQuestions && globalIndex >= questionLimit;
               return (
                 <QuestionRow
                   key={question.id}
@@ -673,7 +673,7 @@ function QuestionRow({
     <div className="relative">
       <div
         className={`flex flex-col gap-3 md:flex-row md:items-center md:justify-between ${
-          isLocked ? "select-none blur-[2px]" : ""
+          isLocked ? "select-none opacity-50" : ""
         }`}
       >
         <div className="flex items-center gap-3">
@@ -700,6 +700,11 @@ function QuestionRow({
                   ★
                 </span>
               )}
+              {isLocked && (
+                <span className="rounded-full border border-gray-200 bg-white/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-500">
+                  PRO
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -716,11 +721,7 @@ function QuestionRow({
         </div>
       </div>
       {isLocked && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="rounded-full bg-gray-900/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
-            Только PRO
-          </span>
-        </div>
+        <div className="pointer-events-none absolute inset-0 bg-gray-900/10" />
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -25,6 +26,7 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
     defaultQuestionMarkState
   );
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
@@ -121,7 +123,14 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
   }, [isPro, markState, userId]);
 
   const handleToggle = async (field: QuestionMarkField) => {
-    if (!userId || !isPro) return;
+    if (!userId) {
+      router.push("/signin");
+      return;
+    }
+    if (!isPro) {
+      router.push("/pro");
+      return;
+    }
 
     const previousState = markState;
     const nextState = getNextQuestionMarkState(previousState, field);
@@ -158,7 +167,7 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
         <QuestionMarkButtons
           value={markState}
           onToggle={handleToggle}
-          disabled={!userId || !isPro || isLoading}
+          disabled={isLoading}
           size="md"
         />
       </div>
