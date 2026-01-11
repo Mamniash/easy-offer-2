@@ -137,8 +137,12 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
   };
 
   return (
-    <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div className="relative mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div
+        className={`flex flex-col gap-3 transition md:flex-row md:items-center md:justify-between ${
+          !userId ? "pointer-events-none blur-[2px]" : ""
+        }`}
+      >
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
             Мой прогресс
@@ -153,9 +157,9 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
         />
       </div>
       {!userId && (
-        <p className="mt-3 text-sm text-gray-500">
-          Авторизуйтесь, чтобы сохранять заметки по каждому вопросу.
-        </p>
+        <div className="absolute inset-0 flex items-center justify-center bg-white/70 text-sm font-semibold text-gray-700">
+          Доступно после авторизации
+        </div>
       )}
     </div>
   );
