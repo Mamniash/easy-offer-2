@@ -3,10 +3,14 @@ import Link from "next/link";
 
 import LogoMark from "@/public/images/logo-01.svg";
 
-export default function Logo() {
+type LogoProps = {
+  href?: string;
+};
+
+export default function Logo({ href = "/" }: LogoProps) {
   return (
     <Link
-      href="/"
+      href={href}
       className="inline-flex items-center gap-2"
       aria-label="PreOffer"
     >
