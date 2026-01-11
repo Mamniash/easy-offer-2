@@ -10,13 +10,12 @@ import {
 } from "@/lib/question-marks";
 import { getTrackSkillFilters } from "@/lib/track-skill-filters";
 import type { Track } from "@/lib/tracks";
+import { isProEmail } from "@/lib/subscription";
 import { supabase } from "@/lib/supabaseClient";
 
 const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
 const AUTHORIZED_QUESTIONS_LIMIT = 50;
-const PRO_EMAILS = ["mamniashvili2003@gmail.com", "pokrasov.04@mail.ru"];
-
 export default function TrackDetail({ track }: { track: Track }) {
   const [search, setSearch] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -52,8 +51,8 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       if (!isMounted) return;
 
-      const email = session?.user?.email?.toLowerCase();
-      const hasPro = email ? PRO_EMAILS.includes(email) : false;
+      const email = session?.user?.email;
+      const hasPro = isProEmail(email);
 
       setIsAuthorized(Boolean(session?.user));
       setUserId(session?.user?.id ?? null);
@@ -67,8 +66,8 @@ export default function TrackDetail({ track }: { track: Track }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
-      const email = session?.user?.email?.toLowerCase();
-      const hasPro = email ? PRO_EMAILS.includes(email) : false;
+      const email = session?.user?.email;
+      const hasPro = isProEmail(email);
 
       setIsAuthorized(Boolean(session?.user));
       setUserId(session?.user?.id ?? null);
@@ -582,6 +581,14 @@ export default function TrackDetail({ track }: { track: Track }) {
             PRO-доступ сейчас включен для выбранных аккаунтов. Оставьте заявку,
             и мы подключим подписку.
           </p>
+          <div className="pt-2">
+            <Link
+              href="/pro"
+              className="inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
+            >
+              Перейти к PRO-подписке
+            </Link>
+          </div>
         </div>
       )}
     </div>

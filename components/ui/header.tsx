@@ -143,6 +143,27 @@ export default function Header() {
                           ></path>
                         </svg>
                       </Link>
+                      <Link
+                        href="/pro"
+                        className="flex items-center justify-between rounded-lg px-3 py-2 text-gray-700 transition hover:bg-gray-50"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <span className="font-medium">PRO-подписка</span>
+                        <svg
+                          className="h-4 w-4 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5l7 7-7 7"
+                          ></path>
+                        </svg>
+                      </Link>
                       <button
                         onClick={handleSignOut}
                         className="flex w-full items-center justify-between rounded-lg px-3 py-2 font-medium text-red-600 transition hover:bg-red-50"
