@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -8,6 +10,7 @@ import {
   type QuestionMarkField,
   type QuestionMarkState,
 } from "@/lib/question-marks";
+import { isProEmail } from "@/lib/subscription";
 import { supabase } from "@/lib/supabaseClient";
 
 import QuestionMarkButtons from "./question-mark-buttons";
@@ -18,10 +21,12 @@ type QuestionMarkPanelProps = {
 
 export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps) {
   const [userId, setUserId] = useState<string | null>(null);
+  const [isPro, setIsPro] = useState(false);
   const [markState, setMarkState] = useState<QuestionMarkState>(
     defaultQuestionMarkState
   );
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
@@ -33,6 +38,8 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
 
       if (!isMounted) return;
 
+      const email = session?.user?.email;
+      setIsPro(isProEmail(email));
       setUserId(session?.user?.id ?? null);
     };
 
@@ -43,6 +50,8 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
+      const email = session?.user?.email;
+      setIsPro(isProEmail(email));
       setUserId(session?.user?.id ?? null);
     });
 
@@ -56,7 +65,7 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
     let isMounted = true;
 
     const fetchMark = async () => {
-      if (!userId) {
+      if (!userId || !isPro) {
         if (isMounted) {
           setMarkState(defaultQuestionMarkState);
           setIsLoading(false);
@@ -96,11 +105,14 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
     return () => {
       isMounted = false;
     };
-  }, [questionId, userId]);
+  }, [isPro, questionId, userId]);
 
   const title = useMemo(() => {
     if (!userId) {
       return "Войдите, чтобы отмечать статус вопроса";
+    }
+    if (!isPro) {
+      return "Персонализация доступна в PRO";
     }
 
     if (markState.known) return "Отмечено как известный";
@@ -108,10 +120,17 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
     if (markState.favorite) return "В избранном";
 
     return "Поставьте статус вопросу";
-  }, [markState, userId]);
+  }, [isPro, markState, userId]);
 
   const handleToggle = async (field: QuestionMarkField) => {
-    if (!userId) return;
+    if (!userId) {
+      router.push("/signin");
+      return;
+    }
+    if (!isPro) {
+      router.push("/pro");
+      return;
+    }
 
     const previousState = markState;
     const nextState = getNextQuestionMarkState(previousState, field);
@@ -148,7 +167,7 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
         <QuestionMarkButtons
           value={markState}
           onToggle={handleToggle}
-          disabled={!userId || isLoading}
+          disabled={isLoading}
           size="md"
         />
       </div>
@@ -156,6 +175,20 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
         <p className="mt-3 text-sm text-gray-500">
           Авторизуйтесь, чтобы сохранять заметки по каждому вопросу.
         </p>
+      )}
+      {userId && !isPro && (
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+          <p>
+            Отмечайте вопросы, чтобы собрать личный прогресс — эта функция
+            доступна в PRO.
+          </p>
+          <Link
+            href="/pro"
+            className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+          >
+            Перейти к PRO
+          </Link>
+        </div>
       )}
     </div>
   );
