@@ -89,22 +89,22 @@ export default function ProPlanSelection() {
         </p>
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+      <div className="mt-8 flex gap-6 overflow-x-auto pb-4 lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
         {PLANS.map((plan) => (
           <div
             key={plan.id}
-            className={`relative flex h-full flex-col rounded-3xl border p-6 shadow-sm transition ${
+            className={`relative flex h-full min-w-[260px] flex-col rounded-3xl border p-6 shadow-lg transition sm:min-w-[300px] lg:min-w-0 ${
               plan.emphasis
-                ? "border-blue-500 bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/20"
-                : "border-gray-200 bg-white text-gray-900"
+                ? "border-blue-400 bg-gradient-to-br from-blue-600 via-blue-500 to-sky-400 text-white shadow-blue-500/30"
+                : "border-slate-800 bg-slate-900 text-white shadow-slate-900/30"
             }`}
           >
             {plan.badge && (
               <span
                 className={`absolute left-6 top-6 rounded-full px-3 py-1 text-xs font-semibold ${
                   plan.emphasis
-                    ? "bg-white/15 text-white"
-                    : "bg-blue-50 text-blue-700"
+                    ? "bg-white/20 text-white"
+                    : "bg-white/10 text-white"
                 }`}
               >
                 {plan.badge}
@@ -112,19 +112,11 @@ export default function ProPlanSelection() {
             )}
 
             <div className="mt-6">
-              <p
-                className={`text-sm font-semibold uppercase tracking-wide ${
-                  plan.emphasis ? "text-blue-100" : "text-gray-500"
-                }`}
-              >
+              <p className="text-sm font-semibold uppercase tracking-wide text-white/70">
                 {plan.name}
               </p>
               <p className="mt-3 text-3xl font-bold">{plan.price}</p>
-              <p
-                className={`mt-1 text-sm ${
-                  plan.emphasis ? "text-blue-100" : "text-gray-500"
-                }`}
-              >
+              <p className="mt-1 text-sm text-white/70">
                 {plan.period}
               </p>
             </div>
@@ -134,14 +126,10 @@ export default function ProPlanSelection() {
                 <li key={perk} className="flex items-start gap-2">
                   <span
                     className={`mt-1 h-2 w-2 rounded-full ${
-                      plan.emphasis ? "bg-white" : "bg-blue-600"
+                      plan.emphasis ? "bg-white" : "bg-sky-300"
                     }`}
                   />
-                  <span
-                    className={plan.emphasis ? "text-blue-50" : "text-gray-700"}
-                  >
-                    {perk}
-                  </span>
+                  <span className="text-white/90">{perk}</span>
                 </li>
               ))}
             </ul>
@@ -152,7 +140,7 @@ export default function ProPlanSelection() {
               className={`mt-8 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
                 plan.emphasis
                   ? "bg-white text-blue-700 hover:bg-blue-50"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
+                  : "bg-white text-slate-900 hover:bg-slate-100"
               }`}
             >
               Оформить {plan.name.toLowerCase()}
