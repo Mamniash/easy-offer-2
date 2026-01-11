@@ -23,10 +23,11 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
-  const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
+  const [isFetchingAll, setIsFetchingAll] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const [questionMarks, setQuestionMarks] = useState<
     Record<string, QuestionMarkState>
   >({});
@@ -38,7 +39,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     setPage(1);
     setSearch("");
     setSelectedSkills([]);
-    setIsFetchingFiltered(false);
+    setIsFetchingAll(false);
   }, [track]);
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     let isMounted = true;
 
     const fetchQuestionMarks = async () => {
-      if (!userId) {
+      if (!userId || !isPro) {
         if (isMounted) {
           setQuestionMarks({});
         }
@@ -97,8 +98,8 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       if (questionIds.length === 0) {
         setQuestionMarks({});
-          return;
-        }
+        return;
+      }
 
       const { data, error } = await supabase
         .from("question_marks")
@@ -131,7 +132,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     return () => {
       isMounted = false;
     };
-  }, [questions, userId]);
+  }, [isPro, questions, userId]);
 
   const skillFilters = useMemo(
     () => getTrackSkillFilters(track.slug),
@@ -147,13 +148,7 @@ export default function TrackDetail({ track }: { track: Track }) {
   );
 
   const filteredQuestions = useMemo(() => {
-    const availableQuestions = isPro
-      ? questions
-      : isAuthorized
-        ? questions.slice(0, AUTHORIZED_QUESTIONS_LIMIT)
-        : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
-
-    return availableQuestions.filter((question) => {
+    return questions.filter((question) => {
       const normalizedQuestion = question.question.toLowerCase();
       const normalizedAnswer = question.answer?.toLowerCase() ?? "";
       const combinedText = `${normalizedQuestion} ${normalizedAnswer}`;
@@ -168,16 +163,10 @@ export default function TrackDetail({ track }: { track: Track }) {
         filter.keywords.some((keyword) => combinedText.includes(keyword))
       );
     });
-  }, [
-    isAuthorized,
-    isPro,
-    normalizedSearch,
-    questions,
-    appliedSkillFilters,
-  ]);
+  }, [normalizedSearch, questions, appliedSkillFilters]);
 
   const paginatedQuestions = useMemo(() => {
-    if (!hasActiveFilters) return filteredQuestions;
+    if (!hasActiveFilters || !isPro) return filteredQuestions;
 
     const startIndex = (page - 1) * QUESTIONS_PER_PAGE;
     const endIndex = startIndex + QUESTIONS_PER_PAGE;
@@ -186,10 +175,9 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, [filteredQuestions, hasActiveFilters, page]);
 
   const fetchAllQuestions = useCallback(async () => {
-    if (!isAuthorized || !isPro) return;
-    if (isFetchingFiltered) return;
+    if (isFetchingAll) return;
 
-    setIsFetchingFiltered(true);
+    setIsFetchingAll(true);
 
     try {
       const fetchedQuestions: Track["questions"] = [];
@@ -226,14 +214,17 @@ export default function TrackDetail({ track }: { track: Track }) {
     } catch (error) {
       console.error("[TrackDetail] Ошибка загрузки всех вопросов", error);
     } finally {
-      setIsFetchingFiltered(false);
+      setIsFetchingAll(false);
     }
-  }, [isAuthorized, isFetchingFiltered, isPro, track.slug]);
+  }, [isFetchingAll, track.slug]);
 
   useEffect(() => {
-    if (!isPro) return;
+    if (isPro && hasActiveFilters) {
+      fetchAllQuestions();
+      return;
+    }
 
-    if (hasActiveFilters) {
+    if (!isPro && track.stats.questions > track.questions.length) {
       fetchAllQuestions();
       return;
     }
@@ -241,7 +232,13 @@ export default function TrackDetail({ track }: { track: Track }) {
     setQuestions(track.questions);
     setTotalQuestions(track.stats.questions);
     setPage(1);
-  }, [hasActiveFilters, isPro, track.questions, track.stats.questions]);
+  }, [
+    fetchAllQuestions,
+    hasActiveFilters,
+    isPro,
+    track.questions,
+    track.stats.questions,
+  ]);
 
   useEffect(() => {
     if (!hasActiveFilters) return;
@@ -348,8 +345,12 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, [page, totalPages]);
 
   const isEmptyState =
-    !isLoadingPage && !isFetchingFiltered && paginatedQuestions.length === 0;
+    !isLoadingPage && !isFetchingAll && paginatedQuestions.length === 0;
   const hasPagination = isPro && totalPages > 1;
+  const questionLimit = isAuthorized
+    ? AUTHORIZED_QUESTIONS_LIMIT
+    : UNAUTHORIZED_QUESTIONS_LIMIT;
+  const totalAvailableQuestions = totalQuestions || filteredQuestions.length;
   const visibleQuestionsCount = isPro
     ? hasActiveFilters
       ? filteredQuestions.length
@@ -357,8 +358,13 @@ export default function TrackDetail({ track }: { track: Track }) {
     : Math.min(
         filteredQuestions.length,
         totalQuestions,
-        isAuthorized ? AUTHORIZED_QUESTIONS_LIMIT : UNAUTHORIZED_QUESTIONS_LIMIT
+        questionLimit
       );
+  const questionsCountLabel =
+    !isPro && !hasActiveFilters
+      ? `${visibleQuestionsCount.toLocaleString("ru-RU")} из ${totalAvailableQuestions.toLocaleString("ru-RU")} вопросов`
+      : `${visibleQuestionsCount.toLocaleString("ru-RU")} вопросов`;
+  const shouldLockQuestions = !isPro;
 
   return (
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -393,7 +399,7 @@ export default function TrackDetail({ track }: { track: Track }) {
             </div>
           ) : (
             <p className="text-base font-semibold text-gray-900 md:text-lg">
-              {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
+              {questionsCountLabel}
             </p>
           )}
 
@@ -471,21 +477,25 @@ export default function TrackDetail({ track }: { track: Track }) {
         </div>
       </div>
       <div ref={listTopRef} className="divide-y divide-gray-200">
-        {isLoadingPage ||
-        (isFetchingFiltered && paginatedQuestions.length === 0)
+        {isLoadingPage || (isFetchingAll && paginatedQuestions.length === 0)
           ? Array.from({ length: 6 }).map((_, index) => (
               <QuestionSkeleton key={index} />
             ))
-          : paginatedQuestions.map((question) => (
-              <QuestionRow
-                key={question.id}
-                question={question}
-                slug={track.slug}
-                markState={
-                  questionMarks[question.id] ?? defaultQuestionMarkState
-                }
-              />
-            ))}
+          : paginatedQuestions.map((question, index) => {
+              const isLocked = shouldLockQuestions && index >= questionLimit;
+              return (
+                <QuestionRow
+                  key={question.id}
+                  question={question}
+                  slug={track.slug}
+                  markState={
+                    questionMarks[question.id] ?? defaultQuestionMarkState
+                  }
+                  isLocked={isLocked}
+                  onLockedClick={() => setIsLimitModalOpen(true)}
+                />
+              );
+            })}
 
         {isEmptyState && (
           <div className="px-6 py-8 text-center text-gray-500">
@@ -546,47 +556,66 @@ export default function TrackDetail({ track }: { track: Track }) {
         </div>
       )}
 
-      {!isAuthorized && (
-        <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
-          <p className="text-base font-semibold">
-            Это только 5% того, что реально спрашивают!
-          </p>
-          <p className="text-sm text-gray-600">
-            Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3 pt-1">
-            <Link
-              href="/signin"
-              className="btn-sm bg-blue-600 text-white shadow-sm transition hover:bg-blue-700"
-            >
-              Войти
-            </Link>
-            <Link
-              href="/signup"
-              className="btn-sm bg-white text-gray-800 shadow-sm ring-1 ring-inset ring-gray-200 transition hover:bg-gray-50"
-            >
-              Зарегистрироваться
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {isAuthorized && !isPro && (
-        <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
-          <p className="text-base font-semibold">
-            Дальше — вопросы, на которых чаще всего валятся!
-          </p>
-          <p className="text-sm text-gray-600">
-            Оформите PRO-подписку, чтобы снять ограничение и видеть все вопросы
-            по направлению.
-          </p>
-          <div className="pt-2">
-            <Link
-              href="/pro"
-              className="inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
-            >
-              Перейти к PRO-подписке
-            </Link>
+      {isLimitModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 px-4 py-6">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-400">
+                  Доступ ограничен
+                </p>
+                <p className="mt-2 text-xl font-semibold text-gray-900">
+                  {isAuthorized
+                    ? "Дальше — вопросы, на которых чаще всего валятся!"
+                    : "Это только 5% того, что реально спрашивают!"}
+                </p>
+                <p className="mt-2 text-sm text-gray-600">
+                  {isAuthorized
+                    ? "Оформите PRO-подписку, чтобы снять ограничение и видеть все вопросы по направлению."
+                    : "Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsLimitModalOpen(false)}
+                className="rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                aria-label="Закрыть"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="mt-6 flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setIsLimitModalOpen(false)}
+                className="btn-sm bg-white text-gray-800 shadow-sm ring-1 ring-inset ring-gray-200 transition hover:bg-gray-50"
+              >
+                Понятно
+              </button>
+              {isAuthorized ? (
+                <Link
+                  href="/pro"
+                  className="btn-sm bg-gray-900 text-white shadow-sm transition hover:bg-gray-800"
+                >
+                  Перейти к PRO
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/signin"
+                    className="btn-sm bg-blue-600 text-white shadow-sm transition hover:bg-blue-700"
+                  >
+                    Войти
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="btn-sm bg-white text-gray-800 shadow-sm ring-1 ring-inset ring-gray-200 transition hover:bg-gray-50"
+                  >
+                    Зарегистрироваться
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -618,9 +647,17 @@ type QuestionRowProps = {
   question: Track["questions"][number];
   slug: Track["slug"];
   markState: QuestionMarkState;
+  isLocked?: boolean;
+  onLockedClick?: () => void;
 };
 
-function QuestionRow({ question, slug, markState }: QuestionRowProps) {
+function QuestionRow({
+  question,
+  slug,
+  markState,
+  isLocked = false,
+  onLockedClick,
+}: QuestionRowProps) {
   const statusDotClassName = markState.known
     ? "bg-emerald-400"
     : markState.unknown
@@ -632,12 +669,13 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
       ? "shadow-[0_0_0_3px_rgba(244,63,94,0.2)]"
       : "";
 
-  return (
-    <Link
-      href={`/tracks/${slug}/questions/${question.id}`}
-      className="group block px-6 py-5 transition hover:bg-blue-50/60"
-    >
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+  const content = (
+    <div className="relative">
+      <div
+        className={`flex flex-col gap-3 md:flex-row md:items-center md:justify-between ${
+          isLocked ? "select-none blur-[2px]" : ""
+        }`}
+      >
         <div className="flex items-center gap-3">
           <div
             className={`flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white ${statusPillClassName}`}
@@ -677,6 +715,34 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
           </p>
         </div>
       </div>
+      {isLocked && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="rounded-full bg-gray-900/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+            Только PRO
+          </span>
+        </div>
+      )}
+    </div>
+  );
+
+  if (isLocked) {
+    return (
+      <button
+        type="button"
+        onClick={onLockedClick}
+        className="group block w-full px-6 py-5 text-left transition hover:bg-blue-50/60"
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      href={`/tracks/${slug}/questions/${question.id}`}
+      className="group block px-6 py-5 transition hover:bg-blue-50/60"
+    >
+      {content}
     </Link>
   );
 }
