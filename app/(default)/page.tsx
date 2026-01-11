@@ -8,10 +8,12 @@ import BusinessCategories from "@/components/business-categories";
 import FeaturesPlanet from "@/components/features-planet";
 import LargeTestimonial from "@/components/large-testimonial";
 import Cta from "@/components/cta";
+import HomeAuthRedirect from "@/components/home-auth-redirect";
 
 export default function Home() {
   return (
     <>
+      <HomeAuthRedirect />
       <Hero />
       <BusinessCategories />
       <FeaturesPlanet />
