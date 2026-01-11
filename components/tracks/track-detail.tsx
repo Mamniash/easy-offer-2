@@ -471,7 +471,8 @@ export default function TrackDetail({ track }: { track: Track }) {
         </div>
       </div>
       <div ref={listTopRef} className="divide-y divide-gray-200">
-        {isLoadingPage || (isFetchingFiltered && paginatedQuestions.length === 0)
+        {isLoadingPage ||
+        (isFetchingFiltered && paginatedQuestions.length === 0)
           ? Array.from({ length: 6 }).map((_, index) => (
               <QuestionSkeleton key={index} />
             ))
@@ -548,7 +549,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       {!isAuthorized && (
         <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
           <p className="text-base font-semibold">
-            Хотите видеть больше вопросов?
+            Это только 5% того, что реально спрашивают!
           </p>
           <p className="text-sm text-gray-600">
             Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению.
@@ -572,14 +573,12 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       {isAuthorized && !isPro && (
         <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
-          <p className="text-base font-semibold">Нужен полный доступ?</p>
+          <p className="text-base font-semibold">
+            Дальше — вопросы, на которых чаще всего валятся!
+          </p>
           <p className="text-sm text-gray-600">
             Оформите PRO-подписку, чтобы снять ограничение и видеть все вопросы
             по направлению.
-          </p>
-          <p className="text-xs text-gray-500">
-            PRO-доступ сейчас включен для выбранных аккаунтов. Оставьте заявку,
-            и мы подключим подписку.
           </p>
           <div className="pt-2">
             <Link
