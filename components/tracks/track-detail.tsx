@@ -546,12 +546,16 @@ export default function TrackDetail({ track }: { track: Track }) {
       )}
 
       {!isAuthorized && (
-        <div className="flex flex-col gap-2 border-t border-gray-200 bg-gray-50 px-6 py-5 text-center text-gray-800">
-          <p className="text-base font-semibold">
-            Хотите видеть больше вопросов?
+        <div className="flex flex-col gap-3 border-t border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 px-6 py-5 text-center text-gray-900">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
+            Только малая часть
           </p>
-          <p className="text-sm text-gray-600">
-            Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению.
+          <p className="text-lg font-semibold">
+            Ты видишь лишь 5% реальных вопросов.
+          </p>
+          <p className="text-sm text-gray-700">
+            Войдите и откройте 50 вопросов по этому направлению — это основной
+            пул, который спрашивают чаще всего.
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-1">
             <Link
