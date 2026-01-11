@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "antd";
 
 import { supabase } from "@/lib/supabaseClient";
 
@@ -100,11 +101,8 @@ export default function Header() {
           <div className="flex flex-1 items-center justify-end gap-3">
             {user ? (
               <>
-                <Link
-                  href="/pro"
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:from-blue-500 hover:via-blue-400 hover:to-sky-300"
-                >
-                  Стать PRO
+                <Link href="/pro">
+                  <Button type="primary">Стать PRO</Button>
                 </Link>
                 <div className="relative" ref={menuRef}>
                 <button
@@ -151,11 +149,13 @@ export default function Header() {
                           ></path>
                         </svg>
                       </Link>
-                      <button
+                      <Button
+                        type="text"
+                        danger
+                        className="flex w-full items-center justify-between"
                         onClick={handleSignOut}
-                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 font-medium text-red-600 transition hover:bg-red-50"
                       >
-                        Выйти
+                        <span>Выйти</span>
                         <svg
                           className="h-4 w-4"
                           fill="none"
@@ -170,7 +170,7 @@ export default function Header() {
                             d="M17 16l4-4m0 0l-4-4m4 4H7"
                           ></path>
                         </svg>
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -179,19 +179,13 @@ export default function Header() {
             ) : (
               <ul className="flex items-center gap-3">
                 <li>
-                  <Link
-                    href="/signin"
-                    className="btn-sm bg-white text-gray-800 shadow-sm hover:bg-gray-50"
-                  >
-                    Войти
+                  <Link href="/signin">
+                    <Button type="default">Войти</Button>
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/signup"
-                    className="btn-sm bg-gray-800 text-gray-200 shadow-sm hover:bg-gray-900"
-                  >
-                    Зарегистрироваться
+                  <Link href="/signup">
+                    <Button type="primary">Зарегистрироваться</Button>
                   </Link>
                 </li>
               </ul>

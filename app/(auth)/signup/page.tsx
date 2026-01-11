@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Alert, Button, Input } from "antd";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function SignUp() {
@@ -67,9 +68,8 @@ export default function SignUp() {
             >
               Полное имя
             </label>
-            <input
+            <Input
               id="name"
-              className="form-input w-full py-2"
               type="text"
               placeholder="Иван Иванов"
               value={fullName}
@@ -85,9 +85,8 @@ export default function SignUp() {
             >
               Email
             </label>
-            <input
+            <Input
               id="email"
-              className="form-input w-full py-2"
               type="email"
               placeholder="you@example.com"
               value={email}
@@ -103,9 +102,8 @@ export default function SignUp() {
             >
               Телефон
             </label>
-            <input
+            <Input
               id="phone"
-              className="form-input w-full py-2"
               type="text"
               placeholder="+7 900 000-00-00"
               value={phone}
@@ -120,10 +118,8 @@ export default function SignUp() {
             >
               Пароль
             </label>
-            <input
+            <Input.Password
               id="password"
-              className="form-input w-full py-2"
-              type="password"
               autoComplete="new-password"
               placeholder="••••••••"
               value={password}
@@ -134,25 +130,22 @@ export default function SignUp() {
         </div>
 
         {error && (
-          <div className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </div>
+          <Alert className="mt-4" type="error" showIcon message={error} />
         )}
 
         {success && (
-          <div className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
-            Аккаунт создан. Проверь почту и подтверди email.
-          </div>
+          <Alert
+            className="mt-4"
+            type="success"
+            showIcon
+            message="Аккаунт создан. Проверь почту и подтверди email."
+          />
         )}
 
         <div className="mt-6 space-y-3">
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn w-full bg-linear-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] disabled:opacity-60"
-          >
+          <Button type="primary" htmlType="submit" loading={loading} block>
             {loading ? "Создаём аккаунт…" : "Зарегистрироваться"}
-          </button>
+          </Button>
         </div>
       </form>
 
