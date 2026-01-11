@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   defaultQuestionMarkState,
@@ -16,7 +17,10 @@ type QuestionMarkPanelProps = {
   questionId: number;
 };
 
-export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps) {
+export default function QuestionMarkPanel({
+  questionId,
+}: QuestionMarkPanelProps) {
+  const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [markState, setMarkState] = useState<QuestionMarkState>(
     defaultQuestionMarkState
@@ -111,7 +115,10 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
   }, [markState, userId]);
 
   const handleToggle = async (field: QuestionMarkField) => {
-    if (!userId) return;
+    if (!userId) {
+      router.push("/signin");
+      return;
+    }
 
     const previousState = markState;
     const nextState = getNextQuestionMarkState(previousState, field);
@@ -137,12 +144,8 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
   };
 
   return (
-    <div className="relative mt-6 overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div
-        className={`flex flex-col gap-3 transition md:flex-row md:items-center md:justify-between ${
-          !userId ? "pointer-events-none blur-[2px]" : ""
-        }`}
-      >
+    <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
             Мой прогресс
@@ -152,15 +155,10 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
         <QuestionMarkButtons
           value={markState}
           onToggle={handleToggle}
-          disabled={!userId || isLoading}
+          disabled={isLoading}
           size="md"
         />
       </div>
-      {!userId && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/70 text-sm font-semibold text-gray-700">
-          Доступно после авторизации
-        </div>
-      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Popover } from "@headlessui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -17,6 +18,7 @@ const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
 const AUTHORIZED_QUESTIONS_LIMIT = 50;
 export default function TrackDetail({ track }: { track: Track }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
@@ -434,9 +436,11 @@ export default function TrackDetail({ track }: { track: Track }) {
                         <button
                           key={filter.id}
                           type="button"
-                          disabled={isSkillFiltersLocked}
                           onClick={() => {
-                            if (isSkillFiltersLocked) return;
+                            if (isSkillFiltersLocked) {
+                              router.push("/pro");
+                              return;
+                            }
                             setSelectedSkills((prev) =>
                               prev.includes(filter.id)
                                 ? prev.filter((id) => id !== filter.id)
@@ -447,7 +451,7 @@ export default function TrackDetail({ track }: { track: Track }) {
                             isActive
                               ? "border-blue-600 bg-blue-50 text-blue-700"
                               : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
-                          } ${isSkillFiltersLocked ? "cursor-not-allowed opacity-60 hover:border-gray-200 hover:text-gray-600" : ""}`}
+                          } ${isSkillFiltersLocked ? "opacity-70" : ""}`}
                         >
                           {filter.label}
                         </button>
