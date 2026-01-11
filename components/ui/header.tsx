@@ -96,9 +96,16 @@ export default function Header() {
           </div>
 
           {/* Desktop navigation */}
-          <div className="flex flex-1 items-center justify-end">
+          <div className="flex flex-1 items-center justify-end gap-3">
             {user ? (
-              <div className="relative" ref={menuRef}>
+              <>
+                <Link
+                  href="/pro"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:from-blue-500 hover:via-blue-400 hover:to-sky-300"
+                >
+                  Стать PRO
+                </Link>
+                <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen((prev) => !prev)}
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md"
@@ -167,6 +174,7 @@ export default function Header() {
                   </div>
                 )}
               </div>
+              </>
             ) : (
               <ul className="flex items-center gap-3">
                 <li>
