@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   defaultQuestionMarkState,
@@ -16,7 +17,10 @@ type QuestionMarkPanelProps = {
   questionId: number;
 };
 
-export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps) {
+export default function QuestionMarkPanel({
+  questionId,
+}: QuestionMarkPanelProps) {
+  const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [markState, setMarkState] = useState<QuestionMarkState>(
     defaultQuestionMarkState
@@ -111,7 +115,10 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
   }, [markState, userId]);
 
   const handleToggle = async (field: QuestionMarkField) => {
-    if (!userId) return;
+    if (!userId) {
+      router.push("/signin");
+      return;
+    }
 
     const previousState = markState;
     const nextState = getNextQuestionMarkState(previousState, field);
@@ -148,15 +155,10 @@ export default function QuestionMarkPanel({ questionId }: QuestionMarkPanelProps
         <QuestionMarkButtons
           value={markState}
           onToggle={handleToggle}
-          disabled={!userId || isLoading}
+          disabled={isLoading}
           size="md"
         />
       </div>
-      {!userId && (
-        <p className="mt-3 text-sm text-gray-500">
-          Авторизуйтесь, чтобы сохранять заметки по каждому вопросу.
-        </p>
-      )}
     </div>
   );
 }

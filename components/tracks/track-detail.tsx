@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Popover } from "@headlessui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -17,6 +18,7 @@ const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
 const AUTHORIZED_QUESTIONS_LIMIT = 50;
 export default function TrackDetail({ track }: { track: Track }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
@@ -350,15 +352,21 @@ export default function TrackDetail({ track }: { track: Track }) {
   const isEmptyState =
     !isLoadingPage && !isFetchingFiltered && paginatedQuestions.length === 0;
   const hasPagination = isPro && totalPages > 1;
+  const totalQuestionsCount =
+    totalQuestions || filteredQuestions.length || questions.length;
   const visibleQuestionsCount = isPro
     ? hasActiveFilters
       ? filteredQuestions.length
-      : totalQuestions
+      : totalQuestionsCount
     : Math.min(
         filteredQuestions.length,
-        totalQuestions,
+        totalQuestionsCount,
         isAuthorized ? AUTHORIZED_QUESTIONS_LIMIT : UNAUTHORIZED_QUESTIONS_LIMIT
       );
+  const displayQuestionsCount = isPro
+    ? `${visibleQuestionsCount.toLocaleString("ru-RU")} вопросов`
+    : `${visibleQuestionsCount.toLocaleString("ru-RU")} из ${totalQuestionsCount.toLocaleString("ru-RU")} вопросов`;
+  const isSkillFiltersLocked = !isPro;
 
   return (
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -393,7 +401,7 @@ export default function TrackDetail({ track }: { track: Track }) {
             </div>
           ) : (
             <p className="text-base font-semibold text-gray-900 md:text-lg">
-              {visibleQuestionsCount.toLocaleString("ru-RU")} вопросов
+              {displayQuestionsCount}
             </p>
           )}
 
@@ -408,6 +416,11 @@ export default function TrackDetail({ track }: { track: Track }) {
                   }`}
                 >
                   Навыки
+                  {isSkillFiltersLocked && (
+                    <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[10px] font-semibold uppercase text-gray-600">
+                      PRO
+                    </span>
+                  )}
                   {selectedSkills.length > 0 && (
                     <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">
                       {selectedSkills.length}
@@ -424,6 +437,10 @@ export default function TrackDetail({ track }: { track: Track }) {
                           key={filter.id}
                           type="button"
                           onClick={() => {
+                            if (isSkillFiltersLocked) {
+                              router.push("/pro");
+                              return;
+                            }
                             setSelectedSkills((prev) =>
                               prev.includes(filter.id)
                                 ? prev.filter((id) => id !== filter.id)
@@ -434,13 +451,18 @@ export default function TrackDetail({ track }: { track: Track }) {
                             isActive
                               ? "border-blue-600 bg-blue-50 text-blue-700"
                               : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
-                          }`}
+                          } ${isSkillFiltersLocked ? "opacity-70" : ""}`}
                         >
                           {filter.label}
                         </button>
                       );
                     })}
                   </div>
+                  {isSkillFiltersLocked && (
+                    <p className="mt-3 text-xs text-gray-500">
+                      Фильтры по навыкам доступны в PRO-подписке.
+                    </p>
+                  )}
                   {selectedSkills.length > 0 && (
                     <div className="mt-3 flex justify-end text-xs">
                       <button
@@ -649,9 +671,6 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
             {question.frequency}%
           </div>
           <div>
-            <p className="text-sm uppercase tracking-[0.16em] text-gray-500">
-              {question.category}
-            </p>
             <p className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-700">
               {question.question}
               {markState.favorite && (
