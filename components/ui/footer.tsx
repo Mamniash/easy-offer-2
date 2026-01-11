@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { Button, Input, Modal, Typography } from "antd";
 
 import { canSendMessage, sendToTelegram } from "@/lib/telegram";
 import Logo from "./logo";
@@ -83,56 +84,56 @@ const ContactForm = ({ form, sessionTime }: { form: ReturnType<typeof useContact
         <label className="text-xs font-medium text-gray-800" htmlFor={`${controlId}-contact`}>
           Контакт для связи
         </label>
-        <input
-          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        <Input
+          className="w-full"
           id={`${controlId}-contact`}
           name="contact"
           onChange={(event) => form.setContact(event.target.value)}
           placeholder="Телеграм, почта или телефон"
           required
-        type="text"
-        value={form.contact}
-      />
-    </div>
-    <div className="space-y-1">
+          type="text"
+          value={form.contact}
+        />
+      </div>
+      <div className="space-y-1">
         <label className="text-xs font-medium text-gray-800" htmlFor={`${controlId}-location`}>
           Город или часовой пояс
         </label>
-        <input
-          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        <Input
+          className="w-full"
           id={`${controlId}-location`}
           name="location"
           onChange={(event) => form.setLocation(event.target.value)}
           placeholder="Например, Москва или GMT+3"
-        required
-        type="text"
-        value={form.location}
-      />
-    </div>
-    <div className="space-y-1">
+          required
+          type="text"
+          value={form.location}
+        />
+      </div>
+      <div className="space-y-1">
         <label className="text-xs font-medium text-gray-800" htmlFor={`${controlId}-note`}>
           {form.noteLabel}
         </label>
-        <textarea
-          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        <Input.TextArea
+          className="w-full"
           id={`${controlId}-note`}
           name="note"
           onChange={(event) => form.setNote(event.target.value)}
           placeholder={form.notePlaceholder}
-        required
-        rows={3}
-        value={form.note}
-      />
-    </div>
-    <button
-      className="inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-60"
-      disabled={form.loading}
-      type="submit"
-    >
-      {form.loading ? "Отправляем..." : form.cta}
-    </button>
-    {form.status ? <p className="text-xs text-gray-600">{form.status}</p> : null}
-  </form>
+          required
+          rows={3}
+          value={form.note}
+        />
+      </div>
+      <Button htmlType="submit" loading={form.loading} type="primary" block>
+        {form.loading ? "Отправляем..." : form.cta}
+      </Button>
+      {form.status ? (
+        <Typography.Text type="secondary" className="text-xs">
+          {form.status}
+        </Typography.Text>
+      ) : null}
+    </form>
   );
 };
 
@@ -251,13 +252,13 @@ export default function Footer({ border = false }: { border?: boolean }) {
 
   const renderLink = (label: string, key: FooterKey) => (
     <li>
-      <button
-        className="text-left text-gray-600 transition hover:text-gray-900"
+      <Button
+        type="text"
+        className="h-auto p-0 text-left text-gray-600 transition hover:text-gray-900"
         onClick={() => openModal(key)}
-        type="button"
       >
         {label}
-      </button>
+      </Button>
     </li>
   );
 
@@ -313,40 +314,27 @@ export default function Footer({ border = false }: { border?: boolean }) {
         </div>
       </div>
 
-      {activeModal ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Футер</p>
-                <h3 className="text-lg font-semibold text-gray-900">{activeModal.title}</h3>
-              </div>
-              <button
-                aria-label="Закрыть"
-                className="rounded-full p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
-                onClick={closeModal}
-                type="button"
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M6 18 18 6m0 12L6 6"></path>
-                </svg>
-              </button>
+      <Modal
+        open={Boolean(activeModal)}
+        onCancel={closeModal}
+        footer={null}
+        centered
+        destroyOnClose
+        title={
+          activeModal ? (
+            <div>
+              <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Футер</p>
+              <h3 className="text-lg font-semibold text-gray-900">{activeModal.title}</h3>
             </div>
-            <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1 text-left">
-              {activeModal.content}
-            </div>
+          ) : null
+        }
+      >
+        {activeModal ? (
+          <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1 text-left">
+            {activeModal.content}
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </Modal>
     </footer>
   );
 }

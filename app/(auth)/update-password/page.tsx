@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Alert, Button, Input } from "antd";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function UpdatePasswordPage() {
@@ -64,10 +65,8 @@ export default function UpdatePasswordPage() {
           >
             Новый пароль
           </label>
-          <input
+          <Input.Password
             id="password"
-            className="form-input w-full py-2"
-            type="password"
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -82,10 +81,8 @@ export default function UpdatePasswordPage() {
           >
             Повтори пароль
           </label>
-          <input
+          <Input.Password
             id="passwordConfirm"
-            className="form-input w-full py-2"
-            type="password"
             autoComplete="new-password"
             value={passwordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
@@ -93,26 +90,20 @@ export default function UpdatePasswordPage() {
           />
         </div>
 
-        {error && (
-          <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-            {error}
-          </div>
-        )}
+        {error && <Alert type="error" showIcon message={error} />}
 
         {success && (
-          <div className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
-            Пароль обновлён. Сейчас перенаправим на страницу входа…
-          </div>
+          <Alert
+            type="success"
+            showIcon
+            message="Пароль обновлён. Сейчас перенаправим на страницу входа…"
+          />
         )}
 
         <div className="mt-6">
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn w-full bg-linear-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] disabled:opacity-60"
-          >
+          <Button type="primary" htmlType="submit" loading={loading} block>
             {loading ? "Обновляем…" : "Обновить пароль"}
-          </button>
+          </Button>
         </div>
       </form>
     </>

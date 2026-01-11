@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "antd";
 
 import { supabase } from "@/lib/supabaseClient";
 
@@ -96,18 +97,12 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
-            >
-              На главную
+            <Link href="/">
+              <Button type="primary">На главную</Button>
             </Link>
-            <button
-              onClick={handleSignOut}
-              className="inline-flex items-center justify-center rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
-            >
+            <Button danger onClick={handleSignOut}>
               Выйти из аккаунта
-            </button>
+            </Button>
           </div>
         </div>
 

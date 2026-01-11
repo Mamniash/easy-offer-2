@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Button, Modal } from "antd";
 
 type ProPlan = {
   id: string;
@@ -56,22 +57,6 @@ const PLANS: ProPlan[] = [
 export default function ProPlanSelection() {
   const [selectedPlan, setSelectedPlan] = useState<ProPlan | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", onKeyDown);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [isOpen]);
 
   const openModal = (plan: ProPlan) => {
     setSelectedPlan(plan);
@@ -134,28 +119,29 @@ export default function ProPlanSelection() {
               ))}
             </ul>
 
-            <button
-              type="button"
+            <Button
+              type="default"
+              shape="round"
+              size="large"
+              className="mt-8"
               onClick={() => openModal(plan)}
-              className={`mt-8 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
-                plan.emphasis
-                  ? "bg-white text-blue-700 hover:bg-blue-50"
-                  : "bg-white text-slate-900 hover:bg-slate-100"
-              }`}
+              block
             >
               Оформить {plan.name.toLowerCase()}
-            </button>
+            </Button>
           </div>
         ))}
       </div>
 
-      {isOpen && selectedPlan && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <Modal
+        open={isOpen}
+        onCancel={() => setIsOpen(false)}
+        centered
+        footer={null}
+        destroyOnClose
+      >
+        {selectedPlan ? (
+          <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">
               Оплата
             </p>
@@ -167,24 +153,16 @@ export default function ProPlanSelection() {
               сейчас мы подключаем онлайн-кассы для оформления подписки.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-              >
+              <Button type="default" shape="round" onClick={() => setIsOpen(false)}>
                 Закрыть
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-              >
+              </Button>
+              <Button type="primary" shape="round" onClick={() => setIsOpen(false)}>
                 Хорошо
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
-      )}
+        ) : null}
+      </Modal>
     </div>
   );
 }
