@@ -188,7 +188,7 @@ export default function Header() {
                 <li>
                   <Link
                     href="/signin"
-                    className="btn-sm bg-white text-gray-800 shadow-sm hover:bg-gray-50"
+                    className="btn-sm bg-slate-900 text-white shadow-sm transition hover:bg-slate-800 hover:text-white"
                   >
                     Войти через Telegram
                   </Link>
