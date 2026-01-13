@@ -1,6 +1,7 @@
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
 
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
@@ -15,22 +16,6 @@ type TelegramAuthPayload = {
 };
 
 const MAX_AUTH_AGE_SECONDS = 24 * 60 * 60;
-
-const getSupabaseAnon = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-};
 
 const normalizeTelegramPayload = (
   payload: TelegramAuthPayload
@@ -69,10 +54,19 @@ const verifyTelegramHash = (
 export async function POST(request: Request) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!botToken || !supabaseServiceKey) {
     return NextResponse.json(
       { error: "Server misconfiguration" },
+      { status: 500 }
+    );
+  }
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.json(
+      { error: "Supabase configuration missing" },
       { status: 500 }
     );
   }
@@ -101,13 +95,29 @@ export async function POST(request: Request) {
     );
   }
 
-  const supabaseAnon = getSupabaseAnon();
-  if (!supabaseAnon) {
-    return NextResponse.json(
-      { error: "Supabase configuration missing" },
-      { status: 500 }
-    );
-  }
+  const cookieStore = cookies();
+  const headerList = headers();
+  const responseCookies: Array<{
+    name: string;
+    value: string;
+    options?: Parameters<typeof cookieStore.set>[2];
+  }> = [];
+
+  const supabaseServer = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        responseCookies.push(...cookiesToSet);
+      },
+    },
+    headers: {
+      get(name) {
+        return headerList.get(name);
+      },
+    },
+  });
 
   const telegramId = String(payload.id);
   const displayName =
@@ -148,7 +158,7 @@ export async function POST(request: Request) {
   let session = null;
   let authUser = null;
 
-  const signInResult = await supabaseAnon.auth.signInWithPassword({
+  const signInResult = await supabaseServer.auth.signInWithPassword({
     email,
     password,
   });
@@ -175,7 +185,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const retrySignIn = await supabaseAnon.auth.signInWithPassword({
+    const retrySignIn = await supabaseServer.auth.signInWithPassword({
       email,
       password,
     });
@@ -207,8 +217,26 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({
+  const setSessionResult = await supabaseServer.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+  });
+
+  if (setSessionResult.error) {
+    return NextResponse.json(
+      { error: "Failed to persist Supabase session" },
+      { status: 500 }
+    );
+  }
+
+  const response = NextResponse.json({
     authenticated: true,
     session,
   });
+
+  responseCookies.forEach(({ name, value, options }) => {
+    response.cookies.set(name, value, options);
+  });
+
+  return response;
 }
