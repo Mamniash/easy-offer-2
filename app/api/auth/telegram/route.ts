@@ -95,12 +95,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const cookieStore = cookies();
-  const headerList = headers();
+  const cookieStore = await cookies();
+  const headerList = await headers();
   const responseCookies: Array<{
     name: string;
     value: string;
-    options?: Parameters<typeof cookieStore.set>[2];
+    options?: Record<string, unknown>;
   }> = [];
 
   const supabaseServer = createServerClient(supabaseUrl, supabaseAnonKey, {
