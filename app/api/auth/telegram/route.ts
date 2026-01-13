@@ -122,23 +122,6 @@ export async function POST(request: Request) {
     avatar_url: payload.photo_url ?? null,
   };
 
-  const { error: upsertError } = await supabaseAdmin.from("users").upsert(
-    {
-      telegram_id: telegramId,
-      username: payload.username ?? null,
-      first_name: payload.first_name ?? null,
-      avatar_url: payload.photo_url ?? null,
-    },
-    { onConflict: "telegram_id" }
-  );
-
-  if (upsertError) {
-    return NextResponse.json(
-      { error: "Failed to sync Telegram profile" },
-      { status: 500 }
-    );
-  }
-
   const email = `telegram_${telegramId}@telegram.local`;
   const password = crypto
     .createHash("sha256")
@@ -147,6 +130,8 @@ export async function POST(request: Request) {
 
   let session = null;
   let authUser = null;
+  let authUserId: string | null = null;
+  let authUserEmail: string | null = null;
 
   const signInResult = await supabaseAnon.auth.signInWithPassword({
     email,
@@ -192,6 +177,36 @@ export async function POST(request: Request) {
   } else {
     session = signInResult.data.session;
     authUser = signInResult.data.user;
+  }
+
+  if (authUser) {
+    authUserId = authUser.id ?? null;
+    authUserEmail = authUser.email ?? null;
+  }
+
+  if (!authUserId || !authUserEmail) {
+    return NextResponse.json(
+      { error: "Supabase user missing" },
+      { status: 500 }
+    );
+  }
+
+  const { error: upsertError } = await supabaseAdmin.from("users").upsert(
+    {
+      id: authUserId,
+      telegram_id: telegramId,
+      username: payload.username ?? null,
+      first_name: payload.first_name ?? null,
+      avatar_url: payload.photo_url ?? null,
+    },
+    { onConflict: "id" }
+  );
+
+  if (upsertError) {
+    return NextResponse.json(
+      { error: "Failed to sync Telegram profile" },
+      { status: 500 }
+    );
   }
 
   if (authUser) {
