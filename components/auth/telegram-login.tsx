@@ -97,34 +97,37 @@ export default function TelegramLogin() {
   }
 
   return (
-    <div className="space-y-4">
-      <div
-        className={`rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm text-gray-600 ${
-          loading ? "opacity-60" : ""
-        }`}
-      >
-        Используй аккаунт Telegram, чтобы войти в приложение. Мы не просим почту
-        и пароль.
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex min-h-[56px] items-center justify-center">
+        <div
+          className={`transition-opacity duration-200 ${
+            loading ? "opacity-60" : "opacity-100"
+          }`}
+        >
+          <Script
+            src="https://telegram.org/js/telegram-widget.js?22"
+            strategy="afterInteractive"
+            data-telegram-login={botName}
+            data-size="large"
+            data-userpic="false"
+            data-radius="12"
+            data-request-access="write"
+            data-onauth="onTelegramAuth(user)"
+          />
+        </div>
       </div>
-      <div className="flex justify-center">
-        <Script
-          src="https://telegram.org/js/telegram-widget.js?22"
-          strategy="afterInteractive"
-          data-telegram-login={botName}
-          data-size="large"
-          data-userpic="false"
-          data-radius="12"
-          data-request-access="write"
-          data-onauth="onTelegramAuth(user)"
-        />
+      <div className="min-h-[24px]">
+        {loading ? (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-transparent" />
+            Подключаем Telegram…
+          </div>
+        ) : (
+          <span className="invisible text-sm">Подключаем Telegram…</span>
+        )}
       </div>
-      {loading && (
-        <p className="text-center text-sm text-gray-500">
-          Подключаем Telegram…
-        </p>
-      )}
       {error && (
-        <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="w-full rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
         </div>
       )}
