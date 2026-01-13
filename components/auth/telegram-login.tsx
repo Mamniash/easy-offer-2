@@ -27,6 +27,11 @@ export default function TelegramLogin() {
   const router = useRouter();
   const widgetRef = useRef<HTMLDivElement | null>(null);
   const botName = process.env.NEXT_PUBLIC_TELEGRAM_BOT_NAME;
+  const authUrl = process.env.NEXT_PUBLIC_TELEGRAM_AUTH_URL;
+  const requestAccess =
+    process.env.NEXT_PUBLIC_TELEGRAM_REQUEST_ACCESS ?? "write";
+  const userpic = process.env.NEXT_PUBLIC_TELEGRAM_USERPIC ?? "false";
+  const lang = process.env.NEXT_PUBLIC_TELEGRAM_LANG ?? "ru";
 
   useEffect(() => {
     if (!botName) {
@@ -96,15 +101,23 @@ export default function TelegramLogin() {
 
     widgetRef.current.innerHTML = "";
 
+    const resolvedAuthUrl = authUrl
+      ? new URL(authUrl, window.location.origin).toString()
+      : null;
     const script = document.createElement("script");
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.async = true;
     script.setAttribute("data-telegram-login", botName);
     script.setAttribute("data-size", "large");
-    script.setAttribute("data-userpic", "false");
+    script.setAttribute("data-userpic", userpic);
     script.setAttribute("data-radius", "12");
-    script.setAttribute("data-request-access", "write");
-    script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    script.setAttribute("data-request-access", requestAccess);
+    script.setAttribute("data-lang", lang);
+    if (resolvedAuthUrl) {
+      script.setAttribute("data-auth-url", resolvedAuthUrl);
+    } else {
+      script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    }
 
     widgetRef.current.appendChild(script);
 
@@ -113,7 +126,7 @@ export default function TelegramLogin() {
         widgetRef.current.innerHTML = "";
       }
     };
-  }, [botName]);
+  }, [authUrl, botName, lang, requestAccess, userpic]);
 
   if (!botName) {
     return (
