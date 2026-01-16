@@ -9,8 +9,9 @@ import { supabase } from "@/lib/supabaseClient";
 import Logo from "./logo";
 
 type UserSummary = {
-  email: string;
+  email?: string;
   name?: string | null;
+  username?: string | null;
 };
 
 export default function Header() {
@@ -29,8 +30,9 @@ export default function Header() {
       if (session?.user) {
         const { email, user_metadata } = session.user;
         setUser({
-          email: email ?? "",
+          email: email ?? undefined,
           name: user_metadata?.full_name || user_metadata?.name,
+          username: user_metadata?.telegram_username || user_metadata?.username,
         });
       }
     };
@@ -43,8 +45,9 @@ export default function Header() {
       if (session?.user) {
         const { email, user_metadata } = session.user;
         setUser({
-          email: email ?? "",
+          email: email ?? undefined,
           name: user_metadata?.full_name || user_metadata?.name,
+          username: user_metadata?.telegram_username || user_metadata?.username,
         });
       } else {
         setUser(null);
@@ -79,7 +82,9 @@ export default function Header() {
     router.replace("/signin");
   };
 
-  const userInitial = user?.name?.[0] || user?.email?.[0] || "";
+  const userInitial =
+    user?.name?.[0] || user?.username?.[1] || user?.email?.[0] || "";
+  const userSubtitle = user?.username || user?.email || "";
 
   const isHomePage = pathname === "/";
   const positionClasses = isHomePage
@@ -125,7 +130,9 @@ export default function Header() {
                         <p className="text-sm font-semibold text-gray-900">
                           {user.name || "Гость"}
                         </p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
+                        <p className="text-xs text-gray-500">
+                          {userSubtitle}
+                        </p>
                       </div>
                     </div>
 
@@ -183,15 +190,7 @@ export default function Header() {
                     href="/signin"
                     className="btn-sm bg-white text-gray-800 shadow-sm hover:bg-gray-50"
                   >
-                    Войти
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/signup"
-                    className="btn-sm bg-gray-800 text-gray-200 shadow-sm hover:bg-gray-900"
-                  >
-                    Зарегистрироваться
+                    Войти через Telegram
                   </Link>
                 </li>
               </ul>

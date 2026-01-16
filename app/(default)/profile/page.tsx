@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 type ProfileUser = {
-  email: string;
+  email?: string;
   name?: string | null;
+  username?: string | null;
+  telegramId?: string | null;
   createdAt?: string;
   id?: string;
 };
@@ -32,10 +34,12 @@ export default function ProfilePage() {
       const { email, id, created_at, user_metadata } = session.user;
 
       setUser({
-        email: email ?? "",
+        email: email ?? undefined,
         id,
         createdAt: created_at,
         name: user_metadata?.full_name || user_metadata?.name,
+        username: user_metadata?.telegram_username || user_metadata?.username,
+        telegramId: user_metadata?.telegram_id || null,
       });
       setLoading(false);
     };
@@ -64,13 +68,15 @@ export default function ProfilePage() {
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm shadow-black/[0.03]">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-xl font-semibold text-white shadow-md">
-              {user?.name?.[0] || user?.email?.[0] || "?"}
+              {user?.name?.[0] || user?.username?.[1] || user?.email?.[0] || "?"}
             </div>
             <div className="space-y-1">
               <p className="text-lg font-semibold text-gray-900">
                 {loading ? "Загружаем…" : user?.name || "Без имени"}
               </p>
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              <p className="text-sm text-gray-500">
+                {user?.username || user?.email || "Telegram-пользователь"}
+              </p>
             </div>
           </div>
 
@@ -81,6 +87,14 @@ export default function ProfilePage() {
               </p>
               <p className="mt-1 truncate text-sm font-medium text-gray-900">
                 {user?.id}
+              </p>
+            </div>
+            <div className="rounded-xl bg-gray-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Telegram ID
+              </p>
+              <p className="mt-1 truncate text-sm font-medium text-gray-900">
+                {user?.telegramId || "—"}
               </p>
             </div>
             <div className="rounded-xl bg-gray-50 p-4">
