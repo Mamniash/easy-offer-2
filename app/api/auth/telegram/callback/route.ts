@@ -124,7 +124,7 @@ export const GET = async (request: NextRequest) => {
   const createResponse = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
-    email_confirmed: true,
+    email_confirm: true,
     user_metadata: {
       telegram_id: telegramId,
       username: payload.username ?? null,
