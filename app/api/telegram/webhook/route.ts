@@ -16,6 +16,31 @@ const extractLoginState = (text: string) => {
   return match?.[1] ?? null;
 };
 
+const isBareStartCommand = (text: string) => /^\/start(?:@\w+)?$/i.test(text);
+
+const sendTelegramMessage = async (
+  botToken: string,
+  payload: {
+    chat_id: number;
+    text: string;
+    reply_markup?: {
+      inline_keyboard: Array<
+        Array<{
+          text: string;
+          login_url: {
+            url: string;
+          };
+        }>
+      >;
+    };
+  },
+) =>
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
 export const POST = async (request: Request) => {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -34,6 +59,28 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ ok: true });
   }
 
+  if (isBareStartCommand(text)) {
+    const origin = new URL(request.url).origin;
+    const response = await sendTelegramMessage(botToken, {
+      chat_id: message.chat.id,
+      text: [
+        "Откройте бота через кнопку “Войти через Telegram” на сайте, иначе нет параметра login_…",
+        `Сайт: ${origin}`,
+        "Нажмите именно кнопку авторизации на сайте.",
+      ].join("\n"),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return NextResponse.json(
+        { error: "Failed to send Telegram message", details: errorText },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json({ ok: true });
+  }
+
   const state = extractLoginState(text);
   if (!state) {
     return NextResponse.json({ ok: true });
@@ -43,29 +90,22 @@ export const POST = async (request: Request) => {
   const loginUrl = new URL("/api/auth/telegram/callback", origin);
   loginUrl.searchParams.set("state", state);
 
-  const response = await fetch(
-    `https://api.telegram.org/bot${botToken}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: message.chat.id,
-        text: "Нажмите кнопку ниже, чтобы войти через Telegram.",
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: "Войти на сайт",
-                login_url: {
-                  url: loginUrl.toString(),
-                },
-              },
-            ],
-          ],
-        },
-      }),
+  const response = await sendTelegramMessage(botToken, {
+    chat_id: message.chat.id,
+    text: "Нажмите кнопку ниже, чтобы войти через Telegram.",
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "Войти на сайт",
+            login_url: {
+              url: loginUrl.toString(),
+            },
+          },
+        ],
+      ],
     },
-  );
+  });
 
   if (!response.ok) {
     const errorText = await response.text();
