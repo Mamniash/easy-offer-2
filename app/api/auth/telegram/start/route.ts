@@ -22,6 +22,7 @@ export const GET = async (request: NextRequest) => {
 
   const state = crypto.randomUUID();
   const returnTo = request.nextUrl.searchParams.get("returnTo");
+  const safeReturnTo = isSafeReturnTo(returnTo) ? returnTo : null;
   const cookieStore = await cookies();
 
   cookieStore.set("tg_auth_state", state, {
@@ -32,8 +33,8 @@ export const GET = async (request: NextRequest) => {
     path: "/",
   });
 
-  if (isSafeReturnTo(returnTo)) {
-    cookieStore.set("tg_auth_return_to", returnTo, {
+  if (safeReturnTo) {
+    cookieStore.set("tg_auth_return_to", safeReturnTo, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
