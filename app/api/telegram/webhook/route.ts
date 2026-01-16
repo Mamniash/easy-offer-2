@@ -75,9 +75,8 @@ export const POST = async (request: Request) => {
     const response = await sendTelegramMessage(botToken, {
       chat_id: message.chat.id,
       text: [
-        "Откройте бота через кнопку “Войти через Telegram” на сайте, иначе нет параметра login_…",
+        "Привет! Для входа откройте бота через кнопку «Войти через Telegram» на сайте.",
         `Сайт: ${origin}`,
-        "Нажмите именно кнопку авторизации на сайте.",
       ].join("\n"),
     });
 
@@ -103,7 +102,7 @@ export const POST = async (request: Request) => {
 
   const response = await sendTelegramMessage(botToken, {
     chat_id: message.chat.id,
-    text: "Нажмите кнопку ниже, чтобы войти через Telegram.",
+    text: "Отлично! Нажмите кнопку ниже, чтобы войти на сайт.",
     reply_markup: {
       inline_keyboard: [
         [

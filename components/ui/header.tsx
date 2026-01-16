@@ -16,6 +16,7 @@ type UserSummary = {
 export default function Header() {
   const [user, setUser] = useState<UserSummary | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -76,7 +77,7 @@ export default function Header() {
     await supabase.auth.signOut();
     setUser(null);
     setMenuOpen(false);
-    router.replace("/signin");
+    router.replace("/");
   };
 
   const userInitial = user?.name?.[0] || user?.email?.[0] || "";
@@ -177,28 +178,83 @@ export default function Header() {
               </div>
               </>
             ) : (
-              <ul className="flex items-center gap-3">
-                <li>
-                  <Link
-                    href="/signin"
-                    className="btn-sm bg-white text-gray-800 shadow-sm hover:bg-gray-50"
+              <button
+                type="button"
+                onClick={() => setLoginOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:bg-blue-600"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
+                  <svg
+                    className="h-4 w-4 text-white"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
                   >
-                    Войти
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/signup"
-                    className="btn-sm bg-gray-800 text-gray-200 shadow-sm hover:bg-gray-900"
-                  >
-                    Зарегистрироваться
-                  </Link>
-                </li>
-              </ul>
+                    <path d="M9.04 15.76 8.9 19.38c.39 0 .55-.17.76-.37l1.82-1.75 3.77 2.76c.69.38 1.18.18 1.36-.64l2.47-11.6c.23-1.05-.38-1.47-1.08-1.2L3.3 9.3c-1.01.4-1 1.02-.18 1.27l4.23 1.32 9.83-6.2c.46-.28.88-.13.53.2L9.04 15.76z" />
+                  </svg>
+                </span>
+                Войти
+              </button>
             )}
           </div>
         </div>
       </div>
+
+      {loginOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setLoginOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl rounded-2xl bg-white px-6 py-8 text-center shadow-xl sm:px-10"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1" />
+              <button
+                type="button"
+                onClick={() => setLoginOpen(false)}
+                className="rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                aria-label="Закрыть"
+              >
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 sm:text-3xl">
+              Войдите в аккаунт
+            </h2>
+            <p className="mt-3 text-sm text-gray-600 sm:text-base">
+              Для продолжения нужно авторизоваться через Telegram.
+            </p>
+            <Link
+              href="/api/auth/telegram/start"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/30 transition hover:bg-blue-600"
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                <svg
+                  className="h-4 w-4 text-white"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M9.04 15.76 8.9 19.38c.39 0 .55-.17.76-.37l1.82-1.75 3.77 2.76c.69.38 1.18.18 1.36-.64l2.47-11.6c.23-1.05-.38-1.47-1.08-1.2L3.3 9.3c-1.01.4-1 1.02-.18 1.27l4.23 1.32 9.83-6.2c.46-.28.88-.13.53.2L9.04 15.76z" />
+                </svg>
+              </span>
+              Войти через Telegram
+            </Link>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
