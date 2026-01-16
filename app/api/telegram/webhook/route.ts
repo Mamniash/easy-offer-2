@@ -41,6 +41,17 @@ const sendTelegramMessage = async (
     body: JSON.stringify(payload),
   });
 
+const resolveBaseOrigin = (request: Request) => {
+  const configuredOrigin =
+    process.env.NEXT_PUBLIC_SITE_URL ?? process.env.APP_BASE_URL;
+
+  if (configuredOrigin) {
+    return new URL(configuredOrigin).origin;
+  }
+
+  return new URL(request.url).origin;
+};
+
 export const POST = async (request: Request) => {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -60,7 +71,7 @@ export const POST = async (request: Request) => {
   }
 
   if (isBareStartCommand(text)) {
-    const origin = new URL(request.url).origin;
+    const origin = resolveBaseOrigin(request);
     const response = await sendTelegramMessage(botToken, {
       chat_id: message.chat.id,
       text: [
@@ -86,7 +97,7 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ ok: true });
   }
 
-  const origin = new URL(request.url).origin;
+  const origin = resolveBaseOrigin(request);
   const loginUrl = new URL("/api/auth/telegram/callback", origin);
   loginUrl.searchParams.set("state", state);
 

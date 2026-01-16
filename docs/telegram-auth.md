@@ -37,14 +37,20 @@ SUPABASE_SERVICE_ROLE_KEY=
 TELEGRAM_BOT_USERNAME=
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_AUTH_PASSWORD_SECRET=
+NEXT_PUBLIC_SITE_URL=
+# or
+APP_BASE_URL=
 ```
 
 `TELEGRAM_AUTH_PASSWORD_SECRET` is used to derive a deterministic password for
 server-side Supabase sign-in (never sent to the client).
+
+`NEXT_PUBLIC_SITE_URL` (or `APP_BASE_URL`) is used by the Telegram webhook to
+build the `login_url` origin. This is required for Vercel Preview deployments,
+where the webhook request origin does not match the public preview domain.
 
 ## Security notes
 
 - The callback validates `hash` using the Telegram bot token (HMAC-SHA256).
 - `auth_date` is required and must be recent (default 5 minutes).
 - A short-lived `state` cookie protects against CSRF and replay.
-
