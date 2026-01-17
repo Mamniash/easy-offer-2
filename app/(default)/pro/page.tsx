@@ -72,7 +72,24 @@ export default function ProPage() {
       }
 
       const { user_metadata } = session.user;
-      setUserName(user_metadata?.full_name || user_metadata?.name || null);
+      const firstName =
+        typeof user_metadata?.first_name === "string"
+          ? user_metadata.first_name.trim()
+          : "";
+      const lastName =
+        typeof user_metadata?.last_name === "string"
+          ? user_metadata.last_name.trim()
+          : "";
+      const fullName = [firstName, lastName].filter(Boolean).join(" ");
+      const fallbackName =
+        (typeof user_metadata?.full_name === "string"
+          ? user_metadata.full_name
+          : null) ||
+        (typeof user_metadata?.name === "string" ? user_metadata.name : null) ||
+        (typeof user_metadata?.username === "string"
+          ? `@${user_metadata.username}`
+          : null);
+      setUserName(fullName || fallbackName || null);
       setIsLoading(false);
     };
 
