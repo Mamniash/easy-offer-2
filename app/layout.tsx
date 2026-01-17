@@ -1,4 +1,6 @@
 import "./css/style.css";
+import { Suspense } from "react";
+
 import { PostHogProvider } from "./providers";
 import { AuthModalProvider } from "@/components/ui/auth-modal-provider";
 
@@ -20,11 +22,13 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className="bg-gray-50 font-inter tracking-tight text-gray-900 antialiased">
         <PostHogProvider>
-          <AuthModalProvider>
-            <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
-              {children}
-            </div>
-          </AuthModalProvider>
+          <Suspense>
+            <AuthModalProvider>
+              <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
+                {children}
+              </div>
+            </AuthModalProvider>
+          </Suspense>
         </PostHogProvider>
       </body>
     </html>
