@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { legalDocuments, type LegalDocKey } from "../ui/legal-documents";
 
 type ProPlan = {
   id: string;
@@ -62,6 +63,7 @@ export default function ProPlanSelection() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [hasAcceptedRecurring, setHasAcceptedRecurring] = useState(false);
+  const [activeLegalDoc, setActiveLegalDoc] = useState<LegalDocKey | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -69,27 +71,48 @@ export default function ProPlanSelection() {
       setHasAcceptedRecurring(false);
     }
 
+    if (!isOpen) {
+      setActiveLegalDoc(null);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen && !activeLegalDoc) {
+      return;
+    }
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
+      if (event.key !== "Escape") {
+        return;
       }
+
+      if (activeLegalDoc) {
+        setActiveLegalDoc(null);
+        return;
+      }
+
+      setIsOpen(false);
     };
 
-    if (isOpen) {
-      document.addEventListener("keydown", onKeyDown);
-    }
+    document.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [isOpen]);
+  }, [activeLegalDoc, isOpen]);
 
   const openModal = (plan: ProPlan) => {
     setSelectedPlan(plan);
     setIsOpen(true);
+    setActiveLegalDoc(null);
   };
 
   const canPurchase = hasAcceptedTerms && hasAcceptedRecurring;
+
+  const closePaymentModal = () => {
+    setIsOpen(false);
+    setActiveLegalDoc(null);
+  };
 
   return (
     <div className="mt-12">
@@ -188,9 +211,23 @@ export default function ProPlanSelection() {
                   type="checkbox"
                 />
                 <span>
-                  Я ознакомлен с договором публичной оферты и согласен на
-                  обработку персональных данных в соответствии с Политикой
-                  конфиденциальности.
+                  Я ознакомлен с{" "}
+                  <button
+                    type="button"
+                    onClick={() => setActiveLegalDoc("public-offer")}
+                    className="text-blue-600 underline underline-offset-2 transition hover:text-blue-700"
+                  >
+                    договором публичной оферты
+                  </button>{" "}
+                  и согласен на обработку персональных данных в соответствии с{" "}
+                  <button
+                    type="button"
+                    onClick={() => setActiveLegalDoc("privacy")}
+                    className="text-blue-600 underline underline-offset-2 transition hover:text-blue-700"
+                  >
+                    Политикой конфиденциальности
+                  </button>
+                  .
                 </span>
               </label>
               <label className="flex items-start gap-3">
@@ -210,7 +247,7 @@ export default function ProPlanSelection() {
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={closePaymentModal}
                 className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
                 Закрыть
@@ -219,7 +256,7 @@ export default function ProPlanSelection() {
                 type="button"
                 onClick={() => {
                   if (canPurchase) {
-                    setIsOpen(false);
+                    closePaymentModal();
                   }
                 }}
                 disabled={!canPurchase}
@@ -231,6 +268,44 @@ export default function ProPlanSelection() {
           </div>
         </div>
       )}
+      {activeLegalDoc ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 py-6"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Документ</p>
+                <h3 className="text-lg font-semibold text-gray-900">{legalDocuments[activeLegalDoc].title}</h3>
+              </div>
+              <button
+                aria-label="Закрыть"
+                className="rounded-full p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+                onClick={() => setActiveLegalDoc(null)}
+                type="button"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M6 18 18 6m0 12L6 6"></path>
+                </svg>
+              </button>
+            </div>
+            <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1 text-left">
+              {legalDocuments[activeLegalDoc].content}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
