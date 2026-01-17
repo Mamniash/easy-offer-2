@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Popover } from "@headlessui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { useAuthModal } from "@/components/ui/auth-modal-provider";
 import {
   defaultQuestionMarkState,
   type QuestionMarkState,
@@ -19,6 +20,7 @@ const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
 const AUTHORIZED_QUESTIONS_LIMIT = 50;
 export default function TrackDetail({ track }: { track: Track }) {
   const router = useRouter();
+  const { open: openAuthModal } = useAuthModal();
   const [search, setSearch] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
@@ -577,18 +579,13 @@ export default function TrackDetail({ track }: { track: Track }) {
             Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению.
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-1">
-            <Link
-              href="/signin"
+            <button
+              type="button"
+              onClick={openAuthModal}
               className="btn-sm bg-blue-600 text-white shadow-sm transition hover:bg-blue-700"
             >
-              Войти
-            </Link>
-            <Link
-              href="/signup"
-              className="btn-sm bg-white text-gray-800 shadow-sm ring-1 ring-inset ring-gray-200 transition hover:bg-gray-50"
-            >
-              Зарегистрироваться
-            </Link>
+              Войти через Telegram
+            </button>
           </div>
         </div>
       )}

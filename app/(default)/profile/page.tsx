@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { supabase } from "@/lib/supabaseClient";
+import { useAuthModal } from "@/components/ui/auth-modal-provider";
 
 type ProfileUser = {
   email?: string;
@@ -52,6 +53,8 @@ const buildProfileUser = (
 export default function ProfilePage() {
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [needsAuth, setNeedsAuth] = useState(false);
+  const { open: openAuthModal } = useAuthModal();
   const router = useRouter();
 
   useEffect(() => {
@@ -61,7 +64,9 @@ export default function ProfilePage() {
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
-        router.replace("/signin");
+        setNeedsAuth(true);
+        setLoading(false);
+        openAuthModal();
         return;
       }
 
@@ -72,12 +77,37 @@ export default function ProfilePage() {
     };
 
     fetchSession();
-  }, [router]);
+  }, [openAuthModal, router]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.replace("/signin");
+    router.replace("/");
   };
+
+  if (needsAuth) {
+    return (
+      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm shadow-black/[0.03]">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-400">
+            Профиль
+          </p>
+          <h1 className="mt-3 text-2xl font-bold text-gray-900">
+            Войдите, чтобы увидеть профиль
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Авторизация нужна, чтобы показать ваши данные и историю.
+          </p>
+          <button
+            type="button"
+            onClick={openAuthModal}
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+          >
+            Войти через Telegram
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
