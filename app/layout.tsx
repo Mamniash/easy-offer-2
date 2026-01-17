@@ -1,5 +1,6 @@
 import "./css/style.css";
 import { PostHogProvider } from "./providers";
+import { AuthModalProvider } from "@/components/ui/auth-modal-provider";
 
 export const metadata = {
   title: "PreOffer",
@@ -19,9 +20,11 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className="bg-gray-50 font-inter tracking-tight text-gray-900 antialiased">
         <PostHogProvider>
-          <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
-            {children}
-          </div>
+          <AuthModalProvider>
+            <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
+              {children}
+            </div>
+          </AuthModalProvider>
         </PostHogProvider>
       </body>
     </html>

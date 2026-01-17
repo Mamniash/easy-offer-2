@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useAuthModal } from "@/components/ui/auth-modal-provider";
 
 import {
   defaultQuestionMarkState,
@@ -20,7 +20,7 @@ type QuestionMarkPanelProps = {
 export default function QuestionMarkPanel({
   questionId,
 }: QuestionMarkPanelProps) {
-  const router = useRouter();
+  const { open: openAuthModal } = useAuthModal();
   const [userId, setUserId] = useState<string | null>(null);
   const [markState, setMarkState] = useState<QuestionMarkState>(
     defaultQuestionMarkState
@@ -116,7 +116,7 @@ export default function QuestionMarkPanel({
 
   const handleToggle = async (field: QuestionMarkField) => {
     if (!userId) {
-      router.push("/signin");
+      openAuthModal();
       return;
     }
 

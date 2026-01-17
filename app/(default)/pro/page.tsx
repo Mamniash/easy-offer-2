@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-
 import ProPlanSelection from "@/components/pro/pro-plan-selection";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuthModal } from "@/components/ui/auth-modal-provider";
 
 type ComparisonItem = {
   title: string;
@@ -58,7 +57,8 @@ const COMPARISON: ComparisonItem[] = [
 export default function ProPage() {
   const [userName, setUserName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  const [needsAuth, setNeedsAuth] = useState(false);
+  const { open: openAuthModal } = useAuthModal();
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -67,7 +67,9 @@ export default function ProPage() {
       } = await supabase.auth.getSession();
 
       if (!session?.user) {
-        router.replace("/signin");
+        setNeedsAuth(true);
+        setIsLoading(false);
+        openAuthModal();
         return;
       }
 
@@ -77,7 +79,32 @@ export default function ProPage() {
     };
 
     fetchSession();
-  }, [router]);
+  }, [openAuthModal]);
+
+  if (needsAuth) {
+    return (
+      <section className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+            PRO-доступ
+          </p>
+          <h1 className="mt-4 text-2xl font-bold text-gray-900">
+            Войдите, чтобы оформить подписку
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Авторизация нужна, чтобы закрепить PRO на вашем аккаунте.
+          </p>
+          <button
+            type="button"
+            onClick={openAuthModal}
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+          >
+            Войти через Telegram
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (

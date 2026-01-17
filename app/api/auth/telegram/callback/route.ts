@@ -26,16 +26,90 @@ const isSafeReturnTo = (returnTo: string | null) => {
 const hashTelegramPassword = (secret: string, telegramId: string) =>
   crypto.createHmac("sha256", secret).update(telegramId).digest("hex");
 
-const renderHtml = (options: { script: string; message: string }) => `
+const renderHtml = (options: {
+  script: string;
+  message: string;
+  description?: string;
+}) => `
 <!doctype html>
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Telegram Login</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at top, #eef5ff, #f7f9fc 45%, #ffffff);
+        color: #0f172a;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        width: min(520px, 100%);
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+        padding: 32px;
+        text-align: center;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #1d4ed8;
+        background: #eff6ff;
+      }
+      .title {
+        margin: 16px 0 8px;
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .description {
+        margin: 0;
+        font-size: 14px;
+        color: #64748b;
+        line-height: 1.5;
+      }
+      .spinner {
+        margin: 24px auto 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 4px solid #dbeafe;
+        border-top-color: #2563eb;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
-    <p>${options.message}</p>
+    <div class="card">
+      <div class="badge">Telegram</div>
+      <h1 class="title">${options.message}</h1>
+      <p class="description">
+        ${options.description ?? "Скоро вернём вас на сайт, это займёт пару секунд."}
+      </p>
+      <div class="spinner" aria-hidden="true"></div>
+    </div>
     <script>
       ${options.script}
     </script>
@@ -80,7 +154,8 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(
       renderHtml({
         message: "Невалидная сессия авторизации. Попробуйте войти ещё раз.",
-        script: "setTimeout(() => window.location.replace('/signin'), 1500);",
+        description: "Если редирект не произойдёт автоматически, вернитесь на сайт.",
+        script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
     );
@@ -96,7 +171,8 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(
       renderHtml({
         message: "Ссылка для входа устарела. Попробуйте снова.",
-        script: "setTimeout(() => window.location.replace('/signin'), 1500);",
+        description: "Мы откроем форму авторизации на главной странице.",
+        script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
     );
@@ -106,7 +182,8 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(
       renderHtml({
         message: "Не удалось подтвердить данные Telegram.",
-        script: "setTimeout(() => window.location.replace('/signin'), 1500);",
+        description: "Откроем форму входа, чтобы вы могли попробовать ещё раз.",
+        script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
     );
@@ -227,6 +304,7 @@ export const GET = async (request: NextRequest) => {
   return new NextResponse(
     renderHtml({
       message: "Выполняем вход…",
+      description: "Сохраняем сессию и возвращаем на ту страницу, где вы были.",
       script: `
         const session = ${JSON.stringify(sessionPayload)};
         window.localStorage.setItem(
