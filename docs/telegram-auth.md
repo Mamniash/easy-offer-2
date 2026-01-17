@@ -49,6 +49,16 @@ server-side Supabase sign-in (never sent to the client).
 build the `login_url` origin. This is required for Vercel Preview deployments,
 where the webhook request origin does not match the public preview domain.
 
+### Vercel production checklist
+
+1. In Vercel **Production** environment variables, set
+   `NEXT_PUBLIC_SITE_URL=https://preoffer.ru` (or
+   `APP_BASE_URL=https://preoffer.ru` — one is sufficient).
+2. Verify the variable is present in **Production** (not only Preview/Development).
+3. Redeploy the Production deployment so the new value is picked up.
+4. Confirm the “Войти на сайт” button points to
+   `https://preoffer.ru/api/auth/telegram/callback?...`.
+
 ## Security notes
 
 - The callback validates `hash` using the Telegram bot token (HMAC-SHA256).
