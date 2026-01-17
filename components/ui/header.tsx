@@ -9,8 +9,40 @@ import { supabase } from "@/lib/supabaseClient";
 import Logo from "./logo";
 
 type UserSummary = {
-  email: string;
+  email?: string;
   name?: string | null;
+  username?: string | null;
+  avatarUrl?: string | null;
+  telegramId?: number | null;
+};
+
+const buildUserSummary = (
+  email: string | null | undefined,
+  metadata: Record<string, unknown> | null | undefined,
+): UserSummary => {
+  const firstName =
+    typeof metadata?.first_name === "string" ? metadata.first_name.trim() : "";
+  const lastName =
+    typeof metadata?.last_name === "string" ? metadata.last_name.trim() : "";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  const username =
+    typeof metadata?.username === "string" ? metadata.username.trim() : null;
+  const avatarUrl =
+    typeof metadata?.avatar_url === "string" ? metadata.avatar_url : null;
+  const telegramId =
+    typeof metadata?.telegram_id === "number" ? metadata.telegram_id : null;
+
+  return {
+    email: email ?? undefined,
+    name:
+      fullName ||
+      (typeof metadata?.full_name === "string" ? metadata.full_name : null) ||
+      (typeof metadata?.name === "string" ? metadata.name : null) ||
+      (username ? `@${username}` : null),
+    username,
+    avatarUrl,
+    telegramId,
+  };
 };
 
 export default function Header() {
@@ -29,10 +61,7 @@ export default function Header() {
 
       if (session?.user) {
         const { email, user_metadata } = session.user;
-        setUser({
-          email: email ?? "",
-          name: user_metadata?.full_name || user_metadata?.name,
-        });
+        setUser(buildUserSummary(email, user_metadata));
       }
     };
 
@@ -43,10 +72,7 @@ export default function Header() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         const { email, user_metadata } = session.user;
-        setUser({
-          email: email ?? "",
-          name: user_metadata?.full_name || user_metadata?.name,
-        });
+        setUser(buildUserSummary(email, user_metadata));
       } else {
         setUser(null);
         setMenuOpen(false);
@@ -80,7 +106,11 @@ export default function Header() {
     router.replace("/");
   };
 
-  const userInitial = user?.name?.[0] || user?.email?.[0] || "";
+  const userInitial =
+    user?.name?.[0] || user?.username?.[0] || user?.email?.[0] || "";
+  const telegramLink = user?.username
+    ? `https://t.me/${user.username}`
+    : undefined;
 
   const isHomePage = pathname === "/";
   const positionClasses = isHomePage
@@ -108,74 +138,105 @@ export default function Header() {
                   Стать PRO
                 </Link>
                 <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setMenuOpen((prev) => !prev)}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md"
-                  aria-label="Профиль"
-                >
-                  {userInitial}
-                </button>
+                  <button
+                    onClick={() => setMenuOpen((prev) => !prev)}
+                    className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md"
+                    aria-label="Профиль"
+                  >
+                    {user?.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name || "Профиль Telegram"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      userInitial
+                    )}
+                  </button>
 
-                {menuOpen && (
-                  <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm shadow-lg shadow-black/[0.04]">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-base font-semibold text-white shadow-sm">
-                        {userInitial}
+                  {menuOpen && (
+                    <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm shadow-lg shadow-black/[0.04]">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-base font-semibold text-white shadow-sm">
+                          {user?.avatarUrl ? (
+                            <img
+                              src={user.avatarUrl}
+                              alt={user.name || "Профиль Telegram"}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            userInitial
+                          )}
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-sm font-semibold text-gray-900">
+                            {user.name || "Telegram пользователь"}
+                          </p>
+                          {telegramLink ? (
+                            <a
+                              href={telegramLink}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs font-medium text-blue-500 hover:text-blue-600"
+                            >
+                              @{user.username}
+                            </a>
+                          ) : (
+                            <p className="text-xs text-gray-500">
+                              {user?.telegramId
+                                ? `Telegram ID: ${user.telegramId}`
+                                : "Аккаунт Telegram"}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className="space-y-0.5">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {user.name || "Гость"}
-                        </p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
+
+                      <div className="mt-4 space-y-2">
+                        <Link
+                          href="/profile"
+                          className="flex items-center justify-between rounded-lg px-3 py-2 text-gray-700 transition hover:bg-gray-50"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          <span className="font-medium">Профиль</span>
+                          <svg
+                            className="h-4 w-4 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5l7 7-7 7"
+                            ></path>
+                          </svg>
+                        </Link>
+                        <button
+                          onClick={handleSignOut}
+                          className="flex w-full items-center justify-between rounded-lg px-3 py-2 font-medium text-red-600 transition hover:bg-red-50"
+                        >
+                          Выйти
+                          <svg
+                            className="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M17 16l4-4m0 0l-4-4m4 4H7"
+                            ></path>
+                          </svg>
+                        </button>
                       </div>
                     </div>
-
-                    <div className="mt-4 space-y-2">
-                      <Link
-                        href="/profile"
-                        className="flex items-center justify-between rounded-lg px-3 py-2 text-gray-700 transition hover:bg-gray-50"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <span className="font-medium">Профиль</span>
-                        <svg
-                          className="h-4 w-4 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9 5l7 7-7 7"
-                          ></path>
-                        </svg>
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="flex w-full items-center justify-between rounded-lg px-3 py-2 font-medium text-red-600 transition hover:bg-red-50"
-                      >
-                        Выйти
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7"
-                          ></path>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
               </>
             ) : (
               <button

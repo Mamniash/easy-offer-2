@@ -7,10 +7,46 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 type ProfileUser = {
-  email: string;
+  email?: string;
   name?: string | null;
   createdAt?: string;
   id?: string;
+  username?: string | null;
+  avatarUrl?: string | null;
+  telegramId?: number | null;
+};
+
+const buildProfileUser = (
+  email: string | null | undefined,
+  metadata: Record<string, unknown> | null | undefined,
+  id?: string,
+  createdAt?: string,
+): ProfileUser => {
+  const firstName =
+    typeof metadata?.first_name === "string" ? metadata.first_name.trim() : "";
+  const lastName =
+    typeof metadata?.last_name === "string" ? metadata.last_name.trim() : "";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  const username =
+    typeof metadata?.username === "string" ? metadata.username.trim() : null;
+  const avatarUrl =
+    typeof metadata?.avatar_url === "string" ? metadata.avatar_url : null;
+  const telegramId =
+    typeof metadata?.telegram_id === "number" ? metadata.telegram_id : null;
+
+  return {
+    email: email ?? undefined,
+    id,
+    createdAt,
+    name:
+      fullName ||
+      (typeof metadata?.full_name === "string" ? metadata.full_name : null) ||
+      (typeof metadata?.name === "string" ? metadata.name : null) ||
+      (username ? `@${username}` : null),
+    username,
+    avatarUrl,
+    telegramId,
+  };
 };
 
 export default function ProfilePage() {
@@ -31,12 +67,7 @@ export default function ProfilePage() {
 
       const { email, id, created_at, user_metadata } = session.user;
 
-      setUser({
-        email: email ?? "",
-        id,
-        createdAt: created_at,
-        name: user_metadata?.full_name || user_metadata?.name,
-      });
+      setUser(buildProfileUser(email, user_metadata, id, created_at));
       setLoading(false);
     };
 
@@ -63,14 +94,37 @@ export default function ProfilePage() {
       <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm shadow-black/[0.03]">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-xl font-semibold text-white shadow-md">
-              {user?.name?.[0] || user?.email?.[0] || "?"}
+            <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-xl font-semibold text-white shadow-md">
+              {user?.avatarUrl ? (
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name || "Профиль Telegram"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                user?.name?.[0] || user?.username?.[0] || user?.email?.[0] || "?"
+              )}
             </div>
             <div className="space-y-1">
               <p className="text-lg font-semibold text-gray-900">
                 {loading ? "Загружаем…" : user?.name || "Без имени"}
               </p>
-              <p className="text-sm text-gray-500">{user?.email}</p>
+              {user?.username ? (
+                <a
+                  className="text-sm font-medium text-blue-500 hover:text-blue-600"
+                  href={`https://t.me/${user.username}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  @{user.username}
+                </a>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  {user?.telegramId
+                    ? `Telegram ID: ${user.telegramId}`
+                    : "Аккаунт Telegram"}
+                </p>
+              )}
             </div>
           </div>
 
