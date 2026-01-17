@@ -7,6 +7,7 @@ type ProPlan = {
   name: string;
   price: string;
   period: string;
+  billingCycle: string;
   badge?: string;
   perks: string[];
   emphasis?: boolean;
@@ -18,6 +19,7 @@ const PLANS: ProPlan[] = [
     name: "Неделя",
     price: "1 500 ₽",
     period: "на 7 дней",
+    billingCycle: "каждые 7 дней",
     perks: [
       "Доступ к выбранному треку",
       "Индекс вопросов + подсказки",
@@ -30,6 +32,7 @@ const PLANS: ProPlan[] = [
     name: "Месяц",
     price: "3 500 ₽",
     period: "на 30 дней",
+    billingCycle: "каждые 30 дней",
     badge: "Популярный",
     perks: [
       "Все из «Неделя»",
@@ -44,6 +47,7 @@ const PLANS: ProPlan[] = [
     name: "Годовой",
     price: "5 000 ₽",
     period: "на 12 месяцев",
+    billingCycle: "каждые 12 месяцев",
     perks: [
       "Все из «Месяц»",
       "Спец-цена по партнерскому коду",
@@ -56,8 +60,15 @@ const PLANS: ProPlan[] = [
 export default function ProPlanSelection() {
   const [selectedPlan, setSelectedPlan] = useState<ProPlan | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [hasAcceptedRecurring, setHasAcceptedRecurring] = useState(false);
 
   useEffect(() => {
+    if (isOpen) {
+      setHasAcceptedTerms(false);
+      setHasAcceptedRecurring(false);
+    }
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsOpen(false);
@@ -77,6 +88,8 @@ export default function ProPlanSelection() {
     setSelectedPlan(plan);
     setIsOpen(true);
   };
+
+  const canPurchase = hasAcceptedTerms && hasAcceptedRecurring;
 
   return (
     <div className="mt-12">
@@ -166,6 +179,34 @@ export default function ProPlanSelection() {
               Вы выбрали тариф «{selectedPlan.name}». Оплата скоро появится —
               сейчас мы подключаем онлайн-кассы для оформления подписки.
             </p>
+            <div className="mt-5 space-y-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-sm text-gray-700">
+              <label className="flex items-start gap-3">
+                <input
+                  checked={hasAcceptedTerms}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600"
+                  onChange={(event) => setHasAcceptedTerms(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>
+                  Я ознакомлен с договором публичной оферты и согласен на
+                  обработку персональных данных в соответствии с Политикой
+                  конфиденциальности.
+                </span>
+              </label>
+              <label className="flex items-start gap-3">
+                <input
+                  checked={hasAcceptedRecurring}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600"
+                  onChange={(event) => setHasAcceptedRecurring(event.target.checked)}
+                  type="checkbox"
+                />
+                <span>
+                  Я понимаю, что стоимость подписки составляет {selectedPlan.price} и будет
+                  списываться автоматически {selectedPlan.billingCycle} до отключения
+                  автопродления.
+                </span>
+              </label>
+            </div>
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
               <button
                 type="button"
@@ -176,10 +217,15 @@ export default function ProPlanSelection() {
               </button>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
-                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                onClick={() => {
+                  if (canPurchase) {
+                    setIsOpen(false);
+                  }
+                }}
+                disabled={!canPurchase}
+                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               >
-                Хорошо
+                Купить подписку
               </button>
             </div>
           </div>
