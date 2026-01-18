@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "antd";
 
 import { supabase } from "@/lib/supabaseClient";
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
@@ -97,13 +97,14 @@ export default function ProfilePage() {
           <p className="mt-2 text-sm text-gray-600">
             Авторизация нужна, чтобы показать ваши данные и историю.
           </p>
-          <button
-            type="button"
+          <Button
+            type="primary"
+            shape="round"
             onClick={openAuthModal}
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+            className="mt-6 px-5 py-2 text-sm font-semibold"
           >
             Войти через Telegram
-          </button>
+          </Button>
         </div>
       </section>
     );
@@ -180,18 +181,21 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+            <Button
+              type="primary"
+              className="px-4 py-2 text-sm font-semibold"
+              onClick={() => router.push("/")}
             >
               На главную
-            </Link>
-            <button
+            </Button>
+            <Button
+              danger
+              type="default"
               onClick={handleSignOut}
-              className="inline-flex items-center justify-center rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+              className="px-4 py-2 text-sm font-semibold"
             >
               Выйти из аккаунта
-            </button>
+            </Button>
           </div>
         </div>
 

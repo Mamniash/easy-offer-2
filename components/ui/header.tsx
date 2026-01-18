@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Avatar, Button, Dropdown } from "antd";
+import type { MenuProps } from "antd";
 
 import { supabase } from "@/lib/supabaseClient";
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
@@ -49,7 +51,6 @@ const buildUserSummary = (
 export default function Header() {
   const [user, setUser] = useState<UserSummary | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { open: openAuthModal } = useAuthModal();
@@ -85,21 +86,6 @@ export default function Header() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        menuOpen
-      ) {
-        setMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOpen]);
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -118,6 +104,50 @@ export default function Header() {
     ? "fixed top-2 md:top-6"
     : "relative mt-3 md:mt-4";
   const logoHref = user ? "/tracks" : "/";
+
+  const userMenuItems = useMemo<MenuProps["items"]>(
+    () => [
+      {
+        key: "profile",
+        label: (
+          <Link
+            href="/profile"
+            className="flex items-center justify-between text-sm text-gray-700"
+          >
+            Профиль
+            <svg
+              className="h-4 w-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5l7 7-7 7"
+              ></path>
+            </svg>
+          </Link>
+        ),
+      },
+      {
+        key: "logout",
+        danger: true,
+        label: "Выйти",
+      },
+    ],
+    []
+  );
+
+  const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
+    if (key === "logout") {
+      handleSignOut();
+    } else {
+      setMenuOpen(false);
+    }
+  };
 
   return (
     <header className={`${positionClasses} z-30 w-full`}>
@@ -138,37 +168,20 @@ export default function Header() {
                 >
                   Стать PRO
                 </Link>
-                <div className="relative" ref={menuRef}>
-                  <button
-                    onClick={() => setMenuOpen((prev) => !prev)}
-                    className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md"
-                    aria-label="Профиль"
-                  >
-                    {user?.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt={user.name || "Профиль Telegram"}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      userInitial
-                    )}
-                  </button>
-
-                  {menuOpen && (
-                    <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm shadow-lg shadow-black/[0.04]">
+                <Dropdown
+                  open={menuOpen}
+                  onOpenChange={setMenuOpen}
+                  menu={{ items: userMenuItems, onClick: handleMenuClick }}
+                  trigger={["click"]}
+                  dropdownRender={(menu) => (
+                    <div className="w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm shadow-lg shadow-black/[0.04]">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-base font-semibold text-white shadow-sm">
-                          {user?.avatarUrl ? (
-                            <img
-                              src={user.avatarUrl}
-                              alt={user.name || "Профиль Telegram"}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            userInitial
-                          )}
-                        </div>
+                        <Avatar
+                          className="h-10 w-10 bg-gradient-to-br from-blue-600 to-blue-500 text-base font-semibold text-white shadow-sm"
+                          src={user?.avatarUrl}
+                        >
+                          {userInitial}
+                        </Avatar>
                         <div className="space-y-0.5">
                           <p className="text-sm font-semibold text-gray-900">
                             {user.name || "Telegram пользователь"}
@@ -191,59 +204,35 @@ export default function Header() {
                           )}
                         </div>
                       </div>
-
-                      <div className="mt-4 space-y-2">
-                        <Link
-                          href="/profile"
-                          className="flex items-center justify-between rounded-lg px-3 py-2 text-gray-700 transition hover:bg-gray-50"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          <span className="font-medium">Профиль</span>
-                          <svg
-                            className="h-4 w-4 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M9 5l7 7-7 7"
-                            ></path>
-                          </svg>
-                        </Link>
-                        <button
-                          onClick={handleSignOut}
-                          className="flex w-full items-center justify-between rounded-lg px-3 py-2 font-medium text-red-600 transition hover:bg-red-50"
-                        >
-                          Выйти
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M17 16l4-4m0 0l-4-4m4 4H7"
-                            ></path>
-                          </svg>
-                        </button>
+                      <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50/60 p-1">
+                        {menu}
                       </div>
                     </div>
                   )}
-                </div>
+                >
+                  <Button
+                    type="text"
+                    className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md !p-0"
+                    aria-label="Профиль"
+                  >
+                    {user?.avatarUrl ? (
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.name || "Профиль Telegram"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      userInitial
+                    )}
+                  </Button>
+                </Dropdown>
               </>
             ) : (
-              <button
-                type="button"
+              <Button
+                type="primary"
+                shape="round"
                 onClick={openAuthModal}
-                className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:bg-blue-600"
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shadow-md shadow-blue-500/30"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
                   <svg
@@ -256,7 +245,7 @@ export default function Header() {
                   </svg>
                 </span>
                 Войти
-              </button>
+              </Button>
             )}
           </div>
         </div>

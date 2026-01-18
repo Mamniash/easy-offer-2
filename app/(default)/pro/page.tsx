@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "antd";
 import ProPlanSelection from "@/components/pro/pro-plan-selection";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
@@ -111,13 +112,14 @@ export default function ProPage() {
           <p className="mt-2 text-sm text-gray-600">
             Авторизация нужна, чтобы закрепить PRO на вашем аккаунте.
           </p>
-          <button
-            type="button"
+          <Button
+            type="primary"
+            shape="round"
             onClick={openAuthModal}
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+            className="mt-6 px-6 py-2 text-sm font-semibold"
           >
             Войти через Telegram
-          </button>
+          </Button>
         </div>
       </section>
     );

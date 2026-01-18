@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal } from "antd";
+import { Button, Input, Modal } from "antd";
 import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
 import { canSendMessage, sendToTelegram } from "@/lib/telegram";
@@ -85,56 +85,58 @@ const ContactForm = ({ form, sessionTime }: { form: ReturnType<typeof useContact
         <label className="text-xs font-medium text-gray-800" htmlFor={`${controlId}-contact`}>
           Контакт для связи
         </label>
-        <input
-          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        <Input
+          className="w-full !rounded-md"
           id={`${controlId}-contact`}
           name="contact"
           onChange={(event) => form.setContact(event.target.value)}
           placeholder="Телеграм, почта или телефон"
           required
-        type="text"
-        value={form.contact}
-      />
-    </div>
-    <div className="space-y-1">
+          type="text"
+          value={form.contact}
+        />
+      </div>
+      <div className="space-y-1">
         <label className="text-xs font-medium text-gray-800" htmlFor={`${controlId}-location`}>
           Город или часовой пояс
         </label>
-        <input
-          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        <Input
+          className="w-full !rounded-md"
           id={`${controlId}-location`}
           name="location"
           onChange={(event) => form.setLocation(event.target.value)}
           placeholder="Например, Москва или GMT+3"
-        required
-        type="text"
-        value={form.location}
-      />
-    </div>
-    <div className="space-y-1">
+          required
+          type="text"
+          value={form.location}
+        />
+      </div>
+      <div className="space-y-1">
         <label className="text-xs font-medium text-gray-800" htmlFor={`${controlId}-note`}>
           {form.noteLabel}
         </label>
-        <textarea
-          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        <Input.TextArea
+          className="w-full !rounded-md"
           id={`${controlId}-note`}
           name="note"
           onChange={(event) => form.setNote(event.target.value)}
           placeholder={form.notePlaceholder}
-        required
-        rows={3}
-        value={form.note}
-      />
-    </div>
-    <button
-      className="inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:opacity-60"
-      disabled={form.loading}
-      type="submit"
-    >
-      {form.loading ? "Отправляем..." : form.cta}
-    </button>
-    {form.status ? <p className="text-xs text-gray-600">{form.status}</p> : null}
-  </form>
+          required
+          rows={3}
+          value={form.note}
+        />
+      </div>
+      <Button
+        className="w-full"
+        disabled={form.loading}
+        loading={form.loading}
+        type="primary"
+        htmlType="submit"
+      >
+        {form.cta}
+      </Button>
+      {form.status ? <p className="text-xs text-gray-600">{form.status}</p> : null}
+    </form>
   );
 };
 
@@ -232,13 +234,13 @@ export default function Footer({ border = false }: { border?: boolean }) {
 
   const renderLink = (label: string, key: FooterKey) => (
     <li>
-      <button
-        className="text-left text-gray-600 transition hover:text-gray-900"
+      <Button
+        className="!p-0 !text-left text-gray-600 transition hover:!text-gray-900"
         onClick={() => openModal(key)}
-        type="button"
+        type="link"
       >
         {label}
-      </button>
+      </Button>
     </li>
   );
 

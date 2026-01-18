@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal } from "antd";
+import { Button, Checkbox, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { legalDocuments, type LegalDocKey } from "../ui/legal-documents";
 
@@ -173,17 +173,18 @@ export default function ProPlanSelection() {
               ))}
             </ul>
 
-            <button
-              type="button"
+            <Button
+              type="default"
+              shape="round"
               onClick={() => openModal(plan)}
-              className={`mt-8 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
+              className={`mt-8 px-4 py-2 text-sm font-semibold transition ${
                 plan.emphasis
-                  ? "bg-white text-blue-700 hover:bg-blue-50"
-                  : "bg-white text-slate-900 hover:bg-slate-100"
+                  ? "!bg-white !text-blue-700 hover:!bg-blue-50"
+                  : "!bg-white !text-slate-900 hover:!bg-slate-100"
               }`}
             >
               Оформить {plan.name.toLowerCase()}
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -208,67 +209,65 @@ export default function ProPlanSelection() {
               сейчас мы подключаем онлайн-кассы для оформления подписки.
             </p>
             <div className="mt-5 space-y-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-sm text-gray-700">
-              <label className="flex items-start gap-3">
-                <input
-                  checked={hasAcceptedTerms}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600"
-                  onChange={(event) => setHasAcceptedTerms(event.target.checked)}
-                  type="checkbox"
-                />
+              <Checkbox
+                checked={hasAcceptedTerms}
+                onChange={(event) => setHasAcceptedTerms(event.target.checked)}
+                className="items-start"
+              >
                 <span>
                   Я ознакомлен с{" "}
-                  <button
-                    type="button"
+                  <Button
+                    type="link"
                     onClick={() => setActiveLegalDoc("public-offer")}
-                    className="text-blue-600 underline underline-offset-2 transition hover:text-blue-700"
+                    className="!p-0"
                   >
                     договором публичной оферты
-                  </button>{" "}
+                  </Button>{" "}
                   и согласен на обработку персональных данных в соответствии с{" "}
-                  <button
-                    type="button"
+                  <Button
+                    type="link"
                     onClick={() => setActiveLegalDoc("privacy")}
-                    className="text-blue-600 underline underline-offset-2 transition hover:text-blue-700"
+                    className="!p-0"
                   >
                     Политикой конфиденциальности
-                  </button>
+                  </Button>
                   .
                 </span>
-              </label>
-              <label className="flex items-start gap-3">
-                <input
-                  checked={hasAcceptedRecurring}
-                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600"
-                  onChange={(event) => setHasAcceptedRecurring(event.target.checked)}
-                  type="checkbox"
-                />
+              </Checkbox>
+              <Checkbox
+                checked={hasAcceptedRecurring}
+                onChange={(event) => setHasAcceptedRecurring(event.target.checked)}
+                className="items-start"
+              >
                 <span>
                   Я понимаю, что стоимость подписки составляет {selectedPlan.price} и будет
                   списываться автоматически {selectedPlan.billingCycle} до отключения
                   автопродления.
                 </span>
-              </label>
+              </Checkbox>
             </div>
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
-              <button
-                type="button"
+              <Button
+                type="default"
+                shape="round"
                 onClick={closePaymentModal}
-                className="rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                className="px-4 py-2 text-sm font-semibold"
               >
                 Закрыть
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                type="primary"
+                shape="round"
                 onClick={() => {
                   if (canPurchase) {
                     closePaymentModal();
                   }
                 }}
                 disabled={!canPurchase}
-                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                className="px-4 py-2 text-sm font-semibold"
               >
                 Купить подписку
-              </button>
+              </Button>
             </div>
           </div>
         ) : null}
