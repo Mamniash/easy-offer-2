@@ -12,7 +12,7 @@ import {
 } from "@/lib/question-marks";
 import { getTrackSkillFilters } from "@/lib/track-skill-filters";
 import type { Track } from "@/lib/tracks";
-import { isProEmail } from "@/lib/subscription";
+import { isProUser } from "@/lib/subscription";
 import { supabase } from "@/lib/supabaseClient";
 
 const QUESTIONS_PER_PAGE = 50;
@@ -55,8 +55,8 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       if (!isMounted) return;
 
-      const email = session?.user?.email;
-      const hasPro = isProEmail(email);
+      const { email, user_metadata } = session?.user ?? {};
+      const hasPro = isProUser({ email, metadata: user_metadata });
 
       setIsAuthorized(Boolean(session?.user));
       setUserId(session?.user?.id ?? null);
@@ -70,8 +70,8 @@ export default function TrackDetail({ track }: { track: Track }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
-      const email = session?.user?.email;
-      const hasPro = isProEmail(email);
+      const { email, user_metadata } = session?.user ?? {};
+      const hasPro = isProUser({ email, metadata: user_metadata });
 
       setIsAuthorized(Boolean(session?.user));
       setUserId(session?.user?.id ?? null);
