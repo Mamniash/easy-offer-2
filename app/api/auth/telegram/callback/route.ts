@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
@@ -130,14 +129,6 @@ export const GET = async (request: NextRequest) => {
     );
   }
 
-  const cookieStore = await cookies();
-  const stateCookie = cookieStore.get("tg_auth_state")?.value;
-  const returnToCookie = cookieStore.get("tg_auth_return_to")?.value ?? "/";
-  const returnTo = isSafeReturnTo(returnToCookie) ? returnToCookie : "/";
-
-  cookieStore.delete("tg_auth_state");
-  cookieStore.delete("tg_auth_return_to");
-
   const searchParams = request.nextUrl.searchParams;
   const payload: TelegramAuthPayload = {
     id: searchParams.get("id") ?? "",
@@ -150,7 +141,7 @@ export const GET = async (request: NextRequest) => {
   };
   const state = searchParams.get("state");
 
-  if (!state || !stateCookie || state !== stateCookie) {
+  if (!state) {
     return new NextResponse(
       renderHtml({
         message: "Невалидная сессия авторизации. Попробуйте войти ещё раз.",
@@ -158,6 +149,49 @@ export const GET = async (request: NextRequest) => {
         script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
+    );
+  }
+
+  const now = Date.now();
+  const ttlThreshold = new Date(now - 10 * 60 * 1000).toISOString();
+  const authStateResponse = await supabaseAdmin
+    .from("telegram_auth_states")
+    .select("state, return_to, created_at, used_at")
+    .eq("state", state)
+    .is("used_at", null)
+    .gte("created_at", ttlThreshold)
+    .maybeSingle();
+
+  if (authStateResponse.error) {
+    return NextResponse.json(
+      { error: authStateResponse.error.message },
+      { status: 500 },
+    );
+  }
+
+  if (!authStateResponse.data) {
+    return new NextResponse(
+      renderHtml({
+        message: "Невалидная сессия авторизации. Попробуйте войти ещё раз.",
+        description: "Если редирект не произойдёт автоматически, вернитесь на сайт.",
+        script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
+      }),
+      { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
+    );
+  }
+
+  const returnToValue = authStateResponse.data.return_to ?? "/";
+  const returnTo = isSafeReturnTo(returnToValue) ? returnToValue : "/";
+
+  const markUsedResponse = await supabaseAdmin
+    .from("telegram_auth_states")
+    .update({ used_at: new Date(now).toISOString() })
+    .eq("state", state);
+
+  if (markUsedResponse.error) {
+    return NextResponse.json(
+      { error: markUsedResponse.error.message },
+      { status: 500 },
     );
   }
 
