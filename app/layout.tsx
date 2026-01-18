@@ -3,6 +3,7 @@ import "./css/style.css";
 import { Suspense } from "react";
 import { ConfigProvider } from "antd";
 import { Inter } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { PostHogProvider } from "./providers";
 import { AuthModalProvider } from "@/components/ui/auth-modal-provider";
@@ -46,6 +47,7 @@ export default function RootLayout({
                 </div>
               </AuthModalProvider>
             </Suspense>
+            <SpeedInsights />
           </PostHogProvider>
         </ConfigProvider>
       </body>
