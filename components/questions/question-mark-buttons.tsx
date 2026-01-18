@@ -47,7 +47,7 @@ export default function QuestionMarkButtons({
   const buttonSize = size === "md" ? "middle" : "small";
 
   const handleClick = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<HTMLElement>,
     field: QuestionMarkField
   ) => {
     if (stopPropagation) {
