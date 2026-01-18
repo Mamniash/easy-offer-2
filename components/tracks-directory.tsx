@@ -66,7 +66,9 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
         <div key={group.title} className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-1 rounded-full bg-blue-500/80" aria-hidden />
-            <p className="text-sm uppercase tracking-[0.18em] text-gray-500">{group.title}</p>
+            <p className="text-sm uppercase tracking-[0.18em] text-gray-500 leading-none pt-px">
+              {group.title}
+            </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
