@@ -195,6 +195,7 @@ export default function ProPlanSelection() {
         onCancel={closePaymentModal}
         footer={null}
         width={480}
+        zIndex={1000}
       >
         {selectedPlan ? (
           <div>
@@ -219,15 +220,15 @@ export default function ProPlanSelection() {
                   <Button
                     type="link"
                     onClick={() => setActiveLegalDoc("public-offer")}
-                    className="!p-0"
+                    className="!p-0 !font-medium !text-blue-600 hover:!text-blue-700 !no-underline"
                   >
-                    договором публичной оферты
+                    Договором публичной оферты
                   </Button>{" "}
                   и согласен на обработку персональных данных в соответствии с{" "}
                   <Button
                     type="link"
                     onClick={() => setActiveLegalDoc("privacy")}
-                    className="!p-0"
+                    className="!p-0 !font-medium !text-blue-600 hover:!text-blue-700 !no-underline"
                   >
                     Политикой конфиденциальности
                   </Button>
@@ -240,9 +241,8 @@ export default function ProPlanSelection() {
                 className="items-start"
               >
                 <span>
-                  Я понимаю, что стоимость подписки составляет {selectedPlan.price} и будет
-                  списываться автоматически {selectedPlan.billingCycle} до отключения
-                  автопродления.
+                  Я понимаю, что оплата подписки будет списываться автоматически каждые 30
+                  дней до отключения автопродления.
                 </span>
               </Checkbox>
             </div>
@@ -278,7 +278,7 @@ export default function ProPlanSelection() {
         onCancel={() => setActiveLegalDoc(null)}
         footer={null}
         width={520}
-        zIndex={60}
+        zIndex={1100}
         title={
           activeLegalDoc ? (
             <div>
