@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const isSafeReturnTo = (returnTo: string | null) => {
   if (!returnTo) {
@@ -23,24 +23,19 @@ export const GET = async (request: NextRequest) => {
   const state = crypto.randomUUID();
   const returnTo = request.nextUrl.searchParams.get("returnTo");
   const safeReturnTo = isSafeReturnTo(returnTo) ? returnTo : null;
-  const cookieStore = await cookies();
-
-  cookieStore.set("tg_auth_state", state, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 60 * 10,
-    path: "/",
-  });
-
-  if (safeReturnTo) {
-    cookieStore.set("tg_auth_return_to", safeReturnTo, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 10,
-      path: "/",
+  const insertResponse = await supabaseAdmin
+    .from("telegram_auth_states")
+    .insert({
+      state,
+      return_to: safeReturnTo,
+      created_at: new Date().toISOString(),
     });
+
+  if (insertResponse.error) {
+    return NextResponse.json(
+      { error: insertResponse.error.message },
+      { status: 500 },
+    );
   }
 
   const startParam = `login_${state}`;
