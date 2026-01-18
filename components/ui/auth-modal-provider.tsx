@@ -62,14 +62,11 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
           className="!mt-6 !inline-flex !h-auto !items-center !justify-center !gap-2 !rounded-full !bg-blue-500 !px-6 !py-3 !text-sm !font-semibold !text-white !shadow-md !shadow-blue-500/30 hover:!bg-blue-600"
         >
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
-            <svg
-              className="h-4 w-4 text-white"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path d="M9.04 15.76 8.9 19.38c.39 0 .55-.17.76-.37l1.82-1.75 3.77 2.76c.69.38 1.18.18 1.36-.64l2.47-11.6c.23-1.05-.38-1.47-1.08-1.2L3.3 9.3c-1.01.4-1 1.02-.18 1.27l4.23 1.32 9.83-6.2c.46-.28.88-.13.53.2L9.04 15.76z" />
-            </svg>
+            <img
+              src="/images/tgLogo.svg"
+              alt="Telegram"
+              className="h-4 w-4"
+            />
           </span>
           Войти через Telegram
         </Button>
