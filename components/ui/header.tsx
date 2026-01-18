@@ -243,7 +243,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={openAuthModal}
-                className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:bg-blue-600"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 via-sky-500 to-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:from-blue-600 hover:via-sky-500 hover:to-blue-700"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
                   <svg
