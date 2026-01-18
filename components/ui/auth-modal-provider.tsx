@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Button, Modal } from "antd";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 type AuthModalContextValue = {
@@ -20,6 +20,7 @@ const buildReturnTo = (pathname: string, searchParams: URLSearchParams) => {
 };
 
 const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => void }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const startHref = useMemo(() => {
     const params = new URLSearchParams();
     if (returnTo) {
@@ -29,45 +30,36 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
     return query ? `/api/auth/telegram/start?${query}` : "/api/auth/telegram/start";
   }, [returnTo]);
 
+  const handleTelegramClick = useCallback(() => {
+    if (isSubmitting) {
+      return;
+    }
+    setIsSubmitting(true);
+    window.location.href = startHref;
+  }, [isSubmitting, startHref]);
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6"
-      role="dialog"
-      aria-modal="true"
-      onClick={onClose}
+    <Modal
+      open
+      centered
+      onCancel={onClose}
+      footer={null}
+      width={600}
+      className="auth-modal"
     >
-      <div
-        className="w-full max-w-xl rounded-2xl bg-white px-6 py-8 text-center shadow-xl sm:px-10"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-start justify-between">
-          <div className="flex-1" />
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
-            aria-label="Закрыть"
-          >
-            <svg
-              className="h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+      <div className="px-2 py-2 text-center sm:px-6">
         <h2 className="text-2xl font-semibold text-gray-900 sm:text-3xl">
           Войдите в аккаунт
         </h2>
         <p className="mt-3 text-sm text-gray-600 sm:text-base">
           Для продолжения нужно авторизоваться через Telegram.
         </p>
-        <Link
-          href={startHref}
-          className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/30 transition hover:bg-blue-600"
+        <Button
+          type="primary"
+          loading={isSubmitting}
+          disabled={isSubmitting}
+          onClick={handleTelegramClick}
+          className="!mt-6 !inline-flex !h-auto !items-center !justify-center !gap-2 !rounded-full !bg-blue-500 !px-6 !py-3 !text-sm !font-semibold !text-white !shadow-md !shadow-blue-500/30 hover:!bg-blue-600"
         >
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
             <svg
@@ -80,9 +72,9 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
             </svg>
           </span>
           Войти через Telegram
-        </Link>
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

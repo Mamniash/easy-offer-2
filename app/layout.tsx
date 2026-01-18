@@ -1,3 +1,4 @@
+import "antd/dist/reset.css";
 import "./css/style.css";
 import { Suspense } from "react";
 
