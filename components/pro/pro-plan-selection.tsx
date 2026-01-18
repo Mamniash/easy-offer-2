@@ -1,5 +1,6 @@
 "use client";
 
+import { Modal } from "antd";
 import { useEffect, useState } from "react";
 import { legalDocuments, type LegalDocKey } from "../ui/legal-documents";
 
@@ -64,6 +65,8 @@ export default function ProPlanSelection() {
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [hasAcceptedRecurring, setHasAcceptedRecurring] = useState(false);
   const [activeLegalDoc, setActiveLegalDoc] = useState<LegalDocKey | null>(null);
+  const isPaymentOpen = isOpen && Boolean(selectedPlan);
+  const isLegalDocOpen = Boolean(activeLegalDoc);
 
   useEffect(() => {
     if (isOpen) {
@@ -185,13 +188,15 @@ export default function ProPlanSelection() {
         ))}
       </div>
 
-      {isOpen && selectedPlan && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <Modal
+        open={isPaymentOpen}
+        centered
+        onCancel={closePaymentModal}
+        footer={null}
+        width={480}
+      >
+        {selectedPlan ? (
+          <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-gray-400">
               Оплата
             </p>
@@ -266,46 +271,35 @@ export default function ProPlanSelection() {
               </button>
             </div>
           </div>
-        </div>
-      )}
-      {activeLegalDoc ? (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 py-6"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Документ</p>
-                <h3 className="text-lg font-semibold text-gray-900">{legalDocuments[activeLegalDoc].title}</h3>
-              </div>
-              <button
-                aria-label="Закрыть"
-                className="rounded-full p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
-                onClick={() => setActiveLegalDoc(null)}
-                type="button"
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M6 18 18 6m0 12L6 6"></path>
-                </svg>
-              </button>
+        ) : null}
+      </Modal>
+      <Modal
+        open={isLegalDocOpen}
+        centered
+        onCancel={() => setActiveLegalDoc(null)}
+        footer={null}
+        width={520}
+        zIndex={60}
+        title={
+          activeLegalDoc ? (
+            <div>
+              <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Документ</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {legalDocuments[activeLegalDoc].title}
+              </h3>
             </div>
-            <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1 text-left">
-              {legalDocuments[activeLegalDoc].content}
-            </div>
-          </div>
-        </div>
-      ) : null}
+          ) : null
+        }
+        styles={{
+          body: {
+            maxHeight: "60vh",
+            overflowY: "auto",
+            paddingRight: "0.25rem",
+          },
+        }}
+      >
+        <div className="text-left">{activeLegalDoc ? legalDocuments[activeLegalDoc].content : null}</div>
+      </Modal>
     </div>
   );
 }

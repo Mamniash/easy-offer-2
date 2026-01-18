@@ -1,5 +1,6 @@
 "use client";
 
+import { Modal } from "antd";
 import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
 import { canSendMessage, sendToTelegram } from "@/lib/telegram";
@@ -227,6 +228,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
   };
 
   const closeModal = () => setActiveModal(null);
+  const isModalOpen = Boolean(activeModal);
 
   const renderLink = (label: string, key: FooterKey) => (
     <li>
@@ -292,40 +294,30 @@ export default function Footer({ border = false }: { border?: boolean }) {
         </div>
       </div>
 
-      {activeModal ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Футер</p>
-                <h3 className="text-lg font-semibold text-gray-900">{activeModal.title}</h3>
-              </div>
-              <button
-                aria-label="Закрыть"
-                className="rounded-full p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
-                onClick={closeModal}
-                type="button"
-              >
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M6 18 18 6m0 12L6 6"></path>
-                </svg>
-              </button>
+      <Modal
+        open={isModalOpen}
+        centered
+        onCancel={closeModal}
+        footer={null}
+        width={520}
+        title={
+          activeModal ? (
+            <div>
+              <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Футер</p>
+              <h3 className="text-lg font-semibold text-gray-900">{activeModal.title}</h3>
             </div>
-            <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1 text-left">
-              {activeModal.content}
-            </div>
-          </div>
-        </div>
-      ) : null}
+          ) : null
+        }
+        styles={{
+          body: {
+            maxHeight: "60vh",
+            overflowY: "auto",
+            paddingRight: "0.25rem",
+          },
+        }}
+      >
+        <div className="text-left">{activeModal?.content}</div>
+      </Modal>
     </footer>
   );
 }
