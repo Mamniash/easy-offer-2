@@ -171,10 +171,14 @@ export default function Header() {
                 <Dropdown
                   open={menuOpen}
                   onOpenChange={setMenuOpen}
-                  menu={{ items: userMenuItems, onClick: handleMenuClick }}
+                  menu={{
+                    items: userMenuItems,
+                    onClick: handleMenuClick,
+                    className: "rounded-xl border-0 p-1",
+                  }}
                   trigger={["click"]}
                   dropdownRender={(menu) => (
-                    <div className="w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm shadow-lg shadow-black/[0.04]">
+                    <div className="w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm shadow-xl shadow-black/[0.06]">
                       <div className="flex items-center gap-3">
                         <Avatar
                           className="h-10 w-10 bg-gradient-to-br from-blue-600 to-blue-500 text-base font-semibold text-white shadow-sm"
@@ -204,7 +208,7 @@ export default function Header() {
                           )}
                         </div>
                       </div>
-                      <div className="mt-4 rounded-lg border border-gray-100 bg-gray-50/60 p-1">
+                      <div className="mt-4 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
                         {menu}
                       </div>
                     </div>
@@ -212,14 +216,14 @@ export default function Header() {
                 >
                   <Button
                     type="text"
-                    className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md !p-0"
+                    className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md hover:ring-2 hover:ring-blue-200 focus-visible:ring-2 focus-visible:ring-blue-300 !p-0"
                     aria-label="Профиль"
                   >
                     {user?.avatarUrl ? (
                       <img
                         src={user.avatarUrl}
                         alt={user.name || "Профиль Telegram"}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full rounded-full object-cover"
                       />
                     ) : (
                       userInitial
