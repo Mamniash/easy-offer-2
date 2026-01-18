@@ -178,8 +178,8 @@ export default function ProPlanSelection() {
               onClick={() => openModal(plan)}
               className={`mt-8 inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold transition ${
                 plan.emphasis
-                  ? "bg-white text-blue-700 hover:bg-blue-50"
-                  : "bg-white text-slate-900 hover:bg-slate-100"
+                  ? "bg-white !text-blue-700 hover:bg-blue-50"
+                  : "bg-white !text-slate-900 hover:bg-slate-100"
               }`}
             >
               Оформить {plan.name.toLowerCase()}
@@ -194,6 +194,7 @@ export default function ProPlanSelection() {
         onCancel={closePaymentModal}
         footer={null}
         width={480}
+        zIndex={1000}
       >
         {selectedPlan ? (
           <div>
@@ -279,7 +280,7 @@ export default function ProPlanSelection() {
         onCancel={() => setActiveLegalDoc(null)}
         footer={null}
         width={520}
-        zIndex={60}
+        zIndex={1100}
         title={
           activeLegalDoc ? (
             <div>

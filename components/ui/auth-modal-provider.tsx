@@ -59,7 +59,7 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
           loading={isSubmitting}
           disabled={isSubmitting}
           onClick={handleTelegramClick}
-          className="!mt-6 !inline-flex !h-auto !items-center !justify-center !gap-2 !rounded-full !bg-blue-500 !px-6 !py-3 !text-sm !font-semibold !text-white !shadow-md !shadow-blue-500/30 hover:!bg-blue-600"
+          className="!mt-6 !inline-flex !h-auto !items-center !justify-center !gap-2 !rounded-full !bg-gradient-to-r !from-blue-500 !via-sky-500 !to-blue-600 !px-6 !py-3 !text-sm !font-semibold !text-white !shadow-md !shadow-blue-500/30 hover:!from-blue-600 hover:!via-sky-500 hover:!to-blue-700"
         >
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
             <svg
