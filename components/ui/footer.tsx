@@ -254,7 +254,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
         target="_blank"
       >
         <span>{label}</span>
-        <span aria-hidden="true" className="text-xs text-gray-400">
+        <span aria-hidden="true" className="text-xs text-current">
           ↗
         </span>
       </a>
