@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { isProEmail } from "@/lib/subscription";
+import { isProUser } from "@/lib/subscription";
 import { supabase } from "@/lib/supabaseClient";
 
 type VideoItem = {
@@ -32,9 +32,9 @@ export default function QuestionSources({ items }: QuestionSourcesProps) {
 
       if (!isMounted) return;
 
-      const email = session?.user?.email;
+      const { email, user_metadata } = session?.user ?? {};
       setIsAuthorized(Boolean(session?.user));
-      setIsPro(isProEmail(email));
+      setIsPro(isProUser({ email, metadata: user_metadata }));
     };
 
     fetchSession();
@@ -44,9 +44,9 @@ export default function QuestionSources({ items }: QuestionSourcesProps) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
-      const email = session?.user?.email;
+      const { email, user_metadata } = session?.user ?? {};
       setIsAuthorized(Boolean(session?.user));
-      setIsPro(isProEmail(email));
+      setIsPro(isProUser({ email, metadata: user_metadata }));
     });
 
     return () => {
