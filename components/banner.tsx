@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "antd";
 import { useState } from "react";
 
 export default function Banner() {
@@ -29,9 +30,11 @@ export default function Banner() {
                 Check Premium Version
               </a>
             </div>
-            <button
-              className="ml-3 border-l border-gray-700 pl-2 text-slate-500 hover:text-slate-400"
+            <Button
+              className="ml-3 border-l border-gray-700 pl-2 text-slate-500 hover:!text-slate-400 !p-0"
               onClick={() => setBannerOpen(false)}
+              type="text"
+              aria-label="Close"
             >
               <span className="sr-only">Close</span>
               <svg
@@ -40,7 +43,7 @@ export default function Banner() {
               >
                 <path d="M12.72 3.293a1 1 0 00-1.415 0L8.012 6.586 4.72 3.293a1 1 0 00-1.414 1.414L6.598 8l-3.293 3.293a1 1 0 101.414 1.414l3.293-3.293 3.293 3.293a1 1 0 001.414-1.414L9.426 8l3.293-3.293a1 1 0 000-1.414z" />
               </svg>
-            </button>
+            </Button>
           </div>
         </div>
       )}

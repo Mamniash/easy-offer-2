@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Popover } from "@headlessui/react";
+import { Button, Input, Popover } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
@@ -390,16 +390,16 @@ export default function TrackDetail({ track }: { track: Track }) {
                   {filter.label}
                 </span>
               ))}
-              <button
-                type="button"
+              <Button
+                type="link"
                 onClick={() => {
                   setSearch("");
                   setSelectedSkills([]);
                 }}
-                className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                className="text-xs font-semibold !p-0"
               >
                 Сбросить
-              </button>
+              </Button>
             </div>
           ) : (
             <p className="text-base font-semibold text-gray-900 md:text-lg">
@@ -409,13 +409,61 @@ export default function TrackDetail({ track }: { track: Track }) {
 
           <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
             {skillFilters.length > 0 && (
-              <Popover className="relative text-sm text-gray-600">
-                <Popover.Button
-                  className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${
-                    selectedSkills.length > 0
-                      ? "border-blue-600 bg-blue-50 text-blue-700"
-                      : "border-gray-200 bg-white text-gray-700 hover:border-blue-300"
-                  }`}
+              <Popover
+                placement="bottomLeft"
+                trigger="click"
+                content={
+                  <div className="w-[min(360px,90vw)] rounded-2xl p-1">
+                    <div className="flex flex-wrap gap-2">
+                      {skillFilters.map((filter) => {
+                        const isActive = selectedSkills.includes(filter.id);
+                        return (
+                          <Button
+                            key={filter.id}
+                            type={isActive ? "primary" : "default"}
+                            size="small"
+                            shape="round"
+                            onClick={() => {
+                              if (isSkillFiltersLocked) {
+                                router.push("/pro");
+                                return;
+                              }
+                              setSelectedSkills((prev) =>
+                                prev.includes(filter.id)
+                                  ? prev.filter((id) => id !== filter.id)
+                                  : [...prev, filter.id]
+                              );
+                            }}
+                            className={`text-xs ${isSkillFiltersLocked ? "opacity-70" : ""}`}
+                          >
+                            {filter.label}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    {isSkillFiltersLocked && (
+                      <p className="mt-3 text-xs text-gray-500">
+                        Фильтры по навыкам доступны в PRO-подписке.
+                      </p>
+                    )}
+                    {selectedSkills.length > 0 && (
+                      <div className="mt-3 flex justify-end text-xs">
+                        <Button
+                          type="link"
+                          onClick={() => setSelectedSkills([])}
+                          className="!p-0 font-semibold"
+                        >
+                          Сбросить
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                }
+              >
+                <Button
+                  type={selectedSkills.length > 0 ? "primary" : "default"}
+                  shape="round"
+                  className="flex items-center gap-2"
                 >
                   Навыки
                   {isSkillFiltersLocked && (
@@ -429,66 +477,18 @@ export default function TrackDetail({ track }: { track: Track }) {
                     </span>
                   )}
                   <span className="text-gray-400">▾</span>
-                </Popover.Button>
-                <Popover.Panel className="absolute left-0 top-full z-10 mt-2 w-[min(360px,90vw)] rounded-2xl border border-gray-200 bg-white p-4 shadow-xl">
-                  <div className="flex flex-wrap gap-2">
-                    {skillFilters.map((filter) => {
-                      const isActive = selectedSkills.includes(filter.id);
-                      return (
-                        <button
-                          key={filter.id}
-                          type="button"
-                          onClick={() => {
-                            if (isSkillFiltersLocked) {
-                              router.push("/pro");
-                              return;
-                            }
-                            setSelectedSkills((prev) =>
-                              prev.includes(filter.id)
-                                ? prev.filter((id) => id !== filter.id)
-                                : [...prev, filter.id]
-                            );
-                          }}
-                          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                            isActive
-                              ? "border-blue-600 bg-blue-50 text-blue-700"
-                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-600"
-                          } ${isSkillFiltersLocked ? "opacity-70" : ""}`}
-                        >
-                          {filter.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {isSkillFiltersLocked && (
-                    <p className="mt-3 text-xs text-gray-500">
-                      Фильтры по навыкам доступны в PRO-подписке.
-                    </p>
-                  )}
-                  {selectedSkills.length > 0 && (
-                    <div className="mt-3 flex justify-end text-xs">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedSkills([])}
-                        className="font-semibold text-blue-600 hover:text-blue-700"
-                      >
-                        Сбросить
-                      </button>
-                    </div>
-                  )}
-                </Popover.Panel>
+                </Button>
               </Popover>
             )}
             <label className="relative md:w-auto">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                🔍
-              </span>
-              <input
+              <Input
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Найти вопрос"
-                className="w-full rounded-full border border-gray-200 bg-white px-11 py-2 text-sm text-gray-900 shadow-sm outline-none placeholder:text-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 md:w-64"
+                className="w-full !rounded-full md:w-64"
+                prefix={<span className="text-gray-400">🔍</span>}
+                allowClear
               />
             </label>
           </div>
@@ -527,45 +527,45 @@ export default function TrackDetail({ track }: { track: Track }) {
             className="flex items-center gap-1 rounded-full border border-gray-200 bg-white p-1 text-sm shadow-sm"
             aria-label="Пагинация вопросов"
           >
-            <button
-              type="button"
+            <Button
+              type="text"
               onClick={() => loadPage(page - 1)}
               disabled={page === 1 || isLoadingPage}
               className="rounded-full px-3 py-1 font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
               aria-label="Предыдущая страница"
             >
               ←
-            </button>
+            </Button>
             {paginationItems.map((item, index) =>
               item === "ellipsis" ? (
                 <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
                   …
                 </span>
               ) : (
-                <button
+                <Button
                   key={item}
-                  type="button"
+                  type={page === item ? "primary" : "text"}
                   onClick={() => loadPage(item)}
                   disabled={isLoadingPage}
                   className={`rounded-full px-3 py-1 font-semibold transition ${
                     page === item
-                      ? "bg-gray-900 text-white shadow"
+                      ? "shadow"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   } disabled:cursor-not-allowed disabled:text-gray-400`}
                 >
                   {item}
-                </button>
+                </Button>
               )
             )}
-            <button
-              type="button"
+            <Button
+              type="text"
               onClick={() => loadPage(page + 1)}
               disabled={page === totalPages || isLoadingPage}
               className="rounded-full px-3 py-1 font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
               aria-label="Следующая страница"
             >
               →
-            </button>
+            </Button>
           </nav>
         </div>
       )}
@@ -579,13 +579,14 @@ export default function TrackDetail({ track }: { track: Track }) {
             Авторизуйтесь, чтобы открыть 50 вопросов по этому направлению.
           </p>
           <div className="flex flex-wrap justify-center gap-3 pt-1">
-            <button
-              type="button"
+            <Button
+              type="primary"
+              shape="round"
               onClick={openAuthModal}
-              className="btn-sm bg-blue-600 text-white shadow-sm transition hover:bg-blue-700"
+              className="px-4 py-2 text-xs font-semibold"
             >
               Войти через Telegram
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -600,12 +601,14 @@ export default function TrackDetail({ track }: { track: Track }) {
             по направлению.
           </p>
           <div className="pt-2">
-            <Link
-              href="/pro"
-              className="inline-flex items-center justify-center rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-gray-800"
+            <Button
+              type="primary"
+              shape="round"
+              className="px-4 py-2 text-xs font-semibold"
+              onClick={() => router.push("/pro")}
             >
               Перейти к PRO-подписке
-            </Link>
+            </Button>
           </div>
         </div>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Input } from "antd";
 import { useMemo, useState } from "react";
 
 type DirectionGroup = {
@@ -43,13 +44,14 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
         </div>
         <label className="relative w-full md:w-80">
           <span className="sr-only">Поиск направления</span>
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-          <input
+          <Input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-800 shadow-inner placeholder:text-gray-400 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-100"
+            className="w-full !rounded-xl"
             placeholder="Найти профессию или стек"
+            prefix={<span className="text-gray-400">🔍</span>}
+            allowClear
           />
         </label>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { Button } from "antd";
 
 import type {
   QuestionMarkField,
@@ -8,9 +9,9 @@ import type {
 } from "@/lib/question-marks";
 
 const BUTTON_STYLES = {
-  base: "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold transition",
-  active: "border-blue-200 bg-blue-50 text-blue-700",
-  inactive: "border-gray-200 bg-white text-gray-600 hover:border-gray-300",
+  base: "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold transition !h-auto",
+  active: "!border-blue-200 !bg-blue-50 !text-blue-700",
+  inactive: "!border-gray-200 !bg-white !text-gray-600 hover:!border-gray-300",
   disabled: "cursor-not-allowed opacity-60",
 };
 
@@ -42,7 +43,8 @@ export default function QuestionMarkButtons({
   size = "sm",
 }: QuestionMarkButtonsProps) {
   const textClassName = size === "md" ? "text-sm" : "text-xs";
-  const paddingClassName = size === "md" ? "px-4 py-2" : "px-3 py-1";
+  const paddingClassName = size === "md" ? "!px-4 !py-2" : "!px-3 !py-1";
+  const buttonSize = size === "md" ? "middle" : "small";
 
   const handleClick = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -62,9 +64,10 @@ export default function QuestionMarkButtons({
         const isActive = value[field];
 
         return (
-          <button
+          <Button
             key={field}
-            type="button"
+            type={isActive ? "primary" : "default"}
+            size={buttonSize}
             onClick={(event) => handleClick(event, field)}
             disabled={disabled}
             className={[
@@ -80,7 +83,7 @@ export default function QuestionMarkButtons({
           >
             <span aria-hidden>{ICONS[field]}</span>
             {LABELS[field]}
-          </button>
+          </Button>
         );
       })}
     </div>

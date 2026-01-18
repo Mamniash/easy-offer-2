@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "antd";
 import { useState } from "react";
 
 type AccordionpProps = {
@@ -20,14 +21,15 @@ export default function Accordion({
   return (
     <div className="relative rounded-lg bg-white/70 shadow-sm shadow-black/[0.03] before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(var(--color-gray-100),var(--color-gray-200))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]">
       <h2>
-        <button
-          className="flex w-full items-center justify-between px-4 py-3 text-left font-semibold"
+        <Button
+          className="flex w-full items-center justify-between px-4 py-3 text-left font-semibold !h-auto"
           onClick={(e) => {
             e.preventDefault();
             setAccordionOpen((prevState) => !prevState);
           }}
           aria-expanded={accordionOpen}
           aria-controls={`accordion-text-${id}`}
+          type="text"
         >
           <span>{title}</span>
           <span className="ml-8 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white shadow-xs">
@@ -44,7 +46,7 @@ export default function Accordion({
               />
             </svg>
           </span>
-        </button>
+        </Button>
       </h2>
       <div
         id={`accordion-text-${id}`}

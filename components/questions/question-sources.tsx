@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "antd";
 
 import { isProUser } from "@/lib/subscription";
 import { supabase } from "@/lib/supabaseClient";
@@ -130,27 +131,30 @@ export default function QuestionSources({ items }: QuestionSourcesProps) {
 
           if (isPro) {
             return (
-              <a
+              <Button
                 key={video.url}
                 href={video.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                type="text"
+                block
+                className="group !h-auto !rounded-xl !border !border-gray-200 !bg-white !p-3 !text-left !text-gray-900 !shadow-sm transition hover:!-translate-y-0.5 hover:!border-blue-200 hover:!shadow-md"
               >
-                {cardContent}
-              </a>
+                <div className="flex items-center gap-3">{cardContent}</div>
+              </Button>
             );
           }
 
           return (
-            <button
+            <Button
               key={video.url}
-              type="button"
               onClick={() => router.push("/pro")}
-              className="group flex items-center gap-3 rounded-xl border border-dashed border-blue-200 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+              type="text"
+              block
+              className="group !h-auto !rounded-xl !border !border-dashed !border-blue-200 !bg-white !p-3 !text-left !text-gray-900 !shadow-sm transition hover:!-translate-y-0.5 hover:!border-blue-300 hover:!shadow-md"
             >
-              {cardContent}
-            </button>
+              <div className="flex items-center gap-3">{cardContent}</div>
+            </Button>
           );
         })}
       </div>
