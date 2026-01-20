@@ -142,13 +142,21 @@ export default function ProfilePage() {
                 user?.name?.[0] || user?.username?.[0] || user?.email?.[0] || "?"
               )}
             </div>
-            <div className="space-y-1">
+            <div className="flex flex-col justify-center">
               <p className="text-lg font-semibold text-gray-900">
                 {loading ? "Загружаем…" : user?.name || "Без имени"}
               </p>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl bg-gray-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Момняшпиль
+              </p>
               {user?.username ? (
                 <a
-                  className="text-sm font-medium text-blue-500 hover:text-blue-600"
+                  className="mt-1 inline-flex text-sm font-semibold text-blue-600 hover:text-blue-700"
                   href={`https://t.me/${user.username}`}
                   target="_blank"
                   rel="noreferrer"
@@ -156,23 +164,12 @@ export default function ProfilePage() {
                   @{user.username}
                 </a>
               ) : (
-                <p className="text-sm text-gray-500">
+                <p className="mt-1 text-sm font-medium text-gray-900">
                   {user?.telegramId
                     ? `Telegram ID: ${user.telegramId}`
                     : "Аккаунт Telegram"}
                 </p>
               )}
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl bg-gray-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Email
-              </p>
-              <p className="mt-1 truncate text-sm font-medium text-gray-900">
-                {user?.email || "—"}
-              </p>
             </div>
             <div className="rounded-xl bg-gray-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -218,15 +215,11 @@ export default function ProfilePage() {
                     : "Оформи Pro подписку, чтобы открыть все функции и ускорить прогресс."}
                 </p>
               </div>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  user?.isPro
-                    ? "bg-green-100 text-green-700"
-                    : "bg-amber-100 text-amber-700"
-                }`}
-              >
-                {user?.isPro ? "Оформлена" : "Не оформлена"}
-              </span>
+              {user?.isPro && (
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                  Оформлена
+                </span>
+              )}
             </div>
             {!user?.isPro && (
               <Button
