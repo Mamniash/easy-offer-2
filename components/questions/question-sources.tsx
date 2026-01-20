@@ -67,7 +67,7 @@ export default function QuestionSources({ items }: QuestionSourcesProps) {
     <aside className="mt-6 md:mt-0 md:pl-2">
       <div className="flex items-center gap-2">
         <div className="h-5 w-1 rounded-full bg-blue-600" aria-hidden />
-        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-800 leading-none pt-px">
+        <p className="flex h-5 items-center text-sm font-semibold uppercase tracking-[0.08em] text-gray-800">
           Источники
         </p>
         {!isPro && (
