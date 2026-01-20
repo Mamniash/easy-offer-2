@@ -102,12 +102,12 @@ export const POST = async (request: Request) => {
 
   const response = await sendTelegramMessage(botToken, {
     chat_id: message.chat.id,
-    text: "Отлично! Нажмите кнопку ниже, чтобы войти на сайт.",
+    text: "Нажмите на кнопку ниже, чтобы авторизоваться в личном кабинете PreOffer.",
     reply_markup: {
       inline_keyboard: [
         [
           {
-            text: "Войти на сайт",
+            text: "Авторизоваться 🔐",
             login_url: {
               url: loginUrl.toString(),
             },
