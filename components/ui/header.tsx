@@ -108,7 +108,7 @@ export default function Header() {
         label: (
           <Link
             href="/profile"
-            className="flex items-center justify-between text-sm text-gray-700"
+            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
           >
             Профиль
             <svg
@@ -131,7 +131,11 @@ export default function Header() {
       {
         key: "logout",
         danger: true,
-        label: "Выйти",
+        label: (
+          <span className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-red-500 transition hover:bg-red-50">
+            Выйти
+          </span>
+        ),
       },
     ],
     []
@@ -180,11 +184,6 @@ export default function Header() {
                           <p className="text-sm font-semibold text-gray-900">
                             {user.name || "Telegram пользователь"}
                           </p>
-                          {user?.username ? (
-                            <p className="text-xs text-gray-500">
-                              @{user.username}
-                            </p>
-                          ) : null}
                         </div>
                         <div className="h-px bg-gray-100" />
                         <div className="[&>ul]:space-y-1 [&>ul]:!bg-transparent [&>ul]:!p-0">
@@ -196,13 +195,13 @@ export default function Header() {
                 >
                   <Button
                     type="text"
-                    className="flex h-10 w-10 min-w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md hover:ring-2 hover:ring-blue-200 focus-visible:ring-2 focus-visible:ring-blue-300 !p-0"
+                    className="flex aspect-square h-11 w-11 min-w-[2.75rem] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md hover:ring-2 hover:ring-blue-200 focus-visible:ring-2 focus-visible:ring-blue-300 !p-0"
                     aria-label="Профиль"
                   >
                     <img
                       src={user?.avatarUrl || fallbackAvatarSrc}
                       alt={user.name || "Профиль Telegram"}
-                      className="h-full w-full rounded-full object-cover"
+                      className="h-full w-full rounded-full object-cover object-center"
                       onError={(event) => {
                         const target = event.currentTarget;
                         if (target.src !== fallbackAvatarSrc) {
