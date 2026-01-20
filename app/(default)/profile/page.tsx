@@ -15,6 +15,7 @@ type ProfileUser = {
   username?: string | null;
   avatarUrl?: string | null;
   telegramId?: number | null;
+  isPro?: boolean;
 };
 
 const buildProfileUser = (
@@ -34,6 +35,10 @@ const buildProfileUser = (
     typeof metadata?.avatar_url === "string" ? metadata.avatar_url : null;
   const telegramId =
     typeof metadata?.telegram_id === "number" ? metadata.telegram_id : null;
+  const isPro =
+    metadata?.is_pro === true ||
+    metadata?.pro === true ||
+    metadata?.subscription_status === "active";
 
   return {
     email: email ?? undefined,
@@ -47,6 +52,7 @@ const buildProfileUser = (
     username,
     avatarUrl,
     telegramId,
+    isPro,
   };
 };
 
@@ -162,10 +168,10 @@ export default function ProfilePage() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-gray-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                ID пользователя
+                Email
               </p>
               <p className="mt-1 truncate text-sm font-medium text-gray-900">
-                {user?.id}
+                {user?.email || "—"}
               </p>
             </div>
             <div className="rounded-xl bg-gray-50 p-4">
@@ -200,6 +206,39 @@ export default function ProfilePage() {
         </div>
 
         <div className="space-y-4">
+          <div className="rounded-2xl border border-gray-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm shadow-black/[0.03]">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                  Pro подписка
+                </h2>
+                <p className="mt-2 text-sm text-gray-700">
+                  {user?.isPro
+                    ? "Твоя Pro подписка активна. Спасибо за поддержку!"
+                    : "Оформи Pro подписку, чтобы открыть все функции и ускорить прогресс."}
+                </p>
+              </div>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                  user?.isPro
+                    ? "bg-green-100 text-green-700"
+                    : "bg-amber-100 text-amber-700"
+                }`}
+              >
+                {user?.isPro ? "Оформлена" : "Не оформлена"}
+              </span>
+            </div>
+            {!user?.isPro && (
+              <Button
+                type="primary"
+                className="mt-4 px-4 py-2 text-sm font-semibold"
+                onClick={() => router.push("/pro")}
+              >
+                Стать Pro
+              </Button>
+            )}
+          </div>
+
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm shadow-black/[0.03]">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
               Контакты
@@ -210,16 +249,6 @@ export default function ProfilePage() {
                 support@preoffer.ru
               </span>{" "}
               или в чат поддержки. Мы ответим максимально быстро.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm shadow-black/[0.03]">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-              Что дальше?
-            </h2>
-            <p className="mt-2 text-sm text-gray-700">
-              Следи за прогрессом, обновляй данные профиля и продолжай
-              тренировки. Новые функции появятся здесь самыми первыми.
             </p>
           </div>
         </div>
