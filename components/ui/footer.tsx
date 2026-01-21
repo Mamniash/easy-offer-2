@@ -217,6 +217,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
   const [activeModal, setActiveModal] = useState<FooterModal | null>(null);
   const [sessionStart, setSessionStart] = useState<number | null>(null);
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL ?? process.env.DEMO_URL;
+  const telegramUrl = "https://t.me/preoffer1";
 
   useEffect(() => {
     setSessionStart(Date.now());
@@ -274,6 +275,25 @@ export default function Footer({ border = false }: { border?: boolean }) {
               <Logo />
             </div>
             <div className="text-sm text-gray-600">&copy; PreOffer — Все права защищены.</div>
+            <div className="flex items-center gap-3 text-sm text-gray-600">
+              <span>Мы в Telegram</span>
+              <a
+                aria-label="PreOffer в Telegram"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-sky-200 hover:text-sky-600"
+                href={telegramUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <svg
+                  aria-hidden="true"
+                  className="h-5 w-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2.04c-5.52 0-9.99 4.47-9.99 9.98 0 5.52 4.47 10 9.99 10s9.99-4.48 9.99-10c0-5.51-4.47-9.98-9.99-9.98Zm4.91 6.85-1.64 7.72c-.13.55-.46.69-.93.43l-2.57-1.9-1.24 1.2c-.14.14-.26.26-.52.26l.19-2.69 4.9-4.42c.21-.2-.05-.3-.33-.12l-6.06 3.81-2.61-.82c-.57-.18-.58-.57.12-.84l10.22-3.94c.48-.18.89.11.47 1.31Z" />
+                </svg>
+              </a>
+            </div>
           </div>
 
           {/* 2nd block */}
