@@ -40,6 +40,32 @@ const isHeadingLine = (line: string) => {
 const normalizeListItem = (line: string) =>
   line.trim().replace(/^(-|\*|•|\d+\.)\s+/g, "");
 
+const countOccurrences = (value: string, target: string) =>
+  value.split(target).length - 1;
+
+const formatCodeLines = (lines: string[]) => {
+  let indentLevel = 0;
+  const indentUnit = "  ";
+
+  return lines.map((line) => {
+    if (!line.trim()) {
+      return "";
+    }
+
+    const trimmed = line.trim();
+    const leadingClosers = trimmed.match(/^[\}]*/)?.[0].length ?? 0;
+    const indentBefore = Math.max(indentLevel - leadingClosers, 0);
+    const indentedLine = `${indentUnit.repeat(indentBefore)}${trimmed}`;
+
+    const openCount = countOccurrences(trimmed, "{");
+    const closeCount = countOccurrences(trimmed, "}");
+
+    indentLevel = Math.max(indentLevel + openCount - closeCount, 0);
+
+    return indentedLine;
+  });
+};
+
 const parseAnswer = (raw: string): AnswerBlock[] => {
   const lines = raw.replace(/\r\n/g, "\n").split("\n");
   const blocks: AnswerBlock[] = [];
@@ -67,7 +93,10 @@ const parseAnswer = (raw: string): AnswerBlock[] => {
 
   const flushCode = () => {
     if (codeBuffer.length > 0) {
-      blocks.push({ type: "code", code: codeBuffer.join("\n") });
+      blocks.push({
+        type: "code",
+        code: formatCodeLines(codeBuffer).join("\n"),
+      });
       codeBuffer = [];
     }
   };
