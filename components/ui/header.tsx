@@ -108,20 +108,8 @@ export default function Header() {
         label: (
           <Link
             href="/profile"
-            className="flex w-full items-center gap-3 rounded-xl border border-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-200 hover:bg-gray-50 hover:text-gray-900"
+            className="block w-full text-sm font-medium text-gray-700 transition hover:text-gray-900"
           >
-            <svg
-              className="h-4 w-4 text-gray-500"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
-              <path d="M4 20a8 8 0 0 1 16 0" />
-            </svg>
             Профиль
           </Link>
         ),
@@ -129,20 +117,7 @@ export default function Header() {
       {
         key: "logout",
         label: (
-          <span className="flex w-full items-center gap-3 rounded-xl border border-red-100 px-3 py-2 text-sm font-medium text-red-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700">
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M16 17l5-5-5-5" />
-              <path d="M21 12H9" />
-              <path d="M12 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7" />
-            </svg>
+          <span className="block w-full text-sm font-medium text-gray-700 transition hover:text-gray-900">
             Выйти
           </span>
         ),
@@ -188,36 +163,12 @@ export default function Header() {
                   }}
                   trigger={["click"]}
                   dropdownRender={(menu) => (
-                    <div className="w-72 rounded-3xl border border-gray-100 bg-white p-4 text-sm shadow-2xl shadow-black/[0.08]">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3 rounded-2xl bg-gray-50 px-3 py-2">
-                          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white">
-                            <img
-                              src={user?.avatarUrl || fallbackAvatarSrc}
-                              alt={user.name || "Профиль Telegram"}
-                              className="h-full w-full rounded-full object-cover"
-                              onError={(event) => {
-                                const target = event.currentTarget;
-                                if (target.src !== fallbackAvatarSrc) {
-                                  target.src = fallbackAvatarSrc;
-                                }
-                              }}
-                            />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-gray-900">
-                              {user.name || "Telegram пользователь"}
-                            </p>
-                            {user.username && (
-                              <p className="truncate text-xs text-gray-500">
-                                @{user.username}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="space-y-2 [&>ul]:space-y-2 [&>ul]:!bg-transparent [&>ul]:!p-0">
-                          {menu}
-                        </div>
+                    <div className="w-60 rounded-2xl bg-white px-4 py-3 text-sm text-gray-900 shadow-lg shadow-black/[0.06]">
+                      <p className="truncate text-sm font-semibold">
+                        {user.name || "Telegram пользователь"}
+                      </p>
+                      <div className="mt-3 space-y-2 [&>ul]:space-y-2 [&>ul]:!bg-transparent [&>ul]:!p-0">
+                        {menu}
                       </div>
                     </div>
                   )}
