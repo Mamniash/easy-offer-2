@@ -108,23 +108,26 @@ export default function Header() {
         label: (
           <Link
             href="/profile"
-            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
+            className="group flex w-full items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3 text-sm font-medium text-gray-900 shadow-sm transition hover:border-blue-100 hover:bg-blue-50"
           >
-            Профиль
-            <svg
-              className="h-4 w-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 5l7 7-7 7"
-              ></path>
-            </svg>
+            <span className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
+                  <path d="M4 20a8 8 0 0 1 16 0" />
+                </svg>
+              </span>
+              Профиль
+            </span>
+            <span className="text-gray-400 transition group-hover:text-blue-500">→</span>
           </Link>
         ),
       },
@@ -132,8 +135,25 @@ export default function Header() {
         key: "logout",
         danger: true,
         label: (
-          <span className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-red-500 transition hover:bg-red-50">
-            Выйти
+          <span className="flex w-full items-center justify-between rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-600 transition hover:border-red-200 hover:bg-red-100">
+            <span className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-red-500">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M16 17l5-5-5-5" />
+                  <path d="M21 12H9" />
+                  <path d="M12 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7" />
+                </svg>
+              </span>
+              Выйти
+            </span>
           </span>
         ),
       },
@@ -174,19 +194,38 @@ export default function Header() {
                   menu={{
                     items: userMenuItems,
                     onClick: handleMenuClick,
-                    className: "rounded-xl border-0 bg-transparent p-0",
+                    className: "rounded-2xl border-0 bg-transparent p-0",
                   }}
                   trigger={["click"]}
                   dropdownRender={(menu) => (
-                    <div className="w-64 rounded-2xl border border-gray-100 bg-white p-4 text-sm shadow-xl shadow-black/[0.06]">
-                      <div className="space-y-3">
-                        <div className="space-y-1">
-                          <p className="text-sm font-semibold text-gray-900">
-                            {user.name || "Telegram пользователь"}
-                          </p>
+                    <div className="w-72 rounded-3xl border border-gray-100 bg-white p-4 text-sm shadow-2xl shadow-black/[0.08]">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 rounded-2xl bg-gray-50 px-3 py-2">
+                          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white">
+                            <img
+                              src={user?.avatarUrl || fallbackAvatarSrc}
+                              alt={user.name || "Профиль Telegram"}
+                              className="h-full w-full rounded-full object-cover"
+                              onError={(event) => {
+                                const target = event.currentTarget;
+                                if (target.src !== fallbackAvatarSrc) {
+                                  target.src = fallbackAvatarSrc;
+                                }
+                              }}
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-gray-900">
+                              {user.name || "Telegram пользователь"}
+                            </p>
+                            {user.username && (
+                              <p className="truncate text-xs text-gray-500">
+                                @{user.username}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <div className="h-px bg-gray-100" />
-                        <div className="[&>ul]:space-y-1 [&>ul]:!bg-transparent [&>ul]:!p-0">
+                        <div className="space-y-2 [&>ul]:space-y-2 [&>ul]:!bg-transparent [&>ul]:!p-0">
                           {menu}
                         </div>
                       </div>
@@ -195,7 +234,8 @@ export default function Header() {
                 >
                   <Button
                     type="text"
-                    className="flex aspect-square h-11 w-11 min-w-[2.75rem] items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md hover:ring-2 hover:ring-blue-200 focus-visible:ring-2 focus-visible:ring-blue-300 !p-0"
+                    shape="circle"
+                    className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-lg font-semibold text-blue-800 shadow-sm ring-1 ring-inset ring-blue-100 transition hover:shadow-md hover:ring-2 hover:ring-blue-200 focus-visible:ring-2 focus-visible:ring-blue-300 !p-0"
                     aria-label="Профиль"
                   >
                     <img
