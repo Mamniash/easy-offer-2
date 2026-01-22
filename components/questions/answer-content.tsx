@@ -6,7 +6,10 @@ type AnswerBlock =
 
 const codeLinePattern = /\w+\([^)]*\)/;
 const codeKeywordPattern =
-  /^(class|const|let|var|function|return|import|export|if|for|while|switch|case)\b/;
+  /^(class|const|let|var|function|return|import|export|if|for|while|switch|case|public|private|protected|internal|static|async|sealed|abstract|override|namespace|using|interface|enum|struct)\b/;
+const codeSymbolPattern = /=>|==|!=|<=|>=|::|\+\+|--|&&|\|\|/;
+const codeSignaturePattern =
+  /^(public|private|protected|internal|static|async|sealed|abstract|override)?\s*\w+(\s*<[^>]+>)?\s+\w+\([^)]*\)\s*$/;
 
 const isCodeLine = (line: string) => {
   const trimmed = line.trim();
@@ -14,9 +17,13 @@ const isCodeLine = (line: string) => {
   if (!trimmed) return false;
   if (trimmed.startsWith("//")) return true;
   if (codeKeywordPattern.test(trimmed)) return true;
+  if (codeSignaturePattern.test(trimmed)) return true;
   if (codeLinePattern.test(trimmed) && /[{};]/.test(trimmed)) return true;
+  if (codeLinePattern.test(trimmed) && codeSymbolPattern.test(trimmed))
+    return true;
   if (/[{}]/.test(trimmed)) return true;
   if (/;$/g.test(trimmed)) return true;
+  if (codeSymbolPattern.test(trimmed)) return true;
 
   return false;
 };
@@ -32,6 +39,32 @@ const isHeadingLine = (line: string) => {
 
 const normalizeListItem = (line: string) =>
   line.trim().replace(/^(-|\*|•|\d+\.)\s+/g, "");
+
+const countOccurrences = (value: string, target: string) =>
+  value.split(target).length - 1;
+
+const formatCodeLines = (lines: string[]) => {
+  let indentLevel = 0;
+  const indentUnit = "  ";
+
+  return lines.map((line) => {
+    if (!line.trim()) {
+      return "";
+    }
+
+    const trimmed = line.trim();
+    const leadingClosers = trimmed.match(/^[\}]*/)?.[0].length ?? 0;
+    const indentBefore = Math.max(indentLevel - leadingClosers, 0);
+    const indentedLine = `${indentUnit.repeat(indentBefore)}${trimmed}`;
+
+    const openCount = countOccurrences(trimmed, "{");
+    const closeCount = countOccurrences(trimmed, "}");
+
+    indentLevel = Math.max(indentLevel + openCount - closeCount, 0);
+
+    return indentedLine;
+  });
+};
 
 const parseAnswer = (raw: string): AnswerBlock[] => {
   const lines = raw.replace(/\r\n/g, "\n").split("\n");
@@ -60,12 +93,16 @@ const parseAnswer = (raw: string): AnswerBlock[] => {
 
   const flushCode = () => {
     if (codeBuffer.length > 0) {
-      blocks.push({ type: "code", code: codeBuffer.join("\n") });
+      blocks.push({
+        type: "code",
+        code: formatCodeLines(codeBuffer).join("\n"),
+      });
       codeBuffer = [];
     }
   };
 
-  lines.forEach((line) => {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
     const trimmed = line.trim();
 
     if (trimmed.startsWith("```")) {
@@ -77,19 +114,34 @@ const parseAnswer = (raw: string): AnswerBlock[] => {
       }
 
       inCodeFence = !inCodeFence;
-      return;
+      continue;
     }
 
     if (inCodeFence) {
       codeBuffer.push(line);
-      return;
+      continue;
     }
 
     if (!trimmed) {
+      if (codeBuffer.length > 0) {
+        let showsCodeAhead = false;
+        for (let nextIndex = index + 1; nextIndex < lines.length; nextIndex += 1) {
+          const candidate = lines[nextIndex].trim();
+          if (!candidate) continue;
+          showsCodeAhead = isCodeLine(candidate);
+          break;
+        }
+
+        if (showsCodeAhead) {
+          codeBuffer.push("");
+          continue;
+        }
+      }
+
       flushParagraph();
       flushList();
       flushCode();
-      return;
+      continue;
     }
 
     if (isHeadingLine(trimmed)) {
@@ -97,21 +149,21 @@ const parseAnswer = (raw: string): AnswerBlock[] => {
       flushList();
       flushCode();
       blocks.push({ type: "heading", text: trimmed.replace(/:$/g, "") });
-      return;
+      continue;
     }
 
     if (isListItem(trimmed)) {
       flushParagraph();
       flushCode();
       listBuffer.push(normalizeListItem(line));
-      return;
+      continue;
     }
 
     if (isCodeLine(trimmed)) {
       flushParagraph();
       flushList();
       codeBuffer.push(line);
-      return;
+      continue;
     }
 
     if (codeBuffer.length > 0) {
@@ -119,7 +171,7 @@ const parseAnswer = (raw: string): AnswerBlock[] => {
     }
 
     paragraphBuffer.push(trimmed);
-  });
+  }
 
   flushParagraph();
   flushList();
@@ -153,13 +205,10 @@ export default function AnswerContent({ text }: AnswerContentProps) {
           return (
             <ul
               key={`${block.type}-${index}`}
-              className="space-y-2 rounded-lg bg-white/70 px-4 py-3 text-gray-700 shadow-sm ring-1 ring-gray-200"
+              className="list-disc space-y-2 rounded-lg bg-white/70 px-4 py-3 pl-6 text-gray-700 shadow-sm ring-1 ring-gray-200 marker:text-gray-400"
             >
               {block.items.map((item, itemIndex) => (
-                <li key={`${block.type}-${index}-${itemIndex}`} className="pl-5">
-                  <span className="relative -left-5 mr-2 inline-block text-gray-400">
-                    •
-                  </span>
+                <li key={`${block.type}-${index}-${itemIndex}`} className="pl-1">
                   {item}
                 </li>
               ))}
