@@ -108,7 +108,7 @@ export default function Header() {
         label: (
           <Link
             href="/profile"
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+            className="flex w-full items-center gap-3 rounded-xl border border-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-200 hover:bg-gray-50 hover:text-gray-900"
           >
             <svg
               className="h-4 w-4 text-gray-500"
@@ -128,9 +128,8 @@ export default function Header() {
       },
       {
         key: "logout",
-        danger: true,
         label: (
-          <span className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-500 transition hover:bg-red-50 hover:text-red-600">
+          <span className="flex w-full items-center gap-3 rounded-xl border border-red-100 px-3 py-2 text-sm font-medium text-red-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700">
             <svg
               className="h-4 w-4"
               viewBox="0 0 24 24"
