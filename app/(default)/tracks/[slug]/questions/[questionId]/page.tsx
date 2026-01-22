@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import QuestionMarkPanel from "@/components/questions/question-mark-panel";
 import QuestionSources from "@/components/questions/question-sources";
+import AnswerContent from "@/components/questions/answer-content";
 import {
   getQuestionById,
   parseVideosField,
@@ -147,9 +148,7 @@ export default async function QuestionPage({
               {question.answer_raw &&
               question.answer_raw !== "EMPTY" &&
               question.answer_raw !== "error" ? (
-                <p className="mt-3 whitespace-pre-line text-gray-700">
-                  {question.answer_raw}
-                </p>
+                <AnswerContent text={question.answer_raw} />
               ) : (
                 <p className="mt-2 text-gray-700">
                   Пока здесь только формулировка вопроса. Мы не стали
