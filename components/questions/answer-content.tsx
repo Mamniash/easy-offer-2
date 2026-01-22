@@ -16,13 +16,13 @@ const isCodeLine = (line: string) => {
   if (codeKeywordPattern.test(trimmed)) return true;
   if (codeLinePattern.test(trimmed) && /[{};]/.test(trimmed)) return true;
   if (/[{}]/.test(trimmed)) return true;
-  if (/;$/u.test(trimmed)) return true;
+  if (/;$/g.test(trimmed)) return true;
 
   return false;
 };
 
 const isListItem = (line: string) =>
-  /^(-|\*|•|\d+\.)\s+/u.test(line.trim());
+  /^(-|\*|•|\d+\.)\s+/g.test(line.trim());
 
 const isHeadingLine = (line: string) => {
   const trimmed = line.trim();
@@ -31,7 +31,7 @@ const isHeadingLine = (line: string) => {
 };
 
 const normalizeListItem = (line: string) =>
-  line.trim().replace(/^(-|\*|•|\d+\.)\s+/u, "");
+  line.trim().replace(/^(-|\*|•|\d+\.)\s+/g, "");
 
 const parseAnswer = (raw: string): AnswerBlock[] => {
   const lines = raw.replace(/\r\n/g, "\n").split("\n");
@@ -96,7 +96,7 @@ const parseAnswer = (raw: string): AnswerBlock[] => {
       flushParagraph();
       flushList();
       flushCode();
-      blocks.push({ type: "heading", text: trimmed.replace(/:$/u, "") });
+      blocks.push({ type: "heading", text: trimmed.replace(/:$/g, "") });
       return;
     }
 
