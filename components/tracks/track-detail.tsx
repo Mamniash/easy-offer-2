@@ -671,7 +671,7 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
             {question.frequency}%
           </div>
           <div>
-            <p className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-700">
+            <p className="flex items-center gap-2 text-lg font-semibold leading-snug text-gray-900 group-hover:text-blue-700">
               {question.question}
               {markState.favorite && (
                 <span
