@@ -108,26 +108,21 @@ export default function Header() {
         label: (
           <Link
             href="/profile"
-            className="group flex w-full items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3 text-sm font-medium text-gray-900 shadow-sm transition hover:border-blue-100 hover:bg-blue-50"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
-            <span className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-                <svg
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
-                  <path d="M4 20a8 8 0 0 1 16 0" />
-                </svg>
-              </span>
-              Профиль
-            </span>
-            <span className="text-gray-400 transition group-hover:text-blue-500">→</span>
+            <svg
+              className="h-4 w-4 text-gray-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" />
+              <path d="M4 20a8 8 0 0 1 16 0" />
+            </svg>
+            Профиль
           </Link>
         ),
       },
@@ -135,25 +130,21 @@ export default function Header() {
         key: "logout",
         danger: true,
         label: (
-          <span className="flex w-full items-center justify-between rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-600 transition hover:border-red-200 hover:bg-red-100">
-            <span className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-red-500">
-                <svg
-                  className="h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M16 17l5-5-5-5" />
-                  <path d="M21 12H9" />
-                  <path d="M12 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7" />
-                </svg>
-              </span>
-              Выйти
-            </span>
+          <span className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-500 transition hover:bg-red-50 hover:text-red-600">
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M16 17l5-5-5-5" />
+              <path d="M21 12H9" />
+              <path d="M12 19H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7" />
+            </svg>
+            Выйти
           </span>
         ),
       },
