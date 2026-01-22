@@ -21,6 +21,10 @@ const AUTHORIZED_QUESTIONS_LIMIT = 50;
 export default function TrackDetail({ track }: { track: Track }) {
   const router = useRouter();
   const { open: openAuthModal } = useAuthModal();
+  const scrollStorageKey = useMemo(
+    () => `track-scroll:${track.slug}`,
+    [track.slug],
+  );
   const [search, setSearch] = useState("");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
@@ -245,6 +249,31 @@ export default function TrackDetail({ track }: { track: Track }) {
     if (!hasActiveFilters) return;
   }, [hasActiveFilters]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const storedScroll = sessionStorage.getItem(scrollStorageKey);
+
+    if (!storedScroll) return;
+
+    sessionStorage.removeItem(scrollStorageKey);
+
+    try {
+      const { y } = JSON.parse(storedScroll) as { y?: number };
+
+      if (!Number.isFinite(y)) return;
+
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: y ?? 0,
+          behavior: "auto",
+        });
+      });
+    } catch (error) {
+      console.error("[TrackDetail] Failed to restore scroll", error);
+    }
+  }, [scrollStorageKey]);
+
   const totalPages = isPro
     ? Math.max(
         1,
@@ -365,6 +394,14 @@ export default function TrackDetail({ track }: { track: Track }) {
     ? `${visibleQuestionsCount.toLocaleString("ru-RU")} вопросов`
     : `${visibleQuestionsCount.toLocaleString("ru-RU")} из ${totalQuestionsCount.toLocaleString("ru-RU")} вопросов`;
   const isSkillFiltersLocked = !isPro;
+  const handleQuestionNavigate = useCallback(() => {
+    if (typeof window === "undefined") return;
+
+    sessionStorage.setItem(
+      scrollStorageKey,
+      JSON.stringify({ y: window.scrollY }),
+    );
+  }, [scrollStorageKey]);
 
   return (
     <div className="mt-10 rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -504,6 +541,7 @@ export default function TrackDetail({ track }: { track: Track }) {
                 markState={
                   questionMarks[question.id] ?? defaultQuestionMarkState
                 }
+                onNavigate={handleQuestionNavigate}
               />
             ))}
 
@@ -636,9 +674,15 @@ type QuestionRowProps = {
   question: Track["questions"][number];
   slug: Track["slug"];
   markState: QuestionMarkState;
+  onNavigate?: () => void;
 };
 
-function QuestionRow({ question, slug, markState }: QuestionRowProps) {
+function QuestionRow({
+  question,
+  slug,
+  markState,
+  onNavigate,
+}: QuestionRowProps) {
   const statusDotClassName = markState.known
     ? "bg-emerald-400"
     : markState.unknown
@@ -654,6 +698,7 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
     <Link
       href={`/tracks/${slug}/questions/${question.id}`}
       className="group block px-6 py-5 transition hover:bg-blue-50/60"
+      onClick={onNavigate}
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
