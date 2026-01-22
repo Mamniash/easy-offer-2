@@ -67,9 +67,9 @@ export default function QuestionSources({ items }: QuestionSourcesProps) {
     <aside className="mt-6 md:mt-0 md:pl-2">
       <div className="flex items-center gap-2">
         <div className="h-5 w-1 rounded-full bg-blue-600" aria-hidden />
-        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-800">
+        <span className="text-sm font-semibold uppercase tracking-[0.08em] text-gray-800">
           Источники
-        </p>
+        </span>
         {!isPro && (
           <span className="rounded-full bg-blue-50 px-2 py-1 text-[10px] font-semibold uppercase text-blue-700">
             PRO
@@ -103,7 +103,9 @@ export default function QuestionSources({ items }: QuestionSourcesProps) {
 
                 <div
                   className={`absolute inset-0 flex items-center justify-center transition ${
-                    isPro ? "bg-black/30 group-hover:bg-black/40" : "bg-black/60"
+                    isPro
+                      ? "bg-black/30 group-hover:bg-black/40"
+                      : "bg-black/60"
                   }`}
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow ring-1 ring-gray-200">

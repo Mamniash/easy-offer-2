@@ -39,8 +39,12 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
     <div className="mt-14 space-y-10">
       <div className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-sm md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.18em] text-gray-500">Навигация</p>
-          <h2 className="text-2xl font-semibold text-gray-900">Быстрый поиск направления</h2>
+          <p className="text-sm uppercase tracking-[0.18em] text-gray-500">
+            Навигация
+          </p>
+          <h2 className="text-2xl font-semibold text-gray-900">
+            Быстрый поиск направления
+          </h2>
         </div>
         <label className="relative w-full md:w-80">
           <span className="sr-only">Поиск направления</span>
@@ -58,7 +62,8 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
 
       {totalVisible === 0 && (
         <p className="rounded-xl border border-dashed border-gray-200 bg-white/70 px-5 py-6 text-center text-sm text-gray-600">
-          Ничего не нашли. Попробуйте другой запрос или посмотрите все направления.
+          Ничего не нашли. Попробуйте другой запрос или посмотрите все
+          направления.
         </p>
       )}
 
@@ -66,7 +71,9 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
         <div key={group.title} className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-1 rounded-full bg-blue-500/80" aria-hidden />
-            <p className="text-sm uppercase tracking-[0.18em] text-gray-500">{group.title}</p>
+            <span className="text-sm uppercase tracking-[0.18em] text-gray-500">
+              {group.title}
+            </span>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -82,8 +89,12 @@ export default function TracksDirectory({ directionGroups }: TracksDirectoryProp
                 </div>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h4 className="text-xl font-semibold text-gray-900">{item.name}</h4>
-                    <p className="mt-1 text-sm text-gray-600">{item.description}</p>
+                    <h4 className="text-xl font-semibold text-gray-900">
+                      {item.name}
+                    </h4>
+                    <p className="mt-1 text-sm text-gray-600">
+                      {item.description}
+                    </p>
                   </div>
                 </div>
               </Link>

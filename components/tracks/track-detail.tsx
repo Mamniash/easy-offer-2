@@ -101,8 +101,8 @@ export default function TrackDetail({ track }: { track: Track }) {
 
       if (questionIds.length === 0) {
         setQuestionMarks({});
-          return;
-        }
+        return;
+      }
 
       const { data, error } = await supabase
         .from("question_marks")
@@ -139,7 +139,7 @@ export default function TrackDetail({ track }: { track: Track }) {
 
   const skillFilters = useMemo(
     () => getTrackSkillFilters(track.slug),
-    [track.slug]
+    [track.slug],
   );
 
   const normalizedSearch = search.trim().toLowerCase();
@@ -147,7 +147,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     normalizedSearch.length > 0 || selectedSkills.length > 0;
   const appliedSkillFilters = useMemo(
     () => skillFilters.filter((filter) => selectedSkills.includes(filter.id)),
-    [selectedSkills, skillFilters]
+    [selectedSkills, skillFilters],
   );
 
   const filteredQuestions = useMemo(() => {
@@ -169,16 +169,10 @@ export default function TrackDetail({ track }: { track: Track }) {
       if (appliedSkillFilters.length === 0) return true;
 
       return appliedSkillFilters.some((filter) =>
-        filter.keywords.some((keyword) => combinedText.includes(keyword))
+        filter.keywords.some((keyword) => combinedText.includes(keyword)),
       );
     });
-  }, [
-    isAuthorized,
-    isPro,
-    normalizedSearch,
-    questions,
-    appliedSkillFilters,
-  ]);
+  }, [isAuthorized, isPro, normalizedSearch, questions, appliedSkillFilters]);
 
   const paginatedQuestions = useMemo(() => {
     if (!hasActiveFilters) return filteredQuestions;
@@ -203,12 +197,12 @@ export default function TrackDetail({ track }: { track: Track }) {
       while (hasMore) {
         const response = await fetch(
           `/api/tracks/${track.slug}/questions?page=${currentPage}&perPage=${QUESTIONS_PER_PAGE}`,
-          { cache: "no-store" }
+          { cache: "no-store" },
         );
 
         if (!response.ok) {
           throw new Error(
-            `Не удалось загрузить вопросы: ${response.statusText}`
+            `Не удалось загрузить вопросы: ${response.statusText}`,
           );
         }
 
@@ -258,8 +252,8 @@ export default function TrackDetail({ track }: { track: Track }) {
           (hasActiveFilters
             ? filteredQuestions.length
             : totalQuestions || filteredQuestions.length || 1) /
-            QUESTIONS_PER_PAGE
-        )
+            QUESTIONS_PER_PAGE,
+        ),
       )
     : 1;
 
@@ -294,12 +288,12 @@ export default function TrackDetail({ track }: { track: Track }) {
       try {
         const response = await fetch(
           `/api/tracks/${track.slug}/questions?page=${nextPage}&perPage=${QUESTIONS_PER_PAGE}`,
-          { cache: "no-store" }
+          { cache: "no-store" },
         );
 
         if (!response.ok) {
           throw new Error(
-            `Не удалось загрузить вопросы: ${response.statusText}`
+            `Не удалось загрузить вопросы: ${response.statusText}`,
           );
         }
 
@@ -321,7 +315,7 @@ export default function TrackDetail({ track }: { track: Track }) {
       scrollToFirstQuestion,
       totalPages,
       track.slug,
-    ]
+    ],
   );
 
   const paginationItems = useMemo(() => {
@@ -363,7 +357,9 @@ export default function TrackDetail({ track }: { track: Track }) {
     : Math.min(
         filteredQuestions.length,
         totalQuestionsCount,
-        isAuthorized ? AUTHORIZED_QUESTIONS_LIMIT : UNAUTHORIZED_QUESTIONS_LIMIT
+        isAuthorized
+          ? AUTHORIZED_QUESTIONS_LIMIT
+          : UNAUTHORIZED_QUESTIONS_LIMIT,
       );
   const displayQuestionsCount = isPro
     ? `${visibleQuestionsCount.toLocaleString("ru-RU")} вопросов`
@@ -402,9 +398,9 @@ export default function TrackDetail({ track }: { track: Track }) {
               </Button>
             </div>
           ) : (
-            <p className="text-base font-semibold text-gray-900 md:text-lg">
+            <span className="text-base font-semibold text-gray-900 md:text-lg">
               {displayQuestionsCount}
-            </p>
+            </span>
           )}
 
           <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
@@ -431,7 +427,7 @@ export default function TrackDetail({ track }: { track: Track }) {
                               setSelectedSkills((prev) =>
                                 prev.includes(filter.id)
                                   ? prev.filter((id) => id !== filter.id)
-                                  : [...prev, filter.id]
+                                  : [...prev, filter.id],
                               );
                             }}
                             className={`text-xs ${isSkillFiltersLocked ? "opacity-70" : ""}`}
@@ -555,7 +551,7 @@ export default function TrackDetail({ track }: { track: Track }) {
                 >
                   {item}
                 </Button>
-              )
+              ),
             )}
             <Button
               type="text"
@@ -671,7 +667,7 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
             {question.frequency}%
           </div>
           <div>
-            <p className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-700">
+            <span className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-700">
               {question.question}
               {markState.favorite && (
                 <span
@@ -681,7 +677,7 @@ function QuestionRow({ question, slug, markState }: QuestionRowProps) {
                   ★
                 </span>
               )}
-            </p>
+            </span>
           </div>
         </div>
         <div className="w-full max-w-md">
