@@ -41,16 +41,6 @@ const baseTracks: Omit<Track, "questions">[] = [
     roles: ["Junior", "Middle", "Senior"],
   },
   {
-    slug: "backend",
-    title: "Backend",
-    group: "Программирование",
-    hero: "API, очереди, базы данных и отказоустойчивость",
-    description:
-      "Подборка общих бэкенд-вопросов: архитектура сервисов, работа с базами, интеграции и эксплуатация.",
-    stats: { questions: 0, interviews: 0, updated: "Обновлено сегодня" },
-    roles: ["Junior", "Middle", "Senior"],
-  },
-  {
     slug: "java",
     title: "Java",
     group: "Программирование",
@@ -327,11 +317,6 @@ export const directionGroups: {
         name: "Golang",
         slug: "golang",
         description: "Микросервисы, gRPC, сети и конкурентность",
-      },
-      {
-        name: "Backend",
-        slug: "backend",
-        description: "API, базы данных, очереди и архитектура",
       },
       {
         name: "PHP",

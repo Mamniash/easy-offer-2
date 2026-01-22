@@ -426,67 +426,6 @@ export const TRACK_SKILL_MAP: Record<string, TrackSkillFilter[]> = {
       keywords: ["gomod", "go mod", "lint", "golangci-lint", "dep"],
     },
   ],
-  backend: [
-    {
-      id: "api",
-      label: "API",
-      keywords: ["api", "rest", "graphql", "rpc", "grpc", "http"],
-    },
-    {
-      id: "db",
-      label: "Databases",
-      keywords: ["sql", "postgres", "mysql", "mongodb", "redis", "index", "transaction", "acid", "бд"],
-    },
-    {
-      id: "arch",
-      label: "Architecture",
-      keywords: ["архитектур", "монолит", "микросервис", "ddd", "clean", "solid", "паттерн"],
-    },
-    {
-      id: "auth",
-      label: "Auth/Security",
-      keywords: ["auth", "jwt", "oauth", "oidc", "csrf", "xss", "security", "шифр"],
-    },
-    {
-      id: "cache",
-      label: "Cache",
-      keywords: ["cache", "кэш", "redis", "memcached"],
-    },
-    {
-      id: "queues",
-      label: "Queues/Streaming",
-      keywords: ["queue", "очеред", "kafka", "rabbit", "nats", "sqs", "pubsub"],
-    },
-    {
-      id: "observ",
-      label: "Observability",
-      keywords: [
-        "logging",
-        "log",
-        "metrics",
-        "monitor",
-        "tracing",
-        "prometheus",
-        "grafana",
-        "opentelemetry",
-      ],
-    },
-    {
-      id: "scaling",
-      label: "Reliability/Scaling",
-      keywords: [
-        "load",
-        "highload",
-        "балансир",
-        "retry",
-        "circuit",
-        "rate limit",
-        "идемпотент",
-        "slo",
-        "sla",
-      ],
-    },
-  ],
   php: [
     {
       id: "core",
