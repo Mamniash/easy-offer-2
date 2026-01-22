@@ -140,37 +140,14 @@ export default function ProPage() {
   return (
     <section className="pb-20 pt-16 md:pt-24">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 sm:px-6">
-        <div className="rounded-3xl border border-blue-500/40 bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 p-8 text-white shadow-xl shadow-blue-500/30">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-100">
-                PRO-подписка
-              </p>
-              <h1 className="mt-3 text-3xl font-bold md:text-4xl">
-                PRO-доступ к PreOffer
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm text-blue-50">
-                {userName ? `${userName},` : "Привет,"} выбери тариф и получи
-                полный доступ ко всем материалам.
-              </p>
-            </div>
-            <div className="rounded-2xl bg-white/15 px-5 py-4 text-center">
-              <p className="text-xs uppercase tracking-[0.2em] text-blue-100">
-                старт от
-              </p>
-              <p className="mt-2 text-2xl font-bold">1 500 ₽</p>
-              <p className="text-xs text-blue-100">за неделю</p>
-            </div>
-          </div>
-        </div>
-
         <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-2">
             <h2 className="text-2xl font-bold text-gray-900">
               Сравнение доступа
             </h2>
             <p className="text-sm text-gray-600">
-              Полная картина отличий между базовым доступом и PRO.
+              {userName ? `${userName},` : "Привет,"} полная картина отличий
+              между базовым доступом и PRO.
             </p>
           </div>
 

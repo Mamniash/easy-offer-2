@@ -128,21 +128,21 @@ export default function ProPlanSelection() {
         </p>
       </div>
 
-      <div className="mt-8 flex gap-6 overflow-x-auto pb-4 lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
+      <div className="mt-8 flex items-stretch gap-6 overflow-x-auto pb-4 lg:grid lg:grid-cols-3 lg:overflow-visible lg:pb-0">
         {PLANS.map((plan) => (
           <div
             key={plan.id}
             className={`relative flex h-full min-w-[260px] flex-col rounded-3xl border p-6 shadow-lg transition sm:min-w-[300px] lg:min-w-0 ${
               plan.emphasis
-                ? "border-blue-400 bg-gradient-to-br from-blue-600 via-blue-500 to-sky-400 text-white shadow-blue-500/30"
+                ? "border-blue-200/70 bg-gradient-to-br from-blue-600 via-blue-500 to-sky-400 text-white shadow-blue-500/40 ring-2 ring-white/50 ring-offset-2 ring-offset-blue-600"
                 : "border-slate-800 bg-slate-900 text-white shadow-slate-900/30"
             }`}
           >
             {plan.badge && (
               <span
-                className={`absolute left-6 top-6 rounded-full px-3 py-1 text-xs font-semibold ${
+                className={`absolute right-6 top-5 rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-wide ${
                   plan.emphasis
-                    ? "bg-white/20 text-white"
+                    ? "bg-white text-blue-700 shadow-lg shadow-blue-900/20"
                     : "bg-white/10 text-white"
                 }`}
               >
@@ -150,7 +150,7 @@ export default function ProPlanSelection() {
               </span>
             )}
 
-            <div className="mt-6">
+            <div className="mt-8">
               <p className="text-sm font-semibold uppercase tracking-wide text-white/70">
                 {plan.name}
               </p>
