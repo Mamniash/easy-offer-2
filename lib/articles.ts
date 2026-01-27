@@ -15,9 +15,7 @@ export type ArticleRow = {
 export async function getArticles(): Promise<ArticleRow[]> {
   const { data, error } = await supabase
     .from("articles")
-    .select("*")
-    .order("published_at", { ascending: false })
-    .order("created_at", { ascending: false });
+    .select("*");
 
   if (error) {
     console.error("[getArticles] Supabase error:", error);

@@ -6,8 +6,6 @@ export const metadata = {
     "Подборка русскоязычных статей о карьере, резюме, интервью и развитии.",
 };
 
-export const dynamic = "force-dynamic";
-
 const formatPublishedAt = (value: string | null) => {
   if (!value) return null;
   const date = new Date(value);
