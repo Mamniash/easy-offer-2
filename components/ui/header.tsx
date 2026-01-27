@@ -151,6 +151,34 @@ export default function Header() {
     []
   );
 
+  const learningMenuItems = useMemo<MenuProps["items"]>(
+    () => [
+      {
+        key: "tracks",
+        label: (
+          <Link
+            href="/tracks"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Вопросы собеседований
+          </Link>
+        ),
+      },
+      {
+        key: "articles",
+        label: (
+          <Link
+            href="/articles"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Статьи
+          </Link>
+        ),
+      },
+    ],
+    []
+  );
+
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key === "logout") {
       handleSignOut();
@@ -164,12 +192,40 @@ export default function Header() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative flex h-14 items-center justify-between gap-3 rounded-2xl bg-white/90 px-3 shadow-lg shadow-black/[0.03] backdrop-blur-xs before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(var(--color-gray-100),var(--color-gray-200))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]">
           {/* Site branding */}
-          <div className="flex flex-1 items-center">
+          <div className="flex flex-1 items-center gap-3">
             <Logo href={logoHref} />
+            <Dropdown
+              menu={{
+                items: learningMenuItems,
+                className:
+                  "rounded-2xl border border-gray-100 bg-white p-2 text-sm shadow-2xl shadow-black/[0.08] [&>li+li]:!mt-1",
+              }}
+              trigger={["click"]}
+              placement="bottomLeft"
+            >
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
+              >
+                Обучение
+                <svg
+                  className="h-3 w-3 text-gray-400"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m3 4.5 3 3 3-3" />
+                </svg>
+              </button>
+            </Dropdown>
           </div>
 
           {/* Desktop navigation */}
-          <div className="flex flex-1 items-center justify-end gap-3">
+          <div className="flex flex-1 items-center justify-end gap-4">
             {user ? (
               <>
                 <Link
