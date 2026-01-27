@@ -151,6 +151,34 @@ export default function Header() {
     []
   );
 
+  const learningMenuItems = useMemo<MenuProps["items"]>(
+    () => [
+      {
+        key: "tracks",
+        label: (
+          <Link
+            href="/tracks"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Вопросы собеседований
+          </Link>
+        ),
+      },
+      {
+        key: "articles",
+        label: (
+          <Link
+            href="/articles"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Статьи
+          </Link>
+        ),
+      },
+    ],
+    []
+  );
+
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key === "logout") {
       handleSignOut();
@@ -170,6 +198,40 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <div className="flex flex-1 items-center justify-end gap-3">
+            <Dropdown
+              menu={{
+                items: learningMenuItems,
+                className: "rounded-2xl border-0 bg-transparent p-0",
+              }}
+              trigger={["hover"]}
+              placement="bottomLeft"
+              dropdownRender={(menu) => (
+                <div className="w-72 rounded-3xl border border-gray-100 bg-white p-4 text-sm shadow-2xl shadow-black/[0.08]">
+                  <div className="space-y-2 [&>ul]:space-y-2 [&>ul]:!bg-transparent [&>ul]:!p-0">
+                    {menu}
+                  </div>
+                </div>
+              )}
+            >
+              <Button
+                type="text"
+                className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+              >
+                Обучение
+                <svg
+                  className="h-3 w-3 text-gray-400"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m3 4.5 3 3 3-3" />
+                </svg>
+              </Button>
+            </Dropdown>
             {user ? (
               <>
                 <Link
