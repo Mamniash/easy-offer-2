@@ -6,15 +6,6 @@ export const metadata = {
     "Подборка русскоязычных статей о карьере, резюме, интервью и развитии.",
 };
 
-const fallbackTags = [
-  "Резюме",
-  "Интервью",
-  "GitHub",
-  "Портфолио",
-  "Soft skills",
-  "Карьера",
-];
-
 const formatPublishedAt = (value: string | null) => {
   if (!value) return null;
   const date = new Date(value);
@@ -28,14 +19,6 @@ const formatPublishedAt = (value: string | null) => {
 
 export default async function ArticlesPage() {
   const articles = await getArticles();
-  const tags = Array.from(
-    new Set(
-      articles
-        .map((article) => article.tags?.trim())
-        .filter((tag): tag is string => Boolean(tag))
-    )
-  );
-  const displayTags = tags.length > 0 ? tags : fallbackTags;
 
   return (
     <section className="pb-20 pt-8 md:pt-10">
@@ -65,17 +48,6 @@ export default async function ArticlesPage() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="mt-8 flex flex-wrap gap-2">
-          {displayTags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm"
-            >
-              {tag}
-            </span>
-          ))}
         </div>
 
         <div className="mt-10">
@@ -119,11 +91,6 @@ export default async function ArticlesPage() {
                           ✨
                         </div>
                       )}
-                      {article.tags ? (
-                        <span className="absolute right-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-700 shadow">
-                          #{article.tags}
-                        </span>
-                      ) : null}
                     </div>
                     <div className="flex flex-1 flex-col p-5">
                       <h2 className="text-lg font-semibold text-gray-900">
