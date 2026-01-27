@@ -67,24 +67,15 @@ export default async function ArticlesPage() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">
-          <div className="flex flex-wrap gap-2">
-            {displayTags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-          <div className="relative">
-            <input
-              className="w-full rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm transition placeholder:text-gray-400 focus:border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-100"
-              placeholder="Поиск по статьям"
-              type="search"
-            />
-          </div>
+        <div className="mt-8 flex flex-wrap gap-2">
+          {displayTags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-600 shadow-sm"
+            >
+              {tag}
+            </span>
+          ))}
         </div>
 
         <div className="mt-10">
