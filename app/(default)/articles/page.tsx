@@ -1,4 +1,5 @@
-import { getArticles } from "@/lib/articles";
+import ArticlesList from "@/components/articles/articles-list";
+import { getArticlesPage } from "@/lib/articles";
 
 export const metadata = {
   title: "PreOffer — статьи и полезные материалы",
@@ -6,19 +7,25 @@ export const metadata = {
     "Подборка русскоязычных статей о карьере, резюме, интервью и развитии.",
 };
 
-const formatPublishedAt = (value: string | null) => {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-};
+const ARTICLES_PER_PAGE = 12;
 
-export default async function ArticlesPage() {
-  const articles = await getArticles();
+type ArticlesSearchParams = Promise<{
+  page?: string;
+}>;
+
+export default async function ArticlesPage({
+  searchParams,
+}: {
+  searchParams?: ArticlesSearchParams;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const requestedPage = Number(resolvedSearchParams?.page ?? "1");
+  const safePage =
+    Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const { articles, total } = await getArticlesPage(
+    safePage,
+    ARTICLES_PER_PAGE,
+  );
 
   return (
     <section className="pb-20 pt-8 md:pt-10">
@@ -43,84 +50,19 @@ export default async function ArticlesPage() {
               <div className="flex flex-col items-center gap-2">
                 <p className="text-sm text-gray-400">Материалов</p>
                 <p className="text-4xl font-semibold">
-                  {articles.length.toLocaleString("ru-RU")}
+                  {total.toLocaleString("ru-RU")}
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-10">
-          {articles.length === 0 ? (
-            <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-gray-200 bg-white/80 p-10 text-center shadow-sm">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-sky-50 text-2xl">
-                📚
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-gray-800">
-                  Пока нет статей — скоро добавим
-                </p>
-                <p className="mt-2 text-sm text-gray-500">
-                  Мы собираем полезные материалы. Загляните чуть позже!
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {articles.map((article) => {
-                const publishedAt = formatPublishedAt(article.published_at);
-
-                return (
-                  <a
-                    key={article.id}
-                    href={article.source_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-sky-200 hover:shadow-lg"
-                  >
-                    <div className="relative h-44 w-full overflow-hidden bg-gray-100">
-                      {article.image_url ? (
-                        <img
-                          src={article.image_url}
-                          alt={article.title}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 text-3xl text-gray-400">
-                          ✨
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex flex-1 flex-col p-5">
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {article.title}
-                      </h2>
-                      <p
-                        className="mt-3 text-sm leading-relaxed text-gray-600"
-                        style={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 4,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
-                        {article.summary}
-                      </p>
-                      <div className="mt-auto flex items-center justify-between pt-4 text-xs text-gray-500">
-                        <span>{publishedAt ?? "Без даты"}</span>
-                        <span className="inline-flex items-center gap-1 font-semibold text-sky-600 transition group-hover:text-sky-500">
-                          Читать статью
-                          <span aria-hidden>↗</span>
-                        </span>
-                      </div>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        <ArticlesList
+          initialArticles={articles}
+          total={total}
+          page={safePage}
+          perPage={ARTICLES_PER_PAGE}
+        />
       </div>
     </section>
   );
