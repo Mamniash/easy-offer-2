@@ -9,16 +9,17 @@ export const metadata = {
 
 const ARTICLES_PER_PAGE = 12;
 
-type ArticlesSearchParams = {
+type ArticlesSearchParams = Promise<{
   page?: string;
-};
+}>;
 
 export default async function ArticlesPage({
   searchParams,
 }: {
   searchParams?: ArticlesSearchParams;
 }) {
-  const requestedPage = Number(searchParams?.page ?? "1");
+  const resolvedSearchParams = await searchParams;
+  const requestedPage = Number(resolvedSearchParams?.page ?? "1");
   const safePage =
     Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const { articles, total } = await getArticlesPage(
