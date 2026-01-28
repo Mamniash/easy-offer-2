@@ -5,6 +5,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { getTrackSkillFilters } from "@/lib/track-skill-filters";
+import { useAuthModal } from "@/components/ui/auth-modal-provider";
 import { isProUser } from "@/lib/subscription";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -34,11 +35,14 @@ export default function TrainerSetupForm({
   directionGroups,
 }: TrainerSetupFormProps) {
   const router = useRouter();
+  const { open: openAuthModal } = useAuthModal();
   const [direction, setDirection] = useState<string | null>(null);
   const [interviewType, setInterviewType] = useState("technical");
   const [grade, setGrade] = useState("all");
   const [skills, setSkills] = useState<string[]>([]);
   const [isPro, setIsPro] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -53,6 +57,7 @@ export default function TrainerSetupForm({
       const { email, user_metadata } = session?.user ?? {};
       const hasPro = isProUser({ email, metadata: user_metadata });
       setIsPro(hasPro);
+      setIsAuthorized(Boolean(session?.user));
     };
 
     fetchSession();
@@ -65,6 +70,7 @@ export default function TrainerSetupForm({
       const { email, user_metadata } = session?.user ?? {};
       const hasPro = isProUser({ email, metadata: user_metadata });
       setIsPro(hasPro);
+      setIsAuthorized(Boolean(session?.user));
     });
 
     return () => {
@@ -100,9 +106,21 @@ export default function TrainerSetupForm({
     </span>
   );
 
+  const handleProClick = () => {
+    if (!isAuthorized) {
+      openAuthModal();
+      return;
+    }
+
+    if (!isPro) {
+      router.push("/pro");
+    }
+  };
+
   const handleStart = () => {
     if (!direction) return;
 
+    setIsStarting(true);
     const searchParams = new URLSearchParams({ direction });
 
     if (isPro) {
@@ -118,7 +136,7 @@ export default function TrainerSetupForm({
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="flex flex-col gap-6">
         <div className="space-y-2">
           <label className="text-sm font-semibold text-gray-700">
             Направление
@@ -133,9 +151,6 @@ export default function TrainerSetupForm({
             }}
             size="large"
           />
-          <p className="text-xs text-gray-500">
-            Определяет банк вопросов для тренировки.
-          </p>
         </div>
 
         <div className="space-y-2">
@@ -143,17 +158,16 @@ export default function TrainerSetupForm({
             Тип собеседования
             {proBadge}
           </label>
-          <Select
-            placeholder="Доступно в PRO"
-            options={interviewOptions}
-            value={interviewType}
-            onChange={setInterviewType}
-            size="large"
-            disabled={!isPro}
-          />
-          <p className="text-xs text-gray-500">
-            Сейчас не влияет на выбор вопросов, но фиксируется в настройке.
-          </p>
+          <div onClick={!isPro ? handleProClick : undefined}>
+            <Select
+              placeholder="Доступно в PRO"
+              options={interviewOptions}
+              value={interviewType}
+              onChange={setInterviewType}
+              size="large"
+              disabled={!isPro}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -161,17 +175,16 @@ export default function TrainerSetupForm({
             Грейд
             {proBadge}
           </label>
-          <Select
-            placeholder="Доступно в PRO"
-            options={gradeOptions}
-            value={grade}
-            onChange={setGrade}
-            size="large"
-            disabled={!isPro}
-          />
-          <p className="text-xs text-gray-500">
-            Выберите уровень, чтобы со временем фильтровать сложность.
-          </p>
+          <div onClick={!isPro ? handleProClick : undefined}>
+            <Select
+              placeholder="Доступно в PRO"
+              options={gradeOptions}
+              value={grade}
+              onChange={setGrade}
+              size="large"
+              disabled={!isPro}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -179,46 +192,41 @@ export default function TrainerSetupForm({
             Навыки
             {proBadge}
           </label>
-          <Select
-            placeholder={
-              direction
-                ? "Выберите навыки"
-                : "Сначала выберите направление"
-            }
-            options={skillOptions}
-            value={skills}
-            onChange={setSkills}
-            size="large"
-            mode="multiple"
-            disabled={!isPro || !direction}
-          />
-          <p className="text-xs text-gray-500">
-            Навыки подтягиваются по выбранному направлению.
-          </p>
+          <div
+            onClick={!isPro && direction ? handleProClick : undefined}
+            onMouseDown={!isPro && direction ? handleProClick : undefined}
+          >
+            <Select
+              placeholder={
+                direction
+                  ? "Выберите навыки"
+                  : "Сначала выберите направление"
+              }
+              options={skillOptions}
+              value={skills}
+              onChange={setSkills}
+              size="large"
+              mode="multiple"
+              disabled={!isPro || !direction}
+            />
+          </div>
         </div>
       </div>
 
-      {!isPro && (
-        <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-          Фильтры по типу интервью, грейду и навыкам доступны в PRO-подписке.
-        </div>
-      )}
-
-      <div className="mt-8 flex flex-wrap items-center gap-4">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+        <span className="text-sm text-gray-500">
+          Вопросы будут подбираться случайным образом по выбранному направлению.
+        </span>
         <Button
           type="primary"
           size="large"
-          disabled={!direction}
+          disabled={!direction || isStarting}
           onClick={handleStart}
+          loading={isStarting}
           className="px-8"
         >
           Начать тренировку
         </Button>
-        {!direction && (
-          <span className="text-sm text-gray-500">
-            Сначала выберите направление.
-          </span>
-        )}
       </div>
     </div>
   );
