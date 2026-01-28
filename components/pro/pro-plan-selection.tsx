@@ -1,8 +1,8 @@
 "use client";
 
 import { Button, Checkbox, Modal } from "antd";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { legalDocuments, type LegalDocKey } from "../ui/legal-documents";
 
 type ProPlan = {
   id: string;
@@ -64,33 +64,22 @@ export default function ProPlanSelection() {
   const [isOpen, setIsOpen] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [hasAcceptedRecurring, setHasAcceptedRecurring] = useState(false);
-  const [activeLegalDoc, setActiveLegalDoc] = useState<LegalDocKey | null>(null);
   const isPaymentOpen = isOpen && Boolean(selectedPlan);
-  const isLegalDocOpen = Boolean(activeLegalDoc);
 
   useEffect(() => {
     if (isOpen) {
       setHasAcceptedTerms(false);
       setHasAcceptedRecurring(false);
     }
-
-    if (!isOpen) {
-      setActiveLegalDoc(null);
-    }
   }, [isOpen]);
 
   useEffect(() => {
-    if (!isOpen && !activeLegalDoc) {
+    if (!isOpen) {
       return;
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") {
-        return;
-      }
-
-      if (activeLegalDoc) {
-        setActiveLegalDoc(null);
         return;
       }
 
@@ -102,19 +91,17 @@ export default function ProPlanSelection() {
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [activeLegalDoc, isOpen]);
+  }, [isOpen]);
 
   const openModal = (plan: ProPlan) => {
     setSelectedPlan(plan);
     setIsOpen(true);
-    setActiveLegalDoc(null);
   };
 
   const canPurchase = hasAcceptedTerms && hasAcceptedRecurring;
 
   const closePaymentModal = () => {
     setIsOpen(false);
-    setActiveLegalDoc(null);
   };
 
   return (
@@ -217,21 +204,19 @@ export default function ProPlanSelection() {
               >
                 <span>
                   Я ознакомлен с{" "}
-                  <Button
-                    type="link"
-                    onClick={() => setActiveLegalDoc("public-offer")}
-                    className="!p-0 !font-medium !text-blue-600 hover:!text-blue-700 !no-underline"
+                  <Link
+                    href="/documents/public-offer"
+                    className="font-medium text-blue-600 hover:text-blue-700"
                   >
                     Договором публичной оферты
-                  </Button>{" "}
+                  </Link>{" "}
                   и согласен на обработку персональных данных в соответствии с{" "}
-                  <Button
-                    type="link"
-                    onClick={() => setActiveLegalDoc("privacy")}
-                    className="!p-0 !font-medium !text-blue-600 hover:!text-blue-700 !no-underline"
+                  <Link
+                    href="/documents/privacy"
+                    className="font-medium text-blue-600 hover:text-blue-700"
                   >
                     Политикой конфиденциальности
-                  </Button>
+                  </Link>
                   .
                 </span>
               </Checkbox>
@@ -271,33 +256,6 @@ export default function ProPlanSelection() {
             </div>
           </div>
         ) : null}
-      </Modal>
-      <Modal
-        open={isLegalDocOpen}
-        centered
-        onCancel={() => setActiveLegalDoc(null)}
-        footer={null}
-        width={520}
-        zIndex={1100}
-        title={
-          activeLegalDoc ? (
-            <div>
-              <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Документ</p>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {legalDocuments[activeLegalDoc].title}
-              </h3>
-            </div>
-          ) : null
-        }
-        styles={{
-          body: {
-            maxHeight: "60vh",
-            overflowY: "auto",
-            paddingRight: "0.25rem",
-          },
-        }}
-      >
-        <div className="text-left">{activeLegalDoc ? legalDocuments[activeLegalDoc].content : null}</div>
       </Modal>
     </div>
   );
