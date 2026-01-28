@@ -216,7 +216,6 @@ const useFooterModals = (sessionTime: number) => {
 export default function Footer({ border = false }: { border?: boolean }) {
   const [activeModal, setActiveModal] = useState<FooterModal | null>(null);
   const [sessionStart, setSessionStart] = useState<number | null>(null);
-  const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL ?? process.env.DEMO_URL;
   const telegramUrl = "https://t.me/preoffer1";
 
   useEffect(() => {
@@ -243,22 +242,6 @@ export default function Footer({ border = false }: { border?: boolean }) {
       >
         {label}
       </Button>
-    </li>
-  );
-
-  const renderExternalLink = (label: string, href: string) => (
-    <li>
-      <a
-        className="inline-flex items-center gap-1 text-gray-600 transition hover:text-gray-900"
-        href={href}
-        rel="noreferrer"
-        target="_blank"
-      >
-        <span>{label}</span>
-        <span aria-hidden="true" className="text-xs text-current">
-          ↗
-        </span>
-      </a>
     </li>
   );
 
@@ -301,7 +284,6 @@ export default function Footer({ border = false }: { border?: boolean }) {
             <h3 className="text-sm font-medium">Компания</h3>
             <ul className="space-y-2 text-sm">
               {renderLink("О нас", "about")}
-              {demoUrl ? renderExternalLink("Демо-ролик", demoUrl) : null}
             </ul>
           </div>
 
