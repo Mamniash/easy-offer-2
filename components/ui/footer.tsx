@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Input, Modal } from "antd";
+import Link from "next/link";
 import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
 import { canSendMessage, sendToTelegram } from "@/lib/telegram";
@@ -68,7 +69,7 @@ const useContactForm = ({
   };
 };
 
-type FooterKey = "about" | "careers" | "vulnerability" | "public-offer" | "privacy";
+type FooterKey = "about" | "careers" | "vulnerability";
 
 type FooterModal = {
   key: FooterKey;
@@ -197,16 +198,6 @@ const useFooterModals = (sessionTime: number) => {
           </div>
         ),
       },
-      {
-        key: "public-offer",
-        title: legalDocuments["public-offer"].title,
-        content: legalDocuments["public-offer"].content,
-      },
-      {
-        key: "privacy",
-        title: legalDocuments.privacy.title,
-        content: legalDocuments.privacy.content,
-      },
     ],
     [careersForm, sessionTime, vulnerabilityForm],
   );
@@ -233,7 +224,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
   const closeModal = () => setActiveModal(null);
   const isModalOpen = Boolean(activeModal);
 
-  const renderLink = (label: string, key: FooterKey) => (
+  const renderModalLink = (label: string, key: FooterKey) => (
     <li>
       <Button
         className="!p-0 !text-left text-gray-600 transition hover:!text-gray-900"
@@ -242,6 +233,14 @@ export default function Footer({ border = false }: { border?: boolean }) {
       >
         {label}
       </Button>
+    </li>
+  );
+
+  const renderDocumentLink = (label: string, href: string) => (
+    <li>
+      <Link className="text-gray-600 transition hover:text-gray-900" href={href}>
+        {label}
+      </Link>
     </li>
   );
 
@@ -283,7 +282,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
           <div className="space-y-2 sm:col-span-6 md:col-span-3 lg:col-span-2">
             <h3 className="text-sm font-medium">Компания</h3>
             <ul className="space-y-2 text-sm">
-              {renderLink("О нас", "about")}
+              {renderModalLink("О нас", "about")}
             </ul>
           </div>
 
@@ -291,8 +290,8 @@ export default function Footer({ border = false }: { border?: boolean }) {
           <div className="space-y-2 sm:col-span-6 md:col-span-3 lg:col-span-2">
             <h3 className="text-sm font-medium">Поддержка</h3>
             <ul className="space-y-2 text-sm">
-              {renderLink("Помочь проекту", "careers")}
-              {renderLink("Сообщить об уязвимости", "vulnerability")}
+              {renderModalLink("Помочь проекту", "careers")}
+              {renderModalLink("Сообщить об уязвимости", "vulnerability")}
             </ul>
           </div>
 
@@ -300,8 +299,8 @@ export default function Footer({ border = false }: { border?: boolean }) {
           <div className="space-y-2 sm:col-span-6 md:col-span-3 lg:col-span-2">
             <h3 className="text-sm font-medium">Документы</h3>
             <ul className="space-y-2 text-sm">
-              {renderLink("Договор публичной оферты", "public-offer")}
-              {renderLink("Политика конфиденциальности", "privacy")}
+              {renderDocumentLink(legalDocuments["public-offer"].title, "/documents/public-offer")}
+              {renderDocumentLink(legalDocuments.privacy.title, "/documents/privacy")}
             </ul>
           </div>
         </div>

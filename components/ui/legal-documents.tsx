@@ -235,7 +235,7 @@ export const legalDocuments: Record<LegalDocKey, LegalDocument> = {
         <section className="space-y-3 rounded-xl bg-slate-50 p-4 leading-relaxed ring-1 ring-slate-100">
           <h4 className="text-sm font-semibold text-gray-900">9. Изменения в Политике</h4>
           <p>Мы оставляем за собой право вносить изменения в настоящую Политику.</p>
-          <p>Актуальная версия всегда доступна по адресу: https://easyoffer.ru/documents/politika-konfidencia.</p>
+          <p>Актуальная версия всегда доступна по адресу: https://easyoffer.ru/documents/privacy.</p>
           <p>Дата последнего обновления указывается в начале документа.</p>
         </section>
       </div>
