@@ -2,12 +2,13 @@
 
 import { Button, Select } from "antd";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getTrackSkillFilters } from "@/lib/track-skill-filters";
 import { directionGroups } from "@/lib/tracks";
 import { isProUser } from "@/lib/subscription";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuthModal } from "@/components/ui/auth-modal-provider";
 
 type Option = {
   label: string;
@@ -29,6 +30,7 @@ const GRADES: Option[] = [
 
 export default function TrainerSetup() {
   const router = useRouter();
+  const { open: openAuthModal } = useAuthModal();
   const [selectedDirection, setSelectedDirection] = useState<string | null>(
     null
   );
@@ -37,6 +39,7 @@ export default function TrainerSetup() {
   const [selectedGrade, setSelectedGrade] = useState<string>("all");
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [isPro, setIsPro] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -48,10 +51,11 @@ export default function TrainerSetup() {
 
       if (!isMounted) return;
 
-      const { email, user_metadata } = session?.user ?? {};
+      const { email, user_metadata, id } = session?.user ?? {};
       const hasPro = isProUser({ email, metadata: user_metadata });
 
       setIsPro(hasPro);
+      setUserId(id ?? null);
     };
 
     fetchSession();
@@ -61,10 +65,11 @@ export default function TrainerSetup() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!isMounted) return;
 
-      const { email, user_metadata } = session?.user ?? {};
+      const { email, user_metadata, id } = session?.user ?? {};
       const hasPro = isProUser({ email, metadata: user_metadata });
 
       setIsPro(hasPro);
+      setUserId(id ?? null);
     });
 
     return () => {
@@ -96,6 +101,18 @@ export default function TrainerSetup() {
 
   const isProLocked = !isPro;
   const isStartDisabled = !selectedDirection;
+
+  const handleProGate = useCallback(() => {
+    if (!isProLocked) return false;
+
+    if (!userId) {
+      openAuthModal();
+    } else {
+      router.push("/pro");
+    }
+
+    return true;
+  }, [isProLocked, openAuthModal, router, userId]);
 
   const handleStart = () => {
     if (!selectedDirection) return;
@@ -172,13 +189,13 @@ export default function TrainerSetup() {
                 onChange={setSelectedInterviewType}
                 className="w-full"
                 size="large"
-                disabled={isProLocked}
+                onMouseDown={(event) => {
+                  if (handleProGate()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                }}
               />
-              {isProLocked && (
-                <p className="text-xs text-gray-500">
-                  Доступно в PRO-подписке.
-                </p>
-              )}
             </div>
 
             <div className="space-y-2">
@@ -199,7 +216,12 @@ export default function TrainerSetup() {
                 onChange={setSelectedGrade}
                 className="w-full"
                 size="large"
-                disabled={isProLocked}
+                onMouseDown={(event) => {
+                  if (handleProGate()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                }}
               />
             </div>
 
@@ -227,13 +249,14 @@ export default function TrainerSetup() {
                 size="large"
                 mode="multiple"
                 maxTagCount="responsive"
-                disabled={isProLocked || !selectedDirection}
+                disabled={isPro ? !selectedDirection : false}
+                onMouseDown={(event) => {
+                  if (handleProGate()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+                }}
               />
-              {isProLocked && (
-                <p className="text-xs text-gray-500">
-                  Фильтры по навыкам доступны в PRO-подписке.
-                </p>
-              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-4">
