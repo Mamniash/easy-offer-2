@@ -189,12 +189,13 @@ export default function TrainerSetup() {
                 onChange={setSelectedInterviewType}
                 className="w-full"
                 size="large"
-                onMouseDown={(event) => {
+                onClick={(event) => {
                   if (handleProGate()) {
                     event.preventDefault();
                     event.stopPropagation();
                   }
                 }}
+                open={isProLocked ? false : undefined}
               />
             </div>
 
@@ -216,12 +217,13 @@ export default function TrainerSetup() {
                 onChange={setSelectedGrade}
                 className="w-full"
                 size="large"
-                onMouseDown={(event) => {
+                onClick={(event) => {
                   if (handleProGate()) {
                     event.preventDefault();
                     event.stopPropagation();
                   }
                 }}
+                open={isProLocked ? false : undefined}
               />
             </div>
 
@@ -250,12 +252,13 @@ export default function TrainerSetup() {
                 mode="multiple"
                 maxTagCount="responsive"
                 disabled={isPro ? !selectedDirection : false}
-                onMouseDown={(event) => {
+                onClick={(event) => {
                   if (handleProGate()) {
                     event.preventDefault();
                     event.stopPropagation();
                   }
                 }}
+                open={isProLocked ? false : undefined}
               />
             </div>
 
