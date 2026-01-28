@@ -165,6 +165,17 @@ export default function Header() {
         ),
       },
       {
+        key: "trainer",
+        label: (
+          <Link
+            href="/trainer"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Тренажер вопросов
+          </Link>
+        ),
+      },
+      {
         key: "articles",
         label: (
           <Link
