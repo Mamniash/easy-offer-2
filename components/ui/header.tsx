@@ -165,6 +165,17 @@ export default function Header() {
         ),
       },
       {
+        key: "roadmap",
+        label: (
+          <Link
+            href="/roadmap"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Роадмапы
+          </Link>
+        ),
+      },
+      {
         key: "articles",
         label: (
           <Link
@@ -172,6 +183,45 @@ export default function Header() {
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             Статьи
+          </Link>
+        ),
+      },
+    ],
+    []
+  );
+
+  const practiceMenuItems = useMemo<MenuProps["items"]>(
+    () => [
+      {
+        key: "trainer",
+        label: (
+          <Link
+            href="/trainer"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Тренажер вопросов
+          </Link>
+        ),
+      },
+      {
+        key: "live-coding",
+        label: (
+          <Link
+            href="/live-code"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Live coding
+          </Link>
+        ),
+      },
+      {
+        key: "mentors",
+        label: (
+          <Link
+            href="/mentor"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            IT Менторы
           </Link>
         ),
       },
@@ -208,6 +258,34 @@ export default function Header() {
                 className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
               >
                 Обучение
+                <svg
+                  className="h-3 w-3 text-gray-400"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m3 4.5 3 3 3-3" />
+                </svg>
+              </button>
+            </Dropdown>
+            <Dropdown
+              menu={{
+                items: practiceMenuItems,
+                className:
+                  "rounded-2xl border border-gray-100 bg-white p-2 text-sm shadow-2xl shadow-black/[0.08] [&>li+li]:!mt-1",
+              }}
+              trigger={["click"]}
+              placement="bottomLeft"
+            >
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
+              >
+                Практика
                 <svg
                   className="h-3 w-3 text-gray-400"
                   viewBox="0 0 12 12"
