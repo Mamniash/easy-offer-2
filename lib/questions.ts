@@ -182,3 +182,49 @@ export async function getQuestionById(id: number): Promise<QuestionRow | null> {
 
   return data as QuestionRow | null;
 }
+
+/**
+ * Получить случайный вопрос по направлению.
+ */
+export async function getRandomQuestionByDirection(
+  slug: string
+): Promise<QuestionRow | null> {
+  const direction = slugToDirection(slug);
+
+  const { count, error: countError } = await supabase
+    .from("questions")
+    .select("id", { count: "exact", head: true })
+    .eq("direction", direction);
+
+  if (countError) {
+    console.error(
+      "[getRandomQuestionByDirection] Supabase count error:",
+      countError
+    );
+    return null;
+  }
+
+  if (!count || count <= 0) {
+    return null;
+  }
+
+  const randomIndex = Math.floor(Math.random() * count);
+
+  const { data, error } = await supabase
+    .from("questions")
+    .select("*")
+    .eq("direction", direction)
+    .order("id", { ascending: true })
+    .range(randomIndex, randomIndex)
+    .maybeSingle();
+
+  if (error) {
+    console.error(
+      "[getRandomQuestionByDirection] Supabase question error:",
+      error
+    );
+    return null;
+  }
+
+  return (data ?? null) as QuestionRow | null;
+}
