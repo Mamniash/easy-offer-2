@@ -31,7 +31,7 @@ const PLANS: ProPlan[] = [
   {
     id: "week",
     name: "Неделя",
-    price: "1 500 ₽",
+    price: "2 000 ₽",
     period: "на 7 дней",
     billingCycle: "каждые 7 дней",
     perks: [
@@ -44,7 +44,7 @@ const PLANS: ProPlan[] = [
   {
     id: "month",
     name: "Месяц",
-    price: "3 500 ₽",
+    price: "4 000 ₽",
     period: "на 30 дней",
     billingCycle: "каждые 30 дней",
     badge: "Популярный",
@@ -59,7 +59,7 @@ const PLANS: ProPlan[] = [
   {
     id: "year",
     name: "Годовой",
-    price: "5 000 ₽",
+    price: "5 500 ₽",
     period: "на 12 месяцев",
     billingCycle: "каждые 12 месяцев",
     perks: [

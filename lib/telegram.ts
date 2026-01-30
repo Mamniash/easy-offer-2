@@ -67,7 +67,8 @@ export const sendSubscriptionToTelegram = async ({
   user,
 }: SubscriptionPayload) => {
   const username = user.username ? `@${user.username}` : null;
-  const contactLabel = username ?? "не указан";
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+  const contactLabel = fullName || username || "не указан";
   const telegramLink = username ?? "не указан";
   const message = `
 💳 Запрос на оплату подписки
