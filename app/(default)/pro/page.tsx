@@ -12,6 +12,13 @@ type ComparisonItem = {
   pro: string;
 };
 
+type TelegramUserInfo = {
+  telegramId: number | null;
+  username: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
+
 const COMPARISON: ComparisonItem[] = [
   {
     title: "Доступ к вопросам",
@@ -57,6 +64,12 @@ const COMPARISON: ComparisonItem[] = [
 
 export default function ProPage() {
   const [userName, setUserName] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<TelegramUserInfo>({
+    telegramId: null,
+    username: null,
+    firstName: null,
+    lastName: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [needsAuth, setNeedsAuth] = useState(false);
   const { open: openAuthModal } = useAuthModal();
@@ -75,6 +88,14 @@ export default function ProPage() {
       }
 
       const { user_metadata } = session.user;
+      const telegramId =
+        typeof user_metadata?.telegram_id === "number"
+          ? user_metadata.telegram_id
+          : null;
+      const username =
+        typeof user_metadata?.username === "string"
+          ? user_metadata.username.trim()
+          : null;
       const firstName =
         typeof user_metadata?.first_name === "string"
           ? user_metadata.first_name.trim()
@@ -93,6 +114,12 @@ export default function ProPage() {
           ? `@${user_metadata.username}`
           : null);
       setUserName(fullName || fallbackName || null);
+      setUserInfo({
+        telegramId,
+        username,
+        firstName: firstName || null,
+        lastName: lastName || null,
+      });
       setIsLoading(false);
     };
 
@@ -189,7 +216,7 @@ export default function ProPage() {
             </div>
           </div>
 
-          <ProPlanSelection />
+          <ProPlanSelection userInfo={userInfo} />
         </div>
       </div>
     </section>

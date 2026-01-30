@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Checkbox, Modal } from "antd";
+import { Button, Checkbox, Input, Modal } from "antd";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { sendSubscriptionToTelegram } from "@/lib/telegram";
 
 type ProPlan = {
   id: string;
@@ -13,6 +14,17 @@ type ProPlan = {
   badge?: string;
   perks: string[];
   emphasis?: boolean;
+};
+
+type TelegramUserInfo = {
+  telegramId: number | null;
+  username: string | null;
+  firstName: string | null;
+  lastName: string | null;
+};
+
+type ProPlanSelectionProps = {
+  userInfo: TelegramUserInfo;
 };
 
 const PLANS: ProPlan[] = [
@@ -59,17 +71,27 @@ const PLANS: ProPlan[] = [
   },
 ];
 
-export default function ProPlanSelection() {
+const PLAN_LINKS: Record<string, string | undefined> = {
+  week: process.env.LINK_TO_WEEK,
+  month: process.env.LINK_TO_MONTH,
+  year: process.env.LINK_TO_YEAR,
+};
+
+export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
   const [selectedPlan, setSelectedPlan] = useState<ProPlan | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [hasAcceptedRecurring, setHasAcceptedRecurring] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isPaymentOpen = isOpen && Boolean(selectedPlan);
 
   useEffect(() => {
     if (isOpen) {
       setHasAcceptedTerms(false);
       setHasAcceptedRecurring(false);
+      setPromoCode("");
+      setIsSubmitting(false);
     }
   }, [isOpen]);
 
@@ -102,6 +124,24 @@ export default function ProPlanSelection() {
 
   const closePaymentModal = () => {
     setIsOpen(false);
+  };
+
+  const selectedPlanLink = selectedPlan ? PLAN_LINKS[selectedPlan.id] : null;
+  const canProceed = canPurchase && Boolean(selectedPlanLink) && !isSubmitting;
+
+  const handlePurchase = async () => {
+    if (!selectedPlan || !selectedPlanLink || !canProceed) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    await sendSubscriptionToTelegram({
+      planName: selectedPlan.name,
+      planPrice: selectedPlan.price,
+      promoCode,
+      user: userInfo,
+    });
+    window.location.assign(selectedPlanLink);
   };
 
   return (
@@ -190,12 +230,25 @@ export default function ProPlanSelection() {
               Оплата
             </p>
             <h3 className="mt-2 text-2xl font-bold text-gray-900">
-              Подключаем онлайн-кассы
+              Оплата подписки
             </h3>
             <p className="mt-3 text-sm text-gray-600">
-              Вы выбрали тариф «{selectedPlan.name}». Оплата скоро появится —
-              сейчас мы подключаем онлайн-кассы для оформления подписки.
+              Вы выбрали тариф «{selectedPlan.name}». Перед оплатой можно указать
+              промокод. После нажатия кнопки вы перейдёте на страницу оплаты.
             </p>
+            <div className="mt-5 space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Промокод
+              </label>
+              <Input
+                value={promoCode}
+                onChange={(event) => setPromoCode(event.target.value)}
+                placeholder="Введите промокод"
+              />
+              <p className="text-xs text-gray-500">
+                Если промокода нет, оставьте поле пустым — можно продолжать оплату.
+              </p>
+            </div>
             <div className="mt-5 space-y-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-sm text-gray-700">
               <Checkbox
                 checked={hasAcceptedTerms}
@@ -226,11 +279,16 @@ export default function ProPlanSelection() {
                 className="items-start"
               >
                 <span>
-                  Я понимаю, что оплата подписки будет списываться автоматически каждые 30
-                  дней до отключения автопродления.
+                  Я понимаю, что оплата подписки будет списываться автоматически{" "}
+                  {selectedPlan.billingCycle} до отключения автопродления.
                 </span>
               </Checkbox>
             </div>
+            {!selectedPlanLink && (
+              <p className="mt-3 text-xs text-rose-500">
+                Ссылка на оплату временно недоступна. Попробуйте чуть позже.
+              </p>
+            )}
             <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
               <Button
                 type="default"
@@ -243,12 +301,9 @@ export default function ProPlanSelection() {
               <Button
                 type="primary"
                 shape="round"
-                onClick={() => {
-                  if (canPurchase) {
-                    closePaymentModal();
-                  }
-                }}
-                disabled={!canPurchase}
+                onClick={handlePurchase}
+                disabled={!canProceed}
+                loading={isSubmitting}
                 className="px-4 py-2 text-sm font-semibold"
               >
                 Купить подписку
