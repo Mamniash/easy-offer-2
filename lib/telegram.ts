@@ -66,16 +66,15 @@ export const sendSubscriptionToTelegram = async ({
   promoCode,
   user,
 }: SubscriptionPayload) => {
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
   const username = user.username ? `@${user.username}` : null;
-  const contactLabel =
-    fullName || username || (user.telegramId ? `ID ${user.telegramId}` : null);
+  const contactLabel = username ?? "не указан";
+  const telegramLink = username ?? "не указан";
   const message = `
 💳 Запрос на оплату подписки
 🗂 Тариф: ${planName} (${planPrice})
 🏷 Промокод: ${promoCode?.trim() || "не указан"}
-👤 Пользователь: ${contactLabel ?? "не определен"}
-🆔 Telegram ID: ${user.telegramId ?? "не указан"}
+👤 Пользователь: ${contactLabel}
+🔗 Telegram: ${telegramLink}
   `.trim();
 
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
