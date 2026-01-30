@@ -258,9 +258,7 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                 value={promoCode}
                 onChange={(event) => setPromoCode(event.target.value)}
                 placeholder="Введите промокод"
-                status={
-                  isPromoCodeProvided ? (isPromoCodeValid ? "success" : "error") : undefined
-                }
+                status={isPromoCodeProvided && !isPromoCodeValid ? "error" : undefined}
               />
               {isPromoCodeProvided && (
                 <p
