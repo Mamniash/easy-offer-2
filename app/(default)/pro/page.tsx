@@ -83,7 +83,6 @@ export default function ProPage() {
       if (!session?.user) {
         setNeedsAuth(true);
         setIsLoading(false);
-        openAuthModal();
         return;
       }
 
@@ -124,7 +123,7 @@ export default function ProPage() {
     };
 
     fetchSession();
-  }, [openAuthModal]);
+  }, []);
 
   if (needsAuth) {
     return (
