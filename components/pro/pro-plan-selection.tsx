@@ -77,6 +77,14 @@ const PLAN_LINKS: Record<string, string | undefined> = {
   year: process.env.LINK_TO_YEAR,
 };
 
+const PROMO_PLAN_LINKS: Record<string, string | undefined> = {
+  week: process.env.LINK_TO_WEEK_PROMO,
+  month: process.env.LINK_TO_MONTH_PROMO,
+  year: process.env.LINK_TO_YEAR_PROMO,
+};
+
+const VALID_PROMO_CODES = new Set(["promo@alexgrabko", "promo@500"]);
+
 export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
   const [selectedPlan, setSelectedPlan] = useState<ProPlan | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -126,7 +134,13 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
     setIsOpen(false);
   };
 
-  const selectedPlanLink = selectedPlan ? PLAN_LINKS[selectedPlan.id] : null;
+  const normalizedPromoCode = promoCode.trim().toLowerCase();
+  const isPromoCodeProvided = normalizedPromoCode.length > 0;
+  const isPromoCodeValid =
+    isPromoCodeProvided && VALID_PROMO_CODES.has(normalizedPromoCode);
+  const selectedPlanLink = selectedPlan
+    ? (isPromoCodeValid ? PROMO_PLAN_LINKS : PLAN_LINKS)[selectedPlan.id]
+    : null;
   const canProceed = canPurchase && Boolean(selectedPlanLink) && !isSubmitting;
 
   const handlePurchase = async () => {
@@ -244,7 +258,19 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                 value={promoCode}
                 onChange={(event) => setPromoCode(event.target.value)}
                 placeholder="Введите промокод"
+                status={isPromoCodeProvided && !isPromoCodeValid ? "error" : undefined}
               />
+              {isPromoCodeProvided && (
+                <p
+                  className={`text-xs ${
+                    isPromoCodeValid ? "text-emerald-600" : "text-rose-500"
+                  }`}
+                >
+                  {isPromoCodeValid
+                    ? "Промокод принят. Скидка применена."
+                    : "Промокод не найден. Проверьте написание."}
+                </p>
+              )}
               <p className="text-xs text-gray-500">
                 Если промокода нет, оставьте поле пустым — можно продолжать оплату.
               </p>
