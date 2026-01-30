@@ -73,7 +73,7 @@ const PLANS: ProPlan[] = [
 
 const PLAN_LINKS: Record<string, string | undefined> = {
   week: process.env.LINK_TO_WEEK,
-  month: process.env.LINK_TO_MONTH,
+  month: process.env.LINK_TO_MONTH ?? process.env.LINT_TO_MONTH,
   year: process.env.LINK_TO_YEAR,
 };
 
