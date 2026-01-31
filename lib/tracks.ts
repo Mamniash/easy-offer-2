@@ -376,26 +376,6 @@ export const directionGroups: {
     ],
   },
   {
-    title: "Друзья",
-    items: [
-      {
-        name: "Митша",
-        slug: "python",
-        description: "Python backend, Django/FastAPI и работа с данными",
-      },
-      {
-        name: "Frontend",
-        slug: "frontend",
-        description: "React, SPA, дизайн-системы и оптимизация UI",
-      },
-      {
-        name: "Java",
-        slug: "java",
-        description: "JVM, Spring, микросервисы и профилирование",
-      },
-    ],
-  },
-  {
     title: "Тестирование",
     items: [
       {

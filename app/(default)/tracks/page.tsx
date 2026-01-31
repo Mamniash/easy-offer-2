@@ -49,6 +49,50 @@ export default async function TracksLandingPage() {
           </div>
         </div>
 
+        <div className="mt-10 overflow-hidden rounded-3xl border border-blue-200/60 bg-gradient-to-br from-blue-600 via-sky-500 to-indigo-600 p-8 text-white shadow-2xl">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm uppercase tracking-[0.2em] text-white/70">
+                Друзья PreOffer
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold md:text-4xl">
+                Митша — легенда Python-бэкенда
+              </h2>
+              <p className="mt-4 text-base text-white/85 md:text-lg">
+                Мы уже собрали контент по Python backend, и Митша — тот самый
+                человек, который поможет докрутить дорожную карту. Напишите ему
+                в Telegram, чтобы обсудить задачи или ревью.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href="/tracks/python"
+                  className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-blue-700 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  Смотреть Python backend
+                </a>
+                <a
+                  href="https://t.me/nedv1ga"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-white/70 px-5 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+                >
+                  Написать Митше в Telegram
+                </a>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-4 rounded-2xl bg-white/10 p-4 backdrop-blur lg:w-80">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/en/0/0c/Patrick_Bateman.png"
+                alt="Патрик Бэйман"
+                className="h-48 w-full rounded-xl object-cover shadow-lg"
+              />
+              <p className="text-center text-xs uppercase tracking-[0.2em] text-white/70">
+                Эталон уверенности
+              </p>
+            </div>
+          </div>
+        </div>
+
         <TracksDirectory directionGroups={directionGroups} />
       </div>
     </section>
