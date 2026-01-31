@@ -83,7 +83,13 @@ const PROMO_PLAN_LINKS: Record<string, string | undefined> = {
   year: process.env.LINK_TO_YEAR_PROMO,
 };
 
-const VALID_PROMO_CODES = new Set(["promo@alexgrabko", "promo@500"]);
+const VALID_PROMO_CODES = new Set([
+  "promo@alexgrabko",
+  "promo@eugene",
+  "promo@sherzod",
+  "promo@@iopiopovi4",
+  "promo@500",
+]);
 
 export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
   const [selectedPlan, setSelectedPlan] = useState<ProPlan | null>(null);
