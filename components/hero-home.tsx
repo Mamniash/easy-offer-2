@@ -70,8 +70,8 @@ export default function HeroHome() {
               data-aos="zoom-y-out"
               data-aos-delay={150}
             >
-              PreOffer превращает подготовку <br className="max-lg:hidden" />
-              к собеседованию в систему
+              PreOffer помогает junior’ам <br className="max-lg:hidden" />
+              взять первый оффер
             </h1>
             <div className="mx-auto max-w-3xl">
               <p
@@ -79,10 +79,10 @@ export default function HeroHome() {
                 data-aos="zoom-y-out"
                 data-aos-delay={300}
               >
-                Платформа собирает реальные вопросы из собеседований, считает
-                их частоту по профессии и грейду и показывает, на что делать
-                упор. Видишь карту подготовки, закрываешь пробелы и идёшь на
-                интервью без ощущения лотереи.
+                Если ты учишься 1–2 года, уже ходил на собеседования, но офферов
+                ноль — мы покажем, что реально спрашивают, что считается нормой
+                или провалом и где обычно режут junior’ов. Фильтры по стеку и
+                темам превращают подготовку в понятный план, а не в лотерею.
               </p>
               <div className="relative before:absolute before:inset-0 before:border-y before:[border-image:linear-gradient(to_right,transparent,--theme(--color-slate-300/.8),transparent)1]">
                 <div
@@ -118,27 +118,45 @@ export default function HeroHome() {
                 </span>
               </div>
               <div className="font-mono text-gray-500 [&_span]:opacity-0">
-                <span className="animate-[code-1_10s_infinite] text-gray-200">
-                  Сканируем реальные вопросы
+                <span className="animate-[code-1_18s_infinite] text-gray-200">
+                  Сканируем реальные junior-интервью
                 </span>{" "}
-                <span className="animate-[code-2_10s_infinite]">
-                  12345 собеседований
+                <span className="animate-[code-2_18s_infinite]">
+                  1&nbsp;284 вопроса
                 </span>
                 <br />
-                <span className="animate-[code-3_10s_infinite]">
-                  Фильтруем по профессии и грейду
+                <span className="animate-[code-3_18s_infinite]">
+                  FE/BE/QA/Data — только junior
                 </span>{" "}
-                <span className="animate-[code-4_10s_infinite]">
-                  Карта подготовки готова
+                <span className="animate-[code-4_18s_infinite]">
+                  0 коммерческого опыта — ок
                 </span>
                 <br />
-                <br />
-                <span className="animate-[code-5_10s_infinite] text-gray-200">
-                  Живые прогоны с карьерным экспертом
+                <span className="animate-[code-5_18s_infinite] text-gray-200">
+                  Показываем, что проверяют
                 </span>
                 <br />
-                <span className="animate-[code-6_10s_infinite]">
-                  Ты отвечаешь уверенно.
+                <span className="animate-[code-6_18s_infinite]">
+                  Норма/провал по ответу
+                </span>
+                <br />
+                <span className="animate-[code-7_18s_infinite] text-gray-200">
+                  Типовые ошибки новичков
+                </span>{" "}
+                <span className="animate-[code-8_18s_infinite]">
+                  Фильтр по стеку: React/TS, Python, SQL
+                </span>
+                <br />
+                <span className="animate-[code-9_18s_infinite]">
+                  3–5 собеседований → знаешь, за что режут
+                </span>
+                <br />
+                <span className="animate-[code-10_18s_infinite] text-gray-200">
+                  План подготовки на 14 дней
+                </span>
+                <br />
+                <span className="animate-[code-11_18s_infinite]">
+                  Первый оффер — цель, а не лотерея
                 </span>
               </div>
             </div>

@@ -1,6 +1,7 @@
 export const metadata = {
-  title: "PreOffer — подготовка к собеседованиям",
-  description: "Платформа для уверенной подготовки к IT-собеседованиям",
+  title: "PreOffer — первый оффер для junior",
+  description:
+    "Платформа для junior-специалистов: реальные вопросы, критерии ответов и план подготовки к первому офферу.",
 };
 
 import Hero from "@/components/hero-home";

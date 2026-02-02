@@ -50,6 +50,11 @@
   --animate-code-4: code-4;
   --animate-code-5: code-5;
   --animate-code-6: code-6;
+  --animate-code-7: code-7;
+  --animate-code-8: code-8;
+  --animate-code-9: code-9;
+  --animate-code-10: code-10;
+  --animate-code-11: code-11;
   --animate-breath: breath;
   --animate-float: float;
   --animate-line: line;
@@ -70,10 +75,10 @@
     }
   }
   @keyframes code-2 {
-    16.2% {
+    8% {
       opacity: 0;
     }
-    18.75% {
+    10.5% {
       opacity: 1;
     }
     97.5% {
@@ -84,10 +89,10 @@
     }
   }
   @keyframes code-3 {
-    32.5% {
+    16% {
       opacity: 0;
     }
-    35% {
+    18.5% {
       opacity: 1;
     }
     97.5% {
@@ -98,10 +103,10 @@
     }
   }
   @keyframes code-4 {
-    48.75% {
+    24% {
       opacity: 0;
     }
-    51.25% {
+    26.5% {
       opacity: 1;
     }
     97.5% {
@@ -112,10 +117,10 @@
     }
   }
   @keyframes code-5 {
-    65% {
+    32% {
       opacity: 0;
     }
-    72.5% {
+    34.5% {
       opacity: 1;
     }
     97.5% {
@@ -126,10 +131,80 @@
     }
   }
   @keyframes code-6 {
-    81.25% {
+    40% {
       opacity: 0;
     }
-    83.75% {
+    42.5% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-7 {
+    48% {
+      opacity: 0;
+    }
+    50.5% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-8 {
+    56% {
+      opacity: 0;
+    }
+    58.5% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-9 {
+    64% {
+      opacity: 0;
+    }
+    66.5% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-10 {
+    72% {
+      opacity: 0;
+    }
+    74.5% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-11 {
+    80% {
+      opacity: 0;
+    }
+    82.5% {
       opacity: 1;
     }
     97.5% {

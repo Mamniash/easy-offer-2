@@ -30,15 +30,15 @@ export default function LargeTestimonial() {
               />
             </div>
             <p className="text-xl font-semibold leading-relaxed text-gray-900">
-              "PreOffer помог собрать фокусный список тем и перестать зубрить
-              всё подряд. После прогона с экспертом ответы звучат увереннее, и
-              я вижу прогресс каждую неделю."
+              "После 6 собеседований без оффера я понял, что меня режут не за
+              знания, а за формат ответов. PreOffer разложил, что считается
+              нормой, а что провалом — и я наконец понял, на что делать упор."
             </p>
             <div className="text-[13px] font-medium text-gray-500">
-              <span className="text-gray-700">Александра, Middle QA</span>{" "}
+              <span className="text-gray-700">Илья, Junior Frontend</span>{" "}
               <span className="text-gray-400">/</span>{" "}
               <a className="text-blue-500" href="#0">
-                переход в продуктовую компанию за 3 недели
+                первый оффер после 2 недель подготовки
               </a>
             </div>
           </div>
