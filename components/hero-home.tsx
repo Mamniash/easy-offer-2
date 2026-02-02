@@ -70,8 +70,7 @@ export default function HeroHome() {
               data-aos="zoom-y-out"
               data-aos-delay={150}
             >
-              PreOffer превращает подготовку <br className="max-lg:hidden" />
-              к собеседованию в систему
+              Первый оффер без лотереи
             </h1>
             <div className="mx-auto max-w-3xl">
               <p
@@ -79,10 +78,9 @@ export default function HeroHome() {
                 data-aos="zoom-y-out"
                 data-aos-delay={300}
               >
-                Платформа собирает реальные вопросы из собеседований, считает
-                их частоту по профессии и грейду и показывает, на что делать
-                упор. Видишь карту подготовки, закрываешь пробелы и идёшь на
-                интервью без ощущения лотереи.
+                Показываем, что реально спрашивают на собеседованиях для Junior
+                и за что режут. Ты перестаёшь готовиться “вообще ко всему” — и
+                готовишься к тому, что решает оффер.
               </p>
               <div className="relative before:absolute before:inset-0 before:border-y before:[border-image:linear-gradient(to_right,transparent,--theme(--color-slate-300/.8),transparent)1]">
                 <div
@@ -95,7 +93,7 @@ export default function HeroHome() {
                     href="/tracks"
                   >
                     <span className="relative inline-flex items-center">
-                      Попробовать бесплатно{" "}
+                      Посмотреть вопросы{" "}
                       <span className="ml-1 tracking-normal text-blue-300 transition-transform group-hover:translate-x-0.5">
                         -&gt;
                       </span>
