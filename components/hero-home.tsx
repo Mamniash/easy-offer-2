@@ -82,8 +82,8 @@ export default function HeroHome() {
                 Если ты учишься уже 1–2 года, сходил на 3–5 собеседований, а
                 офферов всё ещё нет — PreOffer показывает реальные вопросы
                 уровня Junior, объясняет зачем их задают и что считается нормой
-                или провалом. Внутри — типовые ошибки и фильтры по направлению,
-                стеку и темам.
+                или провалом. Ты готовишься к тому, что реально решает оффер:
+                внутри — типовые ошибки и фильтры по направлению, стеку и темам.
               </p>
               <div className="relative before:absolute before:inset-0 before:border-y before:[border-image:linear-gradient(to_right,transparent,--theme(--color-slate-300/.8),transparent)1]">
                 <div
@@ -119,46 +119,53 @@ export default function HeroHome() {
                 </span>
               </div>
               <div className="font-mono text-gray-500 [&_span]:opacity-0">
-                <span className="animate-[code-1_18s_infinite] text-gray-200">
-                  Сканируем 7 собеседований junior
+                <span className="animate-[code-1_26s_linear_forwards] text-gray-200">
+                  Сканируем 7 новых собеседований junior
                 </span>{" "}
-                <span className="animate-[code-2_18s_infinite]">
+                <span className="animate-[code-2_26s_linear_forwards]">
                   за последнюю неделю
                 </span>
                 <br />
-                <span className="animate-[code-3_18s_infinite]">
-                  Собрано 86 реальных вопросов
+                <span className="animate-[code-3_26s_linear_forwards]">
+                  Собрано 86 новых вопросов
                 </span>{" "}
-                <span className="animate-[code-4_18s_infinite]">
+                <span className="animate-[code-4_26s_linear_forwards]">
                   по Frontend Junior
                 </span>
                 <br />
-                <span className="animate-[code-5_18s_infinite] text-gray-200">
+                <span className="animate-[code-5_26s_linear_forwards] text-gray-200">
                   Показываем, зачем их задают
                 </span>{" "}
-                <span className="animate-[code-6_18s_infinite]">
+                <span className="animate-[code-6_26s_linear_forwards]">
                   и что проверяют в ответах
                 </span>
                 <br />
-                <span className="animate-[code-7_18s_infinite]">
-                  Нормальный ответ vs провал
+                <span className="animate-[code-7_26s_linear_forwards]">
+                  Анализируем типовые ошибки новичков
                 </span>{" "}
-                <span className="animate-[code-8_18s_infinite]">
-                  + типовые ошибки
+                <span className="animate-[code-8_26s_linear_forwards]">
+                  и подсвечиваем слабые места
                 </span>
                 <br />
-                <span className="animate-[code-9_18s_infinite] text-gray-200">
-                  Фильтры: стек, темы, компании
+                <span className="animate-[code-9_26s_linear_forwards] text-gray-200">
+                  Формируем список вопросов
                 </span>{" "}
-                <span className="animate-[code-10_18s_infinite]">
+                <span className="animate-[code-10_26s_linear_forwards]">
+                  и ориентиры по ответам
+                </span>
+                <br />
+                <span className="animate-[code-11_26s_linear_forwards]">
+                  Фильтруем: стек, темы, компании
+                </span>{" "}
+                <span className="animate-[code-12_26s_linear_forwards]">
                   выбираешь свой трек
                 </span>
                 <br />
-                <span className="animate-[code-11_18s_infinite]">
+                <span className="animate-[code-13_26s_linear_forwards] text-gray-200">
                   Цель: первый оффер без лотереи
                 </span>{" "}
-                <span className="animate-[code-12_18s_infinite]">
-                  и без лишнего зубрёжа
+                <span className="animate-[code-14_26s_linear_forwards]">
+                  и без страха на собеседовании
                 </span>
               </div>
             </div>
