@@ -70,8 +70,8 @@ export default function HeroHome() {
               data-aos="zoom-y-out"
               data-aos-delay={150}
             >
-              PreOffer превращает подготовку <br className="max-lg:hidden" />
-              к собеседованию в систему
+              PreOffer помогает junior взять <br className="max-lg:hidden" />
+              первый оффер без лотереи
             </h1>
             <div className="mx-auto max-w-3xl">
               <p
@@ -79,10 +79,11 @@ export default function HeroHome() {
                 data-aos="zoom-y-out"
                 data-aos-delay={300}
               >
-                Платформа собирает реальные вопросы из собеседований, считает
-                их частоту по профессии и грейду и показывает, на что делать
-                упор. Видишь карту подготовки, закрываешь пробелы и идёшь на
-                интервью без ощущения лотереи.
+                Если ты учишься уже 1–2 года, сходил на 3–5 собеседований, а
+                офферов всё ещё нет — PreOffer показывает реальные вопросы
+                уровня Junior, объясняет зачем их задают и что считается нормой
+                или провалом. Внутри — типовые ошибки и фильтры по направлению,
+                стеку и темам.
               </p>
               <div className="relative before:absolute before:inset-0 before:border-y before:[border-image:linear-gradient(to_right,transparent,--theme(--color-slate-300/.8),transparent)1]">
                 <div
@@ -118,27 +119,46 @@ export default function HeroHome() {
                 </span>
               </div>
               <div className="font-mono text-gray-500 [&_span]:opacity-0">
-                <span className="animate-[code-1_10s_infinite] text-gray-200">
-                  Сканируем реальные вопросы
+                <span className="animate-[code-1_18s_infinite] text-gray-200">
+                  Сканируем 7 собеседований junior
                 </span>{" "}
-                <span className="animate-[code-2_10s_infinite]">
-                  12345 собеседований
+                <span className="animate-[code-2_18s_infinite]">
+                  за последнюю неделю
                 </span>
                 <br />
-                <span className="animate-[code-3_10s_infinite]">
-                  Фильтруем по профессии и грейду
+                <span className="animate-[code-3_18s_infinite]">
+                  Собрано 86 реальных вопросов
                 </span>{" "}
-                <span className="animate-[code-4_10s_infinite]">
-                  Карта подготовки готова
+                <span className="animate-[code-4_18s_infinite]">
+                  по Frontend Junior
                 </span>
                 <br />
-                <br />
-                <span className="animate-[code-5_10s_infinite] text-gray-200">
-                  Живые прогоны с карьерным экспертом
+                <span className="animate-[code-5_18s_infinite] text-gray-200">
+                  Показываем, зачем их задают
+                </span>{" "}
+                <span className="animate-[code-6_18s_infinite]">
+                  и что проверяют в ответах
                 </span>
                 <br />
-                <span className="animate-[code-6_10s_infinite]">
-                  Ты отвечаешь уверенно.
+                <span className="animate-[code-7_18s_infinite]">
+                  Нормальный ответ vs провал
+                </span>{" "}
+                <span className="animate-[code-8_18s_infinite]">
+                  + типовые ошибки
+                </span>
+                <br />
+                <span className="animate-[code-9_18s_infinite] text-gray-200">
+                  Фильтры: стек, темы, компании
+                </span>{" "}
+                <span className="animate-[code-10_18s_infinite]">
+                  выбираешь свой трек
+                </span>
+                <br />
+                <span className="animate-[code-11_18s_infinite]">
+                  Цель: первый оффер без лотереи
+                </span>{" "}
+                <span className="animate-[code-12_18s_infinite]">
+                  и без лишнего зубрёжа
                 </span>
               </div>
             </div>
