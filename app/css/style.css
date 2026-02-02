@@ -58,6 +58,10 @@
   --animate-code-12: code-12;
   --animate-code-13: code-13;
   --animate-code-14: code-14;
+  --animate-code-15: code-15;
+  --animate-code-16: code-16;
+  --animate-code-17: code-17;
+  --animate-code-18: code-18;
   --animate-breath: breath;
   --animate-float: float;
   --animate-line: line;
@@ -75,10 +79,10 @@
     }
   }
   @keyframes code-2 {
-    7.14% {
+    5.55% {
       opacity: 0;
     }
-    9.64% {
+    8.05% {
       opacity: 1;
     }
     100% {
@@ -86,10 +90,10 @@
     }
   }
   @keyframes code-3 {
-    14.28% {
+    11.1% {
       opacity: 0;
     }
-    16.78% {
+    13.6% {
       opacity: 1;
     }
     100% {
@@ -97,10 +101,10 @@
     }
   }
   @keyframes code-4 {
-    21.42% {
+    16.65% {
       opacity: 0;
     }
-    23.92% {
+    19.15% {
       opacity: 1;
     }
     100% {
@@ -108,10 +112,10 @@
     }
   }
   @keyframes code-5 {
-    28.57% {
+    22.2% {
       opacity: 0;
     }
-    31.07% {
+    24.7% {
       opacity: 1;
     }
     100% {
@@ -119,10 +123,10 @@
     }
   }
   @keyframes code-6 {
-    35.71% {
+    27.75% {
       opacity: 0;
     }
-    38.21% {
+    30.25% {
       opacity: 1;
     }
     100% {
@@ -130,10 +134,10 @@
     }
   }
   @keyframes code-7 {
-    42.85% {
+    33.3% {
       opacity: 0;
     }
-    45.35% {
+    35.8% {
       opacity: 1;
     }
     100% {
@@ -141,10 +145,10 @@
     }
   }
   @keyframes code-8 {
-    50% {
+    38.85% {
       opacity: 0;
     }
-    52.5% {
+    41.35% {
       opacity: 1;
     }
     100% {
@@ -152,10 +156,10 @@
     }
   }
   @keyframes code-9 {
-    57.14% {
+    44.4% {
       opacity: 0;
     }
-    59.64% {
+    46.9% {
       opacity: 1;
     }
     100% {
@@ -163,10 +167,10 @@
     }
   }
   @keyframes code-10 {
-    64.28% {
+    49.95% {
       opacity: 0;
     }
-    66.78% {
+    52.45% {
       opacity: 1;
     }
     100% {
@@ -174,10 +178,10 @@
     }
   }
   @keyframes code-11 {
-    71.42% {
+    55.5% {
       opacity: 0;
     }
-    73.92% {
+    58% {
       opacity: 1;
     }
     100% {
@@ -185,10 +189,10 @@
     }
   }
   @keyframes code-12 {
-    78.57% {
+    61.05% {
       opacity: 0;
     }
-    81.07% {
+    63.55% {
       opacity: 1;
     }
     100% {
@@ -196,10 +200,10 @@
     }
   }
   @keyframes code-13 {
-    85.71% {
+    66.6% {
       opacity: 0;
     }
-    88.21% {
+    69.1% {
       opacity: 1;
     }
     100% {
@@ -207,10 +211,54 @@
     }
   }
   @keyframes code-14 {
-    92.85% {
+    72.15% {
       opacity: 0;
     }
-    95.35% {
+    74.65% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes code-15 {
+    77.7% {
+      opacity: 0;
+    }
+    80.2% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes code-16 {
+    83.25% {
+      opacity: 0;
+    }
+    85.75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes code-17 {
+    88.8% {
+      opacity: 0;
+    }
+    91.3% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes code-18 {
+    94.35% {
+      opacity: 0;
+    }
+    96.85% {
       opacity: 1;
     }
     100% {
@@ -281,5 +329,21 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer components {
+  .testimonial-carousel .slick-list {
+    overflow: visible;
+  }
+
+  .testimonial-carousel .slick-slide {
+    padding-inline: 12px;
+    transition: opacity 0.3s ease;
+    opacity: 0.5;
+  }
+
+  .testimonial-carousel .slick-active {
+    opacity: 1;
   }
 }

@@ -3,7 +3,10 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { Carousel } from "antd";
-import TestimonialImg from "@/public/images/large-testimonial.jpg";
+import Avatar01 from "@/public/images/avatar-01.jpg";
+import Avatar02 from "@/public/images/avatar-02.jpg";
+import Avatar03 from "@/public/images/avatar-03.jpg";
+import Avatar04 from "@/public/images/avatar-04.jpg";
 
 const testimonials = [
   {
@@ -11,24 +14,28 @@ const testimonials = [
       "После четырёх собеседований без оффера я понял, что готовился не к тому. PreOffer показал реальные вопросы, критерии «норма / провал» и типовые ошибки — стало ясно, куда копать и как отвечать уверенно.",
     name: "Даниил, Junior Frontend",
     result: "первый оффер после 2 дополнительных раундов",
+    avatar: Avatar01,
   },
   {
     quote:
       "Список реальных вопросов и фильтры по стеку спасли недели подготовки. Я убрал лишнее, сфокусировался на том, что спрашивали у junior-ов, и ответы стали точнее.",
     name: "Мария, Junior QA",
     result: "оффер в финале без доп. тестового",
+    avatar: Avatar02,
   },
   {
     quote:
       "Больше всего помогли пояснения «зачем задают» и примеры провалов. Теперь понимаю, что хотят услышать, и не теряюсь на базовых вопросах.",
     name: "Илья, Junior Backend",
     result: "оффер после 5 интервью",
+    avatar: Avatar03,
   },
   {
     quote:
       "PreOffer показал, какие темы реально решают исход собеседования. Ушёл страх, потому что было понятно, что учить и как отвечать.",
     name: "Анастасия, Junior Data Analyst",
     result: "первый оффер за 3 недели",
+    avatar: Avatar04,
   },
 ];
 
@@ -37,42 +44,58 @@ export default function LargeTestimonial() {
 
   return (
     <section>
-      <div className="mx-auto max-w-2xl px-4 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="py-10 md:py-16">
-          <div className="relative space-y-6 text-center">
-            <div className="relative inline-flex">
-              <svg
-                className="absolute -left-6 -top-2 -z-10"
-                width={40}
-                height={49}
-                viewBox="0 0 40 49"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M22.7976 -0.000136375L39.9352 23.4746L33.4178 31.7234L13.7686 11.4275L22.7976 -0.000136375ZM9.34947 17.0206L26.4871 40.4953L19.9697 48.7441L0.320491 28.4482L9.34947 17.0206Z"
-                  fill="#D1D5DB"
-                />
-              </svg>
-              <Image
-                className="rounded-full"
-                src={TestimonialImg}
-                width={48}
-                height={48}
-                alt="Large testimonial"
-              />
-            </div>
+          <div className="relative space-y-6">
             <Carousel
               ref={carouselRef}
               autoplay
               autoplaySpeed={5500}
               dots
               pauseOnHover
-              className="px-8"
+              arrows={false}
+              slidesToShow={1}
+              centerMode
+              centerPadding="80px"
+              responsive={[
+                {
+                  breakpoint: 1024,
+                  settings: { centerPadding: "48px" },
+                },
+                {
+                  breakpoint: 640,
+                  settings: { centerPadding: "16px" },
+                },
+              ]}
+              className="testimonial-carousel -mx-4 px-4"
             >
               {testimonials.map((item) => (
                 <div key={item.name}>
-                  <div className="space-y-3">
+                  <div className="mx-auto max-w-3xl space-y-4 rounded-2xl bg-white/70 px-6 py-6 text-center shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] backdrop-blur">
+                    <div className="flex justify-center">
+                      <div className="relative inline-flex">
+                        <svg
+                          className="absolute -left-6 -top-2 -z-10"
+                          width={40}
+                          height={49}
+                          viewBox="0 0 40 49"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M22.7976 -0.000136375L39.9352 23.4746L33.4178 31.7234L13.7686 11.4275L22.7976 -0.000136375ZM9.34947 17.0206L26.4871 40.4953L19.9697 48.7441L0.320491 28.4482L9.34947 17.0206Z"
+                            fill="#D1D5DB"
+                          />
+                        </svg>
+                        <Image
+                          className="rounded-full"
+                          src={item.avatar}
+                          width={52}
+                          height={52}
+                          alt={item.name}
+                        />
+                      </div>
+                    </div>
                     <p className="text-xl font-semibold leading-relaxed text-gray-900">
                       “{item.quote}”
                     </p>

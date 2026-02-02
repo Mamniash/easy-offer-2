@@ -167,6 +167,20 @@ export default function HeroHome() {
                 <span className="animate-[code-14_26s_linear_forwards]">
                   и без страха на собеседовании
                 </span>
+                <br className="hidden lg:block" />
+                <span className="hidden lg:inline animate-[code-15_26s_linear_forwards] text-gray-200">
+                  Помогаем понять, где тебя «режут»
+                </span>{" "}
+                <span className="hidden lg:inline animate-[code-16_26s_linear_forwards]">
+                  и как усилить ответы
+                </span>
+                <br className="hidden lg:block" />
+                <span className="hidden lg:inline animate-[code-17_26s_linear_forwards]">
+                  Отбираем темы с максимальной частотой
+                </span>{" "}
+                <span className="hidden lg:inline animate-[code-18_26s_linear_forwards]">
+                  и даём чёткие ориентиры
+                </span>
               </div>
             </div>
           </div>
