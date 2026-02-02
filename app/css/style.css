@@ -50,6 +50,12 @@
   --animate-code-4: code-4;
   --animate-code-5: code-5;
   --animate-code-6: code-6;
+  --animate-code-7: code-7;
+  --animate-code-8: code-8;
+  --animate-code-9: code-9;
+  --animate-code-10: code-10;
+  --animate-code-11: code-11;
+  --animate-code-12: code-12;
   --animate-breath: breath;
   --animate-float: float;
   --animate-line: line;
@@ -70,10 +76,10 @@
     }
   }
   @keyframes code-2 {
-    16.2% {
+    8.33% {
       opacity: 0;
     }
-    18.75% {
+    10.83% {
       opacity: 1;
     }
     97.5% {
@@ -84,10 +90,10 @@
     }
   }
   @keyframes code-3 {
-    32.5% {
+    16.66% {
       opacity: 0;
     }
-    35% {
+    19.16% {
       opacity: 1;
     }
     97.5% {
@@ -98,10 +104,10 @@
     }
   }
   @keyframes code-4 {
-    48.75% {
+    25% {
       opacity: 0;
     }
-    51.25% {
+    27.5% {
       opacity: 1;
     }
     97.5% {
@@ -112,10 +118,10 @@
     }
   }
   @keyframes code-5 {
-    65% {
+    33.33% {
       opacity: 0;
     }
-    72.5% {
+    35.83% {
       opacity: 1;
     }
     97.5% {
@@ -126,10 +132,248 @@
     }
   }
   @keyframes code-6 {
-    81.25% {
+    41.66% {
       opacity: 0;
     }
-    83.75% {
+    44.16% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes hero-1 {
+    0% {
+      opacity: 0;
+    }
+    2% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-2 {
+    7.14% {
+      opacity: 0;
+    }
+    9.14% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-3 {
+    14.28% {
+      opacity: 0;
+    }
+    16.28% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-4 {
+    21.42% {
+      opacity: 0;
+    }
+    23.42% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-5 {
+    28.56% {
+      opacity: 0;
+    }
+    30.56% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-6 {
+    35.7% {
+      opacity: 0;
+    }
+    37.7% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-7 {
+    42.84% {
+      opacity: 0;
+    }
+    44.84% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-8 {
+    49.98% {
+      opacity: 0;
+    }
+    51.98% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-9 {
+    57.12% {
+      opacity: 0;
+    }
+    59.12% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-10 {
+    64.26% {
+      opacity: 0;
+    }
+    66.26% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-11 {
+    71.4% {
+      opacity: 0;
+    }
+    73.4% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-12 {
+    78.54% {
+      opacity: 0;
+    }
+    80.54% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-13 {
+    85.68% {
+      opacity: 0;
+    }
+    87.68% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes hero-14 {
+    92.82% {
+      opacity: 0;
+    }
+    94.82% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes code-7 {
+    50% {
+      opacity: 0;
+    }
+    52.5% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-8 {
+    58.33% {
+      opacity: 0;
+    }
+    60.83% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-9 {
+    66.66% {
+      opacity: 0;
+    }
+    69.16% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-10 {
+    75% {
+      opacity: 0;
+    }
+    77.5% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-11 {
+    83.33% {
+      opacity: 0;
+    }
+    85.83% {
+      opacity: 1;
+    }
+    97.5% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes code-12 {
+    91.66% {
+      opacity: 0;
+    }
+    94.16% {
       opacity: 1;
     }
     97.5% {

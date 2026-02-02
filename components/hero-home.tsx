@@ -70,8 +70,8 @@ export default function HeroHome() {
               data-aos="zoom-y-out"
               data-aos-delay={150}
             >
-              PreOffer превращает подготовку <br className="max-lg:hidden" />
-              к собеседованию в систему
+              PreOffer помогает junior взять <br className="max-lg:hidden" />
+              первый оффер без лотереи
             </h1>
             <div className="mx-auto max-w-3xl">
               <p
@@ -79,10 +79,11 @@ export default function HeroHome() {
                 data-aos="zoom-y-out"
                 data-aos-delay={300}
               >
-                Платформа собирает реальные вопросы из собеседований, считает
-                их частоту по профессии и грейду и показывает, на что делать
-                упор. Видишь карту подготовки, закрываешь пробелы и идёшь на
-                интервью без ощущения лотереи.
+                Если ты учишься уже 1–2 года, сходил на 3–5 собеседований, а
+                офферов всё ещё нет — PreOffer показывает реальные вопросы
+                уровня Junior, объясняет зачем их задают и что считается нормой
+                или провалом. Ты готовишься к тому, что реально решает оффер:
+                видишь типовые ошибки и фильтры по направлению, стеку и темам.
               </p>
               <div className="relative before:absolute before:inset-0 before:border-y before:[border-image:linear-gradient(to_right,transparent,--theme(--color-slate-300/.8),transparent)1]">
                 <div
@@ -118,27 +119,53 @@ export default function HeroHome() {
                 </span>
               </div>
               <div className="font-mono text-gray-500 [&_span]:opacity-0">
-                <span className="animate-[code-1_10s_infinite] text-gray-200">
-                  Сканируем реальные вопросы
+                <span className="animate-[hero-1_24s_forwards] text-gray-200">
+                  Сканируем новые 7 собеседований junior
                 </span>{" "}
-                <span className="animate-[code-2_10s_infinite]">
-                  12345 собеседований
+                <span className="animate-[hero-2_24s_forwards]">
+                  за последнюю неделю
                 </span>
                 <br />
-                <span className="animate-[code-3_10s_infinite]">
-                  Фильтруем по профессии и грейду
+                <span className="animate-[hero-3_24s_forwards]">
+                  Собрано новых 86 реальных вопросов
                 </span>{" "}
-                <span className="animate-[code-4_10s_infinite]">
-                  Карта подготовки готова
+                <span className="animate-[hero-4_24s_forwards]">
+                  по Frontend Junior
                 </span>
                 <br />
-                <br />
-                <span className="animate-[code-5_10s_infinite] text-gray-200">
-                  Живые прогоны с карьерным экспертом
+                <span className="animate-[hero-5_24s_forwards] text-gray-200">
+                  Показываем, зачем их задают
+                </span>{" "}
+                <span className="animate-[hero-6_24s_forwards]">
+                  и что проверяют в ответах
                 </span>
                 <br />
-                <span className="animate-[code-6_10s_infinite]">
-                  Ты отвечаешь уверенно.
+                <span className="animate-[hero-7_24s_forwards]">
+                  Анализируем типовые ошибки новичков
+                </span>{" "}
+                <span className="animate-[hero-8_24s_forwards]">
+                  и объясняем, что считается провалом
+                </span>
+                <br />
+                <span className="animate-[hero-9_24s_forwards] text-gray-200">
+                  Формируем ответы и примеры
+                </span>{" "}
+                <span className="animate-[hero-10_24s_forwards]">
+                  чтобы попасть в «норму» по оценке
+                </span>
+                <br />
+                <span className="animate-[hero-11_24s_forwards] text-gray-200">
+                  Фильтры: стек, темы, компании
+                </span>{" "}
+                <span className="animate-[hero-12_24s_forwards]">
+                  выбираешь свой трек
+                </span>
+                <br />
+                <span className="animate-[hero-13_24s_forwards]">
+                  Цель: первый оффер без лотереи
+                </span>{" "}
+                <span className="animate-[hero-14_24s_forwards]">
+                  и без страха на собеседованиях
                 </span>
               </div>
             </div>
