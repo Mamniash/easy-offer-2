@@ -51,8 +51,8 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
         <h2 className="text-2xl font-semibold text-gray-900 sm:text-3xl">
           Войдите в аккаунт
         </h2>
-        <p className="mt-3 text-sm text-gray-600 sm:text-base">
-          Для продолжения нужно авторизоваться через Telegram.
+        <p className="mt-3 text-sm text-gray-500">
+          Рекомендуем включить VPN, если вход не открывается с первого раза.
         </p>
         <Button
           type="primary"

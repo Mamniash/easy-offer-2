@@ -84,6 +84,14 @@ const renderHtml = (options: {
         color: #64748b;
         line-height: 1.5;
       }
+      .description a {
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .description a:hover {
+        color: #1d4ed8;
+      }
       .spinner {
         margin: 24px auto 0;
         width: 40px;
@@ -145,7 +153,8 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(
       renderHtml({
         message: "Невалидная сессия авторизации. Попробуйте войти ещё раз.",
-        description: "Если редирект не произойдёт автоматически, вернитесь на сайт.",
+        description:
+          "Если редирект не произойдёт автоматически, вернитесь на сайт. Если ошибка повторяется, напишите в <a href=\"https://t.me/mamniash\" target=\"_blank\" rel=\"noreferrer\">техподдержку в Telegram</a>.",
         script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
@@ -173,7 +182,8 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(
       renderHtml({
         message: "Невалидная сессия авторизации. Попробуйте войти ещё раз.",
-        description: "Если редирект не произойдёт автоматически, вернитесь на сайт.",
+        description:
+          "Если редирект не произойдёт автоматически, вернитесь на сайт. Если ошибка повторяется, напишите в <a href=\"https://t.me/mamniash\" target=\"_blank\" rel=\"noreferrer\">техподдержку в Telegram</a>.",
         script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
@@ -205,7 +215,8 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(
       renderHtml({
         message: "Ссылка для входа устарела. Попробуйте снова.",
-        description: "Мы откроем форму авторизации на главной странице.",
+        description:
+          "Мы откроем форму авторизации на главной странице. Если ошибка повторяется, напишите в <a href=\"https://t.me/mamniash\" target=\"_blank\" rel=\"noreferrer\">техподдержку в Telegram</a>.",
         script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
@@ -216,7 +227,8 @@ export const GET = async (request: NextRequest) => {
     return new NextResponse(
       renderHtml({
         message: "Не удалось подтвердить данные Telegram.",
-        description: "Откроем форму входа, чтобы вы могли попробовать ещё раз.",
+        description:
+          "Откроем форму входа, чтобы вы могли попробовать ещё раз. Если ошибка повторяется, напишите в <a href=\"https://t.me/mamniash\" target=\"_blank\" rel=\"noreferrer\">техподдержку в Telegram</a>.",
         script: "setTimeout(() => window.location.replace('/?login=1'), 1500);",
       }),
       { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
