@@ -73,18 +73,6 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
           </span>
           Войти через Telegram
         </Button>
-        <p className="mt-6 text-xs text-gray-500">
-          Не получилось войти? Напишите в&nbsp;
-          <a
-            className="font-medium text-blue-600 hover:text-blue-700"
-            href="https://t.me/mamniash"
-            target="_blank"
-            rel="noreferrer"
-          >
-            техподдержку в Telegram
-          </a>
-          .
-        </p>
       </div>
     </Modal>
   );
