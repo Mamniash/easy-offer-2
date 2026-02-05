@@ -54,6 +54,9 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
         <p className="mt-3 text-sm text-gray-600 sm:text-base">
           Для продолжения нужно авторизоваться через Telegram.
         </p>
+        <p className="mt-2 text-sm text-gray-500">
+          Рекомендуем включить VPN, если вход не открывается с первого раза.
+        </p>
         <Button
           type="primary"
           loading={isSubmitting}
@@ -73,6 +76,18 @@ const AuthModal = ({ returnTo, onClose }: { returnTo: string; onClose: () => voi
           </span>
           Войти через Telegram
         </Button>
+        <p className="mt-4 text-xs text-gray-500">
+          Не получилось войти? Напишите в&nbsp;
+          <a
+            className="font-medium text-blue-600 hover:text-blue-700"
+            href="https://t.me/mamniash"
+            target="_blank"
+            rel="noreferrer"
+          >
+            техподдержку в Telegram
+          </a>
+          .
+        </p>
       </div>
     </Modal>
   );
