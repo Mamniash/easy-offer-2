@@ -208,6 +208,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
   const [activeModal, setActiveModal] = useState<FooterModal | null>(null);
   const [sessionStart, setSessionStart] = useState<number | null>(null);
   const telegramUrl = "https://t.me/preoffer1";
+  const supportTelegramUrl = "https://t.me/mamniash";
 
   useEffect(() => {
     setSessionStart(Date.now());
@@ -292,6 +293,16 @@ export default function Footer({ border = false }: { border?: boolean }) {
             <ul className="space-y-2 text-sm">
               {renderModalLink("Помочь проекту", "careers")}
               {renderModalLink("Сообщить об уязвимости", "vulnerability")}
+              <li>
+                <a
+                  className="text-gray-600 transition hover:text-gray-900"
+                  href={supportTelegramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Техподдержка в Telegram
+                </a>
+              </li>
             </ul>
           </div>
 
