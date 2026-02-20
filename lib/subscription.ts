@@ -8,11 +8,12 @@ const PRO_EMAILS = new Set([
 const PRO_IDENTIFIERS = new Set([
   "mamniash",
   "pokrasovdaniil",
+  "alexgrabko",
   "александр мамниашвили",
   "pokrasov daniil",
 ]);
 
-const PRO_TELEGRAM_IDS = new Set([2101651535, 975378496]);
+const PRO_TELEGRAM_IDS = new Set([2101651535, 975378496, 337548443]);
 
 const normalize = (value?: string | null) => value?.trim().toLowerCase() ?? "";
 
