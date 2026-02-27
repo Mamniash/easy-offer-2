@@ -38,17 +38,17 @@ const GOLANG_COMPANIES = [
   "EMCD",
   "Employcity",
   "Evrone",
-  "Flant",
-  "Kvando-Technologies",
+  //"Flant",
+  //"Kvando-Technologies",
   "Ламода",
-  "МТС",
-  "Lenvendo",
+  //"МТС",
+  //"Lenvendo",
   "Магнит",
   "Сбер",
   "Тинькофф",
-  "Касперский",
+  //"Касперский",
   "ЦУМ",
-  "Positive-Technologies",
+  //"Positive-Technologies",
   "Swoyo",
   "Telespace",
   "Uplatform",
@@ -75,8 +75,11 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
-  const [companyQuestions, setCompanyQuestions] = useState<GolangCompanyQuestion[]>([]);
-  const [isLoadingCompanyQuestions, setIsLoadingCompanyQuestions] = useState(false);
+  const [companyQuestions, setCompanyQuestions] = useState<
+    GolangCompanyQuestion[]
+  >([]);
+  const [isLoadingCompanyQuestions, setIsLoadingCompanyQuestions] =
+    useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -197,7 +200,9 @@ export default function TrackDetail({ track }: { track: Track }) {
   const isGolangTrack = track.slug === "golang";
   const hasCompanyFilter = isGolangTrack && Boolean(selectedCompany);
   const hasActiveFilters =
-    normalizedSearch.length > 0 || selectedSkills.length > 0 || hasCompanyFilter;
+    normalizedSearch.length > 0 ||
+    selectedSkills.length > 0 ||
+    hasCompanyFilter;
   const appliedSkillFilters = useMemo(
     () => skillFilters.filter((filter) => selectedSkills.includes(filter.id)),
     [selectedSkills, skillFilters],
@@ -222,7 +227,9 @@ export default function TrackDetail({ track }: { track: Track }) {
         );
 
         if (!response.ok) {
-          throw new Error(`Не удалось загрузить вопросы компании: ${response.statusText}`);
+          throw new Error(
+            `Не удалось загрузить вопросы компании: ${response.statusText}`,
+          );
         }
 
         const payload = await response.json();
@@ -397,17 +404,18 @@ export default function TrackDetail({ track }: { track: Track }) {
     }
   }, [scrollStorageKey]);
 
-  const totalPages = isPro && !hasCompanyFilter
-    ? Math.max(
-        1,
-        Math.ceil(
-          (hasActiveFilters
-            ? filteredQuestions.length
-            : totalQuestions || filteredQuestions.length || 1) /
-            QUESTIONS_PER_PAGE,
-        ),
-      )
-    : 1;
+  const totalPages =
+    isPro && !hasCompanyFilter
+      ? Math.max(
+          1,
+          Math.ceil(
+            (hasActiveFilters
+              ? filteredQuestions.length
+              : totalQuestions || filteredQuestions.length || 1) /
+              QUESTIONS_PER_PAGE,
+          ),
+        )
+      : 1;
 
   const scrollToFirstQuestion = useCallback(() => {
     requestAnimationFrame(() => {
@@ -522,7 +530,8 @@ export default function TrackDetail({ track }: { track: Track }) {
     : `${visibleQuestionsCount.toLocaleString("ru-RU")} из ${totalQuestionsCount.toLocaleString("ru-RU")} вопросов`;
   const isSkillFiltersLocked = !isPro;
   const companyOptions = useMemo(
-    () => GOLANG_COMPANIES.map((company) => ({ label: company, value: company })),
+    () =>
+      GOLANG_COMPANIES.map((company) => ({ label: company, value: company })),
     [],
   );
   const handleQuestionNavigate = useCallback(() => {
@@ -684,7 +693,10 @@ export default function TrackDetail({ track }: { track: Track }) {
             ))
           : paginatedQuestions.map((question) =>
               hasCompanyFilter ? (
-                <CompanyQuestionRow key={question.id} question={question.question} />
+                <CompanyQuestionRow
+                  key={question.id}
+                  question={question.question}
+                />
               ) : (
                 <QuestionRow
                   key={question.id}
@@ -806,7 +818,7 @@ export default function TrackDetail({ track }: { track: Track }) {
 function CompanyQuestionRow({ question }: { question: string }) {
   return (
     <div className="px-6 py-5">
-      <p className="text-lg font-semibold text-gray-900">{question}</p>
+      <span className="text-lg font-semibold text-gray-900">{question}</span>
     </div>
   );
 }
