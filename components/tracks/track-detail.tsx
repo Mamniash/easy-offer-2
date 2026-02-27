@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input, Popover } from "antd";
+import { Button, Input, Popover, Select } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
@@ -18,6 +18,48 @@ import { supabase } from "@/lib/supabaseClient";
 const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
 const AUTHORIZED_QUESTIONS_LIMIT = 50;
+const GOLANG_COMPANIES = [
+  "Ozon",
+  "ВК",
+  "ВсеИнструменты",
+  "Wildberries",
+  "XM",
+  "ВкусВилл",
+  "Rutube",
+  "Самокат",
+  "Селектел",
+  "Yadro",
+  "B2Broker",
+  "BetBoom",
+  "Bizone",
+  "Burger-King",
+  "CyberOk",
+  "Домклик",
+  "EMCD",
+  "Employcity",
+  "Evrone",
+  "Flant",
+  "Kvando-Technologies",
+  "Ламода",
+  "МТС",
+  "Lenvendo",
+  "Магнит",
+  "Сбер",
+  "Тинькофф",
+  "Касперский",
+  "ЦУМ",
+  "Positive-Technologies",
+  "Swoyo",
+  "Telespace",
+  "Uplatform",
+  "MIND Software",
+];
+
+type GolangCompanyQuestion = {
+  id: number;
+  company_name: string;
+  question_text: string;
+};
 export default function TrackDetail({ track }: { track: Track }) {
   const router = useRouter();
   const { open: openAuthModal } = useAuthModal();
@@ -26,12 +68,15 @@ export default function TrackDetail({ track }: { track: Track }) {
     [track.slug],
   );
   const [search, setSearch] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [questions, setQuestions] = useState(track.questions);
   const [page, setPage] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
+  const [companyQuestions, setCompanyQuestions] = useState<GolangCompanyQuestion[]>([]);
+  const [isLoadingCompanyQuestions, setIsLoadingCompanyQuestions] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -45,7 +90,9 @@ export default function TrackDetail({ track }: { track: Track }) {
     setTotalQuestions(track.stats.questions);
     setPage(1);
     setSearch("");
+    setSelectedCompany(null);
     setSelectedSkills([]);
+    setCompanyQuestions([]);
     setIsFetchingFiltered(false);
   }, [track]);
 
@@ -92,7 +139,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     let isMounted = true;
 
     const fetchQuestionMarks = async () => {
-      if (!userId) {
+      if ((track.slug === "golang" && selectedCompany) || !userId) {
         if (isMounted) {
           setQuestionMarks({});
         }
@@ -139,7 +186,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     return () => {
       isMounted = false;
     };
-  }, [questions, userId]);
+  }, [questions, selectedCompany, track.slug, userId]);
 
   const skillFilters = useMemo(
     () => getTrackSkillFilters(track.slug),
@@ -147,19 +194,81 @@ export default function TrackDetail({ track }: { track: Track }) {
   );
 
   const normalizedSearch = search.trim().toLowerCase();
+  const isGolangTrack = track.slug === "golang";
+  const hasCompanyFilter = isGolangTrack && Boolean(selectedCompany);
   const hasActiveFilters =
-    normalizedSearch.length > 0 || selectedSkills.length > 0;
+    normalizedSearch.length > 0 || selectedSkills.length > 0 || hasCompanyFilter;
   const appliedSkillFilters = useMemo(
     () => skillFilters.filter((filter) => selectedSkills.includes(filter.id)),
     [selectedSkills, skillFilters],
   );
 
+  useEffect(() => {
+    if (!hasCompanyFilter || !selectedCompany) {
+      setCompanyQuestions([]);
+      setIsLoadingCompanyQuestions(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchCompanyQuestions = async () => {
+      setIsLoadingCompanyQuestions(true);
+
+      try {
+        const response = await fetch(
+          `/api/tracks/${track.slug}/company-questions?company=${encodeURIComponent(selectedCompany)}`,
+          { cache: "no-store" },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Не удалось загрузить вопросы компании: ${response.statusText}`);
+        }
+
+        const payload = await response.json();
+
+        if (!isMounted) return;
+
+        setCompanyQuestions(payload.questions ?? []);
+        setPage(1);
+      } catch (error) {
+        console.error("[TrackDetail] Ошибка загрузки company-вопросов", error);
+        if (isMounted) {
+          setCompanyQuestions([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingCompanyQuestions(false);
+        }
+      }
+    };
+
+    fetchCompanyQuestions();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasCompanyFilter, selectedCompany, track.slug]);
+
   const filteredQuestions = useMemo(() => {
-    const availableQuestions = isPro
-      ? questions
-      : isAuthorized
-        ? questions.slice(0, AUTHORIZED_QUESTIONS_LIMIT)
-        : questions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
+    const baseQuestions = hasCompanyFilter
+      ? companyQuestions.map((question) => ({
+          id: String(question.id),
+          question: question.question_text,
+          frequency: 0,
+          level: "middle" as const,
+          category: question.company_name,
+          answer: undefined,
+        }))
+      : questions;
+
+    const availableQuestions = hasCompanyFilter
+      ? baseQuestions
+      : isPro
+        ? baseQuestions
+        : isAuthorized
+          ? baseQuestions.slice(0, AUTHORIZED_QUESTIONS_LIMIT)
+          : baseQuestions.slice(0, UNAUTHORIZED_QUESTIONS_LIMIT);
 
     return availableQuestions.filter((question) => {
       const normalizedQuestion = question.question.toLowerCase();
@@ -176,7 +285,15 @@ export default function TrackDetail({ track }: { track: Track }) {
         filter.keywords.some((keyword) => combinedText.includes(keyword)),
       );
     });
-  }, [isAuthorized, isPro, normalizedSearch, questions, appliedSkillFilters]);
+  }, [
+    appliedSkillFilters,
+    companyQuestions,
+    hasCompanyFilter,
+    isAuthorized,
+    isPro,
+    normalizedSearch,
+    questions,
+  ]);
 
   const paginatedQuestions = useMemo(() => {
     if (!hasActiveFilters) return filteredQuestions;
@@ -233,7 +350,7 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, [isAuthorized, isFetchingFiltered, isPro, track.slug]);
 
   useEffect(() => {
-    if (!isPro) return;
+    if (!isPro || hasCompanyFilter) return;
 
     if (hasActiveFilters) {
       fetchAllQuestions();
@@ -243,7 +360,13 @@ export default function TrackDetail({ track }: { track: Track }) {
     setQuestions(track.questions);
     setTotalQuestions(track.stats.questions);
     setPage(1);
-  }, [hasActiveFilters, isPro, track.questions, track.stats.questions]);
+  }, [
+    hasActiveFilters,
+    hasCompanyFilter,
+    isPro,
+    track.questions,
+    track.stats.questions,
+  ]);
 
   useEffect(() => {
     if (!hasActiveFilters) return;
@@ -274,7 +397,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     }
   }, [scrollStorageKey]);
 
-  const totalPages = isPro
+  const totalPages = isPro && !hasCompanyFilter
     ? Math.max(
         1,
         Math.ceil(
@@ -375,10 +498,14 @@ export default function TrackDetail({ track }: { track: Track }) {
   }, [page, totalPages]);
 
   const isEmptyState =
-    !isLoadingPage && !isFetchingFiltered && paginatedQuestions.length === 0;
-  const hasPagination = isPro && totalPages > 1;
-  const totalQuestionsCount =
-    totalQuestions || filteredQuestions.length || questions.length;
+    !isLoadingPage &&
+    !isFetchingFiltered &&
+    !isLoadingCompanyQuestions &&
+    paginatedQuestions.length === 0;
+  const hasPagination = isPro && !hasCompanyFilter && totalPages > 1;
+  const totalQuestionsCount = hasCompanyFilter
+    ? companyQuestions.length
+    : totalQuestions || filteredQuestions.length || questions.length;
   const visibleQuestionsCount = isPro
     ? hasActiveFilters
       ? filteredQuestions.length
@@ -394,6 +521,10 @@ export default function TrackDetail({ track }: { track: Track }) {
     ? `${visibleQuestionsCount.toLocaleString("ru-RU")} вопросов`
     : `${visibleQuestionsCount.toLocaleString("ru-RU")} из ${totalQuestionsCount.toLocaleString("ru-RU")} вопросов`;
   const isSkillFiltersLocked = !isPro;
+  const companyOptions = useMemo(
+    () => GOLANG_COMPANIES.map((company) => ({ label: company, value: company })),
+    [],
+  );
   const handleQuestionNavigate = useCallback(() => {
     if (typeof window === "undefined") return;
 
@@ -410,6 +541,11 @@ export default function TrackDetail({ track }: { track: Track }) {
           {hasActiveFilters ? (
             <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
               <span className="font-semibold text-gray-900">Фильтры:</span>
+              {selectedCompany && (
+                <span className="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
+                  Компания: {selectedCompany}
+                </span>
+              )}
               {normalizedSearch && (
                 <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                   Поиск: “{search}”
@@ -427,6 +563,7 @@ export default function TrackDetail({ track }: { track: Track }) {
                 type="link"
                 onClick={() => {
                   setSearch("");
+                  setSelectedCompany(null);
                   setSelectedSkills([]);
                 }}
                 className="text-xs font-semibold !p-0"
@@ -441,6 +578,17 @@ export default function TrackDetail({ track }: { track: Track }) {
           )}
 
           <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
+            {isGolangTrack && (
+              <Select
+                value={selectedCompany ?? undefined}
+                onChange={(value) => setSelectedCompany(value ?? null)}
+                allowClear
+                placeholder="Компания"
+                options={companyOptions}
+                className="w-full md:w-56"
+                size="large"
+              />
+            )}
             {skillFilters.length > 0 && (
               <Popover
                 placement="bottomLeft"
@@ -529,21 +677,26 @@ export default function TrackDetail({ track }: { track: Track }) {
       </div>
       <div ref={listTopRef} className="divide-y divide-gray-200">
         {isLoadingPage ||
+        isLoadingCompanyQuestions ||
         (isFetchingFiltered && paginatedQuestions.length === 0)
           ? Array.from({ length: 6 }).map((_, index) => (
               <QuestionSkeleton key={index} />
             ))
-          : paginatedQuestions.map((question) => (
-              <QuestionRow
-                key={question.id}
-                question={question}
-                slug={track.slug}
-                markState={
-                  questionMarks[question.id] ?? defaultQuestionMarkState
-                }
-                onNavigate={handleQuestionNavigate}
-              />
-            ))}
+          : paginatedQuestions.map((question) =>
+              hasCompanyFilter ? (
+                <CompanyQuestionRow key={question.id} question={question.question} />
+              ) : (
+                <QuestionRow
+                  key={question.id}
+                  question={question}
+                  slug={track.slug}
+                  markState={
+                    questionMarks[question.id] ?? defaultQuestionMarkState
+                  }
+                  onNavigate={handleQuestionNavigate}
+                />
+              ),
+            )}
 
         {isEmptyState && (
           <div className="px-6 py-8 text-center text-gray-500">
@@ -646,6 +799,14 @@ export default function TrackDetail({ track }: { track: Track }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function CompanyQuestionRow({ question }: { question: string }) {
+  return (
+    <div className="px-6 py-5">
+      <p className="text-lg font-semibold text-gray-900">{question}</p>
     </div>
   );
 }
