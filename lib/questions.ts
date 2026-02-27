@@ -11,6 +11,15 @@ export type QuestionRow = {
   videos: string | null;
 };
 
+export type GolangCompanyQuestionRow = {
+  id: number;
+  company_name: string;
+  question_text: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+};
+
 /**
  * Преобразуем строку из БД в объект, который удобно показывать на фронте.
  */
@@ -163,6 +172,31 @@ export async function getQuestionsTotal(): Promise<number> {
   }
 
   return count ?? 0;
+}
+
+export async function getGolangCompanyQuestions(
+  companyName: string,
+): Promise<GolangCompanyQuestionRow[]> {
+  const normalizedCompany = companyName.trim();
+
+  if (!normalizedCompany) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("golang_company_questions")
+    .select("id,company_name,question_text,sort_order,is_active,created_at")
+    .eq("company_name", normalizedCompany)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error("[getGolangCompanyQuestions] Supabase error:", error);
+    return [];
+  }
+
+  return (data ?? []) as GolangCompanyQuestionRow[];
 }
 
 /**
