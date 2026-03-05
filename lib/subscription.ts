@@ -11,6 +11,7 @@ const PRO_IDENTIFIERS = new Set([
   "alexgrabko",
   "александр мамниашвили",
   "pokrasov daniil",
+  "nedv1ga",
 ]);
 
 const PRO_TELEGRAM_IDS = new Set([2101651535, 975378496, 337548443]);
