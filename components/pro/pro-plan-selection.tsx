@@ -89,6 +89,7 @@ const VALID_PROMO_CODES = new Set([
   "promo@sherzod",
   "promo@@iopiopovi4",
   "promo@500",
+  "promo@Mike_Nedviga",
 ]);
 
 export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
