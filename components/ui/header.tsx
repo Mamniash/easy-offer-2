@@ -302,7 +302,7 @@ export default function Header() {
         label: (
           <Link
             href="/pro"
-            className={`block rounded-xl px-3 py-2 text-sm font-semibold text-white ${
+            className={`block rounded-xl px-3 py-2 text-sm font-semibold !text-white ${
               user?.isPro
                 ? "bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-400"
                 : "bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400"
@@ -322,7 +322,40 @@ export default function Header() {
         <div className="relative flex h-14 items-center justify-between gap-3 rounded-2xl bg-white/90 px-3 shadow-lg shadow-black/[0.03] backdrop-blur-xs before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(var(--color-gray-100),var(--color-gray-200))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]">
           {/* Site branding */}
           <div className="flex flex-1 items-center gap-3">
-            <Logo href={logoHref} />
+            <Dropdown
+              menu={{
+                items: mobileMenuItems,
+                onClick: () => setMenuOpen(false),
+                className:
+                  "rounded-2xl border border-gray-100 bg-white p-2 text-sm shadow-2xl shadow-black/[0.08] [&>li+li]:!mt-1",
+              }}
+              trigger={["click"]}
+              placement="bottomLeft"
+            >
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 transition hover:bg-gray-100 md:hidden"
+                aria-label="Открыть меню"
+              >
+                <svg
+                  className="h-5 w-5 text-gray-700"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 7h16" />
+                  <path d="M4 12h16" />
+                  <path d="M4 17h16" />
+                </svg>
+                <span>PreOffer</span>
+              </button>
+            </Dropdown>
+            <div className="hidden md:inline-flex">
+              <Logo href={logoHref} />
+            </div>
             <Dropdown
               menu={{
                 items: learningMenuItems,
@@ -383,36 +416,6 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <div className="flex flex-1 items-center justify-end gap-2 md:gap-4">
-            <Dropdown
-              menu={{
-                items: mobileMenuItems,
-                onClick: () => setMenuOpen(false),
-                className:
-                  "rounded-2xl border border-gray-100 bg-white p-2 text-sm shadow-2xl shadow-black/[0.08] [&>li+li]:!mt-1",
-              }}
-              trigger={["click"]}
-              placement="bottomRight"
-            >
-              <button
-                type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 md:hidden"
-                aria-label="Открыть меню"
-              >
-                <svg
-                  className="h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M4 7h16" />
-                  <path d="M4 12h16" />
-                  <path d="M4 17h16" />
-                </svg>
-              </button>
-            </Dropdown>
             {user ? (
               <>
                 <Link
