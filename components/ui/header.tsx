@@ -7,6 +7,7 @@ import { Button, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 
 import { supabase } from "@/lib/supabaseClient";
+import { isProUser } from "@/lib/subscription";
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
 
 import Logo from "./logo";
@@ -17,6 +18,7 @@ type UserSummary = {
   username?: string | null;
   avatarUrl?: string | null;
   telegramId?: number | null;
+  isPro?: boolean;
 };
 
 const buildUserSummary = (
@@ -34,6 +36,10 @@ const buildUserSummary = (
     typeof metadata?.avatar_url === "string" ? metadata.avatar_url : null;
   const telegramId =
     typeof metadata?.telegram_id === "number" ? metadata.telegram_id : null;
+  const hasActiveSubscription =
+    metadata?.is_pro === true ||
+    metadata?.pro === true ||
+    metadata?.subscription_status === "active";
 
   return {
     email: email ?? undefined,
@@ -45,6 +51,7 @@ const buildUserSummary = (
     username,
     avatarUrl,
     telegramId,
+    isPro: hasActiveSubscription || isProUser({ email, metadata }),
   };
 };
 
@@ -237,6 +244,78 @@ export default function Header() {
     }
   };
 
+  const mobileMenuItems = useMemo<MenuProps["items"]>(
+    () => [
+      {
+        key: "tracks",
+        label: (
+          <Link href="/tracks" className="block rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900">
+            Вопросы собеседований
+          </Link>
+        ),
+      },
+      {
+        key: "roadmap",
+        label: (
+          <Link href="/roadmap" className="block rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900">
+            Роадмапы
+          </Link>
+        ),
+      },
+      {
+        key: "articles",
+        label: (
+          <Link href="/articles" className="block rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900">
+            Статьи
+          </Link>
+        ),
+      },
+      {
+        key: "trainer",
+        label: (
+          <Link href="/trainer" className="block rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900">
+            Тренажер вопросов
+          </Link>
+        ),
+      },
+      {
+        key: "live-code",
+        label: (
+          <Link href="/live-code" className="block rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900">
+            Live coding
+          </Link>
+        ),
+      },
+      {
+        key: "mentor",
+        label: (
+          <Link href="/mentor" className="block rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900">
+            IT Менторы
+          </Link>
+        ),
+      },
+      {
+        type: "divider",
+      },
+      {
+        key: "pro",
+        label: (
+          <Link
+            href="/pro"
+            className={`block rounded-xl px-3 py-2 text-sm font-semibold text-white ${
+              user?.isPro
+                ? "bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-400"
+                : "bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400"
+            }`}
+          >
+            {user?.isPro ? "PRO" : "Стать PRO"}
+          </Link>
+        ),
+      },
+    ],
+    [user?.isPro]
+  );
+
   return (
     <header className={`${positionClasses} z-30 w-full`}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -255,7 +334,7 @@ export default function Header() {
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
+                className="hidden items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 md:inline-flex"
               >
                 Обучение
                 <svg
@@ -283,7 +362,7 @@ export default function Header() {
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
+                className="hidden items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 md:inline-flex"
               >
                 Практика
                 <svg
@@ -303,14 +382,48 @@ export default function Header() {
           </div>
 
           {/* Desktop navigation */}
-          <div className="flex flex-1 items-center justify-end gap-4">
+          <div className="flex flex-1 items-center justify-end gap-2 md:gap-4">
+            <Dropdown
+              menu={{
+                items: mobileMenuItems,
+                onClick: () => setMenuOpen(false),
+                className:
+                  "rounded-2xl border border-gray-100 bg-white p-2 text-sm shadow-2xl shadow-black/[0.08] [&>li+li]:!mt-1",
+              }}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
+              <button
+                type="button"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 md:hidden"
+                aria-label="Открыть меню"
+              >
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 7h16" />
+                  <path d="M4 12h16" />
+                  <path d="M4 17h16" />
+                </svg>
+              </button>
+            </Dropdown>
             {user ? (
               <>
                 <Link
                   href="/pro"
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:from-blue-500 hover:via-blue-400 hover:to-sky-300"
+                  className={`hidden items-center justify-center rounded-full px-4 py-2 text-xs font-semibold text-white shadow-md transition md:inline-flex ${
+                    user.isPro
+                      ? "bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-400 shadow-amber-500/40 hover:from-amber-400 hover:via-yellow-300 hover:to-orange-300"
+                      : "bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 shadow-blue-500/30 hover:from-blue-500 hover:via-blue-400 hover:to-sky-300"
+                  }`}
                 >
-                  Стать PRO
+                  {user.isPro ? "PRO" : "Стать PRO"}
                 </Link>
                 <Dropdown
                   open={menuOpen}
