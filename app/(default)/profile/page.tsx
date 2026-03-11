@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "antd";
 
 import { supabase } from "@/lib/supabaseClient";
+import { isProUser } from "@/lib/subscription";
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
 
 type ProfileUser = {
@@ -38,7 +39,8 @@ const buildProfileUser = (
   const isPro =
     metadata?.is_pro === true ||
     metadata?.pro === true ||
-    metadata?.subscription_status === "active";
+    metadata?.subscription_status === "active" ||
+    isProUser({ email, metadata });
 
   return {
     email: email ?? undefined,
@@ -203,16 +205,22 @@ export default function ProfilePage() {
         </div>
 
         <div className="space-y-4">
-          {!user?.isPro && (
-            <div className="rounded-2xl border border-gray-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm shadow-black/[0.03]">
-              <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-                  Pro подписка
-                </h2>
+          <div className="rounded-2xl border border-gray-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm shadow-black/[0.03]">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+                Pro подписка
+              </h2>
+              {user?.isPro ? (
+                <p className="mt-2 text-sm text-gray-700">
+                  Подписка активна до: без ограничений.
+                </p>
+              ) : (
                 <p className="mt-2 text-sm text-gray-700">
                   Оформи Pro подписку, чтобы открыть все функции и ускорить прогресс.
                 </p>
-              </div>
+              )}
+            </div>
+            {!user?.isPro && (
               <Button
                 type="primary"
                 className="mt-4 px-4 py-2 text-sm font-semibold"
@@ -220,8 +228,8 @@ export default function ProfilePage() {
               >
                 Стать Pro
               </Button>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm shadow-black/[0.03]">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
