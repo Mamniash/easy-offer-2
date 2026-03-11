@@ -275,19 +275,19 @@ export default function Header() {
             onClick={() => startTabLoading("/tracks")}
             className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
-            Обучение
+            Вопросы собеседований
           </Link>
         ),
       },
       {
-        key: "trainer",
+        key: "roadmap",
         label: (
           <Link
-            href="/trainer"
-            onClick={() => startTabLoading("/trainer")}
+            href="/roadmap"
+            onClick={() => startTabLoading("/roadmap")}
             className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
-            Практика
+            Роадмапы
           </Link>
         ),
       },
@@ -300,6 +300,42 @@ export default function Header() {
             className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             Статьи
+          </Link>
+        ),
+      },
+      {
+        key: "trainer",
+        label: (
+          <Link
+            href="/trainer"
+            onClick={() => startTabLoading("/trainer")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Тренажер вопросов
+          </Link>
+        ),
+      },
+      {
+        key: "live-coding",
+        label: (
+          <Link
+            href="/live-code"
+            onClick={() => startTabLoading("/live-code")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Live coding
+          </Link>
+        ),
+      },
+      {
+        key: "mentors",
+        label: (
+          <Link
+            href="/mentor"
+            onClick={() => startTabLoading("/mentor")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            IT Менторы
           </Link>
         ),
       },
