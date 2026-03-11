@@ -24,13 +24,10 @@ export default async function TracksLandingPage() {
                 Маршрут подготовки
               </p>
               <h1 className="mt-3 text-4xl font-bold text-gray-900 md:text-5xl">
-                Выберите направление,
-                <br className="hidden md:block" /> чтобы идти дальше
+                Выберите направление
               </h1>
               <p className="mt-4 max-w-2xl text-lg text-gray-700">
-                Нажмите на профессию — увидите частые вопросы и подсказки.
-                Карточки ниже — готовые подборки тем: их можно двигать и
-                дополнять под задачи вашей команды.
+                Нажмите на профессию — увидите частые вопросы и подсказки
               </p>
             </div>
             <div className="flex gap-6 rounded-2xl bg-gray-900 p-6 text-gray-100 shadow-lg">
