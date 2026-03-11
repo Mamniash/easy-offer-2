@@ -451,9 +451,11 @@ export default function Header() {
           {/* Desktop navigation */}
           <div className="flex flex-1 items-center justify-end gap-3">
             {isTabLoading && (
-              <div className="hidden items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 md:inline-flex">
+              <div
+                className="hidden items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 md:inline-flex"
+                aria-label="Раздел загружается"
+              >
                 <span className="h-2 w-2 animate-pulse rounded-full bg-sky-500" />
-                Загрузка раздела...
               </div>
             )}
             {user ? (
