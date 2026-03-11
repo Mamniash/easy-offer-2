@@ -293,6 +293,8 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                   <Link
                     href="/documents/public-offer"
                     className="font-medium text-blue-600 hover:text-blue-700"
+                    onClick={(event) => event.stopPropagation()}
+                    onMouseDown={(event) => event.stopPropagation()}
                   >
                     Договором публичной оферты
                   </Link>{" "}
@@ -300,6 +302,8 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                   <Link
                     href="/documents/privacy"
                     className="font-medium text-blue-600 hover:text-blue-700"
+                    onClick={(event) => event.stopPropagation()}
+                    onMouseDown={(event) => event.stopPropagation()}
                   >
                     Политикой конфиденциальности
                   </Link>
