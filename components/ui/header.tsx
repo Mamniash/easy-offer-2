@@ -7,6 +7,7 @@ import { Button, Dropdown } from "antd";
 import type { MenuProps } from "antd";
 
 import { supabase } from "@/lib/supabaseClient";
+import { isProUser } from "@/lib/subscription";
 import { useAuthModal } from "@/components/ui/auth-modal-provider";
 
 import Logo from "./logo";
@@ -50,7 +51,9 @@ const buildUserSummary = (
 
 export default function Header() {
   const [user, setUser] = useState<UserSummary | null>(null);
+  const [isPro, setIsPro] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isTabLoading, setIsTabLoading] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -77,6 +80,7 @@ export default function Header() {
       if (session?.user) {
         const { email, user_metadata } = session.user;
         setUser(buildUserSummary(email, user_metadata));
+        setIsPro(isProUser({ email, metadata: user_metadata }));
       }
     };
 
@@ -88,9 +92,12 @@ export default function Header() {
       if (session?.user) {
         const { email, user_metadata } = session.user;
         setUser(buildUserSummary(email, user_metadata));
+        setIsPro(isProUser({ email, metadata: user_metadata }));
       } else {
         setUser(null);
+        setIsPro(false);
         setMenuOpen(false);
+        setMobileMenuOpen(false);
       }
     });
 
@@ -102,7 +109,9 @@ export default function Header() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    setIsPro(false);
     setMenuOpen(false);
+    setMobileMenuOpen(false);
     router.replace("/");
   };
 
@@ -256,13 +265,131 @@ export default function Header() {
     }
   };
 
+  const mobileNavItems = useMemo<MenuProps["items"]>(
+    () => [
+      {
+        key: "tracks",
+        label: (
+          <Link
+            href="/tracks"
+            onClick={() => startTabLoading("/tracks")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Вопросы собеседований
+          </Link>
+        ),
+      },
+      {
+        key: "roadmap",
+        label: (
+          <Link
+            href="/roadmap"
+            onClick={() => startTabLoading("/roadmap")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Роадмапы
+          </Link>
+        ),
+      },
+      {
+        key: "articles",
+        label: (
+          <Link
+            href="/articles"
+            onClick={() => startTabLoading("/articles")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Статьи
+          </Link>
+        ),
+      },
+      {
+        key: "trainer",
+        label: (
+          <Link
+            href="/trainer"
+            onClick={() => startTabLoading("/trainer")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Тренажер вопросов
+          </Link>
+        ),
+      },
+      {
+        key: "live-coding",
+        label: (
+          <Link
+            href="/live-code"
+            onClick={() => startTabLoading("/live-code")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            Live coding
+          </Link>
+        ),
+      },
+      {
+        key: "mentors",
+        label: (
+          <Link
+            href="/mentor"
+            onClick={() => startTabLoading("/mentor")}
+            className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
+          >
+            IT Менторы
+          </Link>
+        ),
+      },
+    ],
+    []
+  );
+
+  const handleMobileMenuClick: MenuProps["onClick"] = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
     <header className={`${positionClasses} z-30 w-full`}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative flex h-14 items-center justify-between gap-3 rounded-2xl bg-white/90 px-3 shadow-lg shadow-black/[0.03] backdrop-blur-xs before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(var(--color-gray-100),var(--color-gray-200))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]">
           {/* Site branding */}
           <div className="flex flex-1 items-center gap-3">
-            <Logo href={logoHref} />
+            <Dropdown
+              open={mobileMenuOpen}
+              onOpenChange={setMobileMenuOpen}
+              menu={{
+                items: mobileNavItems,
+                onClick: handleMobileMenuClick,
+                className:
+                  "rounded-2xl border border-gray-100 bg-white p-2 text-sm shadow-2xl shadow-black/[0.08] [&>li+li]:!mt-1",
+              }}
+              trigger={["click"]}
+              placement="bottomLeft"
+            >
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full px-1 py-2 text-gray-800 md:hidden"
+                aria-label="Открыть меню навигации"
+              >
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M3 12h18" />
+                  <path d="M3 18h18" />
+                </svg>
+                <span className="text-lg font-semibold leading-none">PreOffer</span>
+              </button>
+            </Dropdown>
+            <div className="hidden md:block">
+              <Logo href={logoHref} />
+            </div>
             <Dropdown
               menu={{
                 items: learningMenuItems,
@@ -274,7 +401,7 @@ export default function Header() {
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
+                className="hidden items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 md:inline-flex"
               >
                 Обучение
                 <svg
@@ -302,7 +429,7 @@ export default function Header() {
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900"
+                className="hidden items-center gap-2 rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 hover:text-gray-900 md:inline-flex"
               >
                 Практика
                 <svg
@@ -322,7 +449,7 @@ export default function Header() {
           </div>
 
           {/* Desktop navigation */}
-          <div className="flex flex-1 items-center justify-end gap-4">
+          <div className="flex flex-1 items-center justify-end gap-3">
             {isTabLoading && (
               <div className="hidden items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 md:inline-flex">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-sky-500" />
@@ -331,12 +458,18 @@ export default function Header() {
             )}
             {user ? (
               <>
-                <Link
-                  href="/pro"
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:from-blue-500 hover:via-blue-400 hover:to-sky-300"
-                >
-                  Стать PRO
-                </Link>
+                {isPro ? (
+                  <span className="hidden items-center justify-center rounded-full bg-gradient-to-r from-amber-300 via-yellow-300 to-orange-300 px-4 py-2 text-xs font-semibold text-amber-900 shadow-md shadow-amber-300/40 md:inline-flex">
+                    PRO
+                  </span>
+                ) : (
+                  <Link
+                    href="/pro"
+                    className="hidden items-center justify-center rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-blue-500/30 transition hover:from-blue-500 hover:via-blue-400 hover:to-sky-300 md:inline-flex"
+                  >
+                    Стать PRO
+                  </Link>
+                )}
                 <Dropdown
                   open={menuOpen}
                   onOpenChange={setMenuOpen}
