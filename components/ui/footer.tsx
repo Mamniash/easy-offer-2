@@ -2,7 +2,7 @@
 
 import { Button, Input, Modal } from "antd";
 import Link from "next/link";
-import { FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 
 import { canSendMessage, sendToTelegram } from "@/lib/telegram";
 import Logo from "./logo";
@@ -71,12 +71,6 @@ const useContactForm = ({
 
 type FooterKey = "about" | "careers" | "vulnerability";
 
-type FooterModal = {
-  key: FooterKey;
-  title: string;
-  content: ReactNode;
-};
-
 const ContactForm = ({ form, sessionTime }: { form: ReturnType<typeof useContactForm>; sessionTime: number }) => {
   const controlId = form.subject.toLowerCase().replace(/[^a-z0-9]+/gi, "-");
 
@@ -141,7 +135,16 @@ const ContactForm = ({ form, sessionTime }: { form: ReturnType<typeof useContact
   );
 };
 
-const useFooterModals = (sessionTime: number) => {
+export default function Footer({ border = false }: { border?: boolean }) {
+  const [activeModalKey, setActiveModalKey] = useState<FooterKey | null>(null);
+  const [sessionStart, setSessionStart] = useState<number | null>(null);
+  const telegramUrl = "https://t.me/preoffer1";
+  const supportTelegramUrl = "https://t.me/mamniash";
+
+  useEffect(() => {
+    setSessionStart(Date.now());
+  }, []);
+
   const vulnerabilityForm = useContactForm({
     subject: "Сообщение об уязвимости",
     noteLabel: "Опишите проблему",
@@ -155,75 +158,62 @@ const useFooterModals = (sessionTime: number) => {
     cta: "Отправить отклик",
   });
 
-  const modals: FooterModal[] = useMemo(
-    () => [
-      {
-        key: "about",
-        title: "О нас",
-        content: (
-          <div className="space-y-3 text-sm text-gray-800">
-            <p className="rounded-xl bg-white p-4 ring-1 ring-gray-100">
-              PreOffer — команда, которая превращает подготовку к собеседованиям в понятную систему. Мы собираем реальные вопросы от IT-компаний и показываем, что спросится с наибольшей вероятностью.
-            </p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              <div className="rounded-lg bg-sky-50 p-3 text-xs text-sky-800 ring-1 ring-sky-100">Работаем удалённо, встречаемся с сообществом онлайн.</div>
-              <div className="rounded-lg bg-amber-50 p-3 text-xs text-amber-800 ring-1 ring-amber-100">Персонализируем рекомендации под профессию, грейд и тип компании.</div>
-            </div>
-          </div>
-        ),
-      },
-      {
-        key: "careers",
-        title: "Помочь проекту",
-        content: (
-          <div className="space-y-4 text-sm text-gray-800">
-            <div className="rounded-xl bg-gradient-to-r from-purple-50 via-white to-pink-50 p-4 ring-1 ring-purple-100">
-              <p className="font-semibold text-purple-900">Хотите поучаствовать?</p>
-              <p className="mt-2 leading-relaxed">
-                Откликаются разработчики, продакт-менеджеры и менторы, которые помогают сделать подготовку к собеседованиям честной и понятной.
-              </p>
-              <p className="mt-2 text-xs text-purple-800">Расскажите о себе — мы вернёмся с идеями, где ваш опыт будет полезен.</p>
-            </div>
-            <ContactForm form={careersForm} sessionTime={sessionTime} />
-          </div>
-        ),
-      },
-      {
-        key: "vulnerability",
-        title: "Сообщить об уязвимости",
-        content: (
-          <div className="space-y-4 text-sm text-gray-800">
-            <p>Сообщите о проблеме — мы вернёмся с обновлением статуса или фиксом. Благодарим за внимание к безопасности.</p>
-            <ContactForm form={vulnerabilityForm} sessionTime={sessionTime} />
-          </div>
-        ),
-      },
-    ],
-    [careersForm, sessionTime, vulnerabilityForm],
-  );
-  return { modals };
-};
-
-export default function Footer({ border = false }: { border?: boolean }) {
-  const [activeModal, setActiveModal] = useState<FooterModal | null>(null);
-  const [sessionStart, setSessionStart] = useState<number | null>(null);
-  const telegramUrl = "https://t.me/preoffer1";
-  const supportTelegramUrl = "https://t.me/mamniash";
-
-  useEffect(() => {
-    setSessionStart(Date.now());
-  }, []);
-
   const sessionTime = sessionStart ? Math.round((Date.now() - sessionStart) / 1000) : 0;
-  const { modals } = useFooterModals(sessionTime);
+  const isModalOpen = Boolean(activeModalKey);
 
   const openModal = (key: FooterKey) => {
-    const modal = modals.find((item) => item.key === key) || null;
-    setActiveModal(modal);
+    setActiveModalKey(key);
   };
 
-  const closeModal = () => setActiveModal(null);
-  const isModalOpen = Boolean(activeModal);
+  const closeModal = () => setActiveModalKey(null);
+
+  const modalTitleByKey: Record<FooterKey, string> = {
+    about: "О нас",
+    careers: "Помочь проекту",
+    vulnerability: "Сообщить об уязвимости",
+  };
+
+  const renderModalContent = () => {
+    if (activeModalKey === "about") {
+      return (
+        <div className="space-y-3 text-sm text-gray-800">
+          <p className="rounded-xl bg-white p-4 ring-1 ring-gray-100">
+            PreOffer — команда, которая превращает подготовку к собеседованиям в понятную систему. Мы собираем реальные вопросы от IT-компаний и показываем, что спросится с наибольшей вероятностью.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div className="rounded-lg bg-sky-50 p-3 text-xs text-sky-800 ring-1 ring-sky-100">Работаем удалённо, встречаемся с сообществом онлайн.</div>
+            <div className="rounded-lg bg-amber-50 p-3 text-xs text-amber-800 ring-1 ring-amber-100">Персонализируем рекомендации под профессию, грейд и тип компании.</div>
+          </div>
+        </div>
+      );
+    }
+
+    if (activeModalKey === "careers") {
+      return (
+        <div className="space-y-4 text-sm text-gray-800">
+          <div className="rounded-xl bg-gradient-to-r from-purple-50 via-white to-pink-50 p-4 ring-1 ring-purple-100">
+            <p className="font-semibold text-purple-900">Хотите поучаствовать?</p>
+            <p className="mt-2 leading-relaxed">
+              Откликаются разработчики, продакт-менеджеры и менторы, которые помогают сделать подготовку к собеседованиям честной и понятной.
+            </p>
+            <p className="mt-2 text-xs text-purple-800">Расскажите о себе — мы вернёмся с идеями, где ваш опыт будет полезен.</p>
+          </div>
+          <ContactForm form={careersForm} sessionTime={sessionTime} />
+        </div>
+      );
+    }
+
+    if (activeModalKey === "vulnerability") {
+      return (
+        <div className="space-y-4 text-sm text-gray-800">
+          <p>Сообщите о проблеме — мы вернёмся с обновлением статуса или фиксом. Благодарим за внимание к безопасности.</p>
+          <ContactForm form={vulnerabilityForm} sessionTime={sessionTime} />
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   const renderModalLink = (label: string, key: FooterKey) => (
     <li>
@@ -333,10 +323,10 @@ export default function Footer({ border = false }: { border?: boolean }) {
         footer={null}
         width={520}
         title={
-          activeModal ? (
+          activeModalKey ? (
             <div>
               <p className="text-xs uppercase tracking-[0.08em] text-blue-600">Футер</p>
-              <h3 className="text-lg font-semibold text-gray-900">{activeModal.title}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{modalTitleByKey[activeModalKey]}</h3>
             </div>
           ) : null
         }
@@ -348,7 +338,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
           },
         }}
       >
-        <div className="text-left">{activeModal?.content}</div>
+        <div className="text-left">{renderModalContent()}</div>
       </Modal>
     </footer>
   );
