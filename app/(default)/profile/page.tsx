@@ -152,7 +152,7 @@ export default function ProfilePage() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl bg-gray-50 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Момняшпиль
+                Telegram
               </p>
               {user?.username ? (
                 <a
@@ -203,25 +203,16 @@ export default function ProfilePage() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-gray-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm shadow-black/[0.03]">
-            <div className="flex items-start justify-between gap-3">
+          {!user?.isPro && (
+            <div className="rounded-2xl border border-gray-100 bg-gradient-to-br from-blue-50 via-white to-white p-5 shadow-sm shadow-black/[0.03]">
               <div>
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
                   Pro подписка
                 </h2>
                 <p className="mt-2 text-sm text-gray-700">
-                  {user?.isPro
-                    ? "Твоя Pro подписка активна. Спасибо за поддержку!"
-                    : "Оформи Pro подписку, чтобы открыть все функции и ускорить прогресс."}
+                  Оформи Pro подписку, чтобы открыть все функции и ускорить прогресс.
                 </p>
               </div>
-              {user?.isPro && (
-                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                  Оформлена
-                </span>
-              )}
-            </div>
-            {!user?.isPro && (
               <Button
                 type="primary"
                 className="mt-4 px-4 py-2 text-sm font-semibold"
@@ -229,8 +220,8 @@ export default function ProfilePage() {
               >
                 Стать Pro
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm shadow-black/[0.03]">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
