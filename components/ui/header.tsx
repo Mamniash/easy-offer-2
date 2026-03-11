@@ -51,9 +51,22 @@ const buildUserSummary = (
 export default function Header() {
   const [user, setUser] = useState<UserSummary | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isTabLoading, setIsTabLoading] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { open: openAuthModal } = useAuthModal();
+
+  useEffect(() => {
+    setIsTabLoading(false);
+  }, [pathname]);
+
+  const startTabLoading = (href: string) => {
+    if (pathname === href) {
+      return;
+    }
+
+    setIsTabLoading(true);
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -158,6 +171,7 @@ export default function Header() {
         label: (
           <Link
             href="/tracks"
+            onClick={() => startTabLoading("/tracks")}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             Вопросы собеседований
@@ -169,6 +183,7 @@ export default function Header() {
         label: (
           <Link
             href="/roadmap"
+            onClick={() => startTabLoading("/roadmap")}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             Роадмапы
@@ -180,6 +195,7 @@ export default function Header() {
         label: (
           <Link
             href="/articles"
+            onClick={() => startTabLoading("/articles")}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             Статьи
@@ -197,6 +213,7 @@ export default function Header() {
         label: (
           <Link
             href="/trainer"
+            onClick={() => startTabLoading("/trainer")}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             Тренажер вопросов
@@ -208,6 +225,7 @@ export default function Header() {
         label: (
           <Link
             href="/live-code"
+            onClick={() => startTabLoading("/live-code")}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             Live coding
@@ -219,6 +237,7 @@ export default function Header() {
         label: (
           <Link
             href="/mentor"
+            onClick={() => startTabLoading("/mentor")}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
             IT Менторы
@@ -304,6 +323,12 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <div className="flex flex-1 items-center justify-end gap-4">
+            {isTabLoading && (
+              <div className="hidden items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 md:inline-flex">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-sky-500" />
+                Загрузка раздела...
+              </div>
+            )}
             {user ? (
               <>
                 <Link
