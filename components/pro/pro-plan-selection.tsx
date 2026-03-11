@@ -289,23 +289,24 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                 className="items-start"
               >
                 <span>
-                  Я ознакомлен с{" "}
-                  <Link
-                    href="/documents/public-offer"
-                    className="font-medium text-blue-600 hover:text-blue-700"
-                  >
-                    Договором публичной оферты
-                  </Link>{" "}
-                  и согласен на обработку персональных данных в соответствии с{" "}
-                  <Link
-                    href="/documents/privacy"
-                    className="font-medium text-blue-600 hover:text-blue-700"
-                  >
-                    Политикой конфиденциальности
-                  </Link>
-                  .
+                  Я ознакомлен с Договором публичной оферты и согласен на обработку
+                  персональных данных в соответствии с Политикой конфиденциальности.
                 </span>
               </Checkbox>
+              <div className="ml-6 flex flex-col gap-1 text-xs sm:text-sm">
+                <Link
+                  href="/documents/public-offer"
+                  className="font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Договор публичной оферты
+                </Link>
+                <Link
+                  href="/documents/privacy"
+                  className="font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Политика конфиденциальности
+                </Link>
+              </div>
               <Checkbox
                 checked={hasAcceptedRecurring}
                 onChange={(event) => setHasAcceptedRecurring(event.target.checked)}
