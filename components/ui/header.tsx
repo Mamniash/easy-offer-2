@@ -459,7 +459,7 @@ export default function Header() {
             {user ? (
               <>
                 {isPro ? (
-                  <span className="hidden items-center justify-center rounded-full bg-gradient-to-r from-amber-300 via-yellow-300 to-orange-300 px-4 py-2 text-xs font-semibold text-amber-900 shadow-md shadow-amber-300/40 md:inline-flex">
+                  <span className="hidden select-none items-center justify-center rounded-full bg-gradient-to-r from-amber-300 via-yellow-300 to-orange-300 px-4 py-2 text-xs font-semibold text-amber-900 shadow-md shadow-amber-300/40 md:inline-flex">
                     PRO
                   </span>
                 ) : (

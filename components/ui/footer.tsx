@@ -227,9 +227,11 @@ export default function Footer({ border = false }: { border?: boolean }) {
     </li>
   );
 
+  const footerLinkClass = "text-blue-600 transition hover:text-blue-700";
+
   const renderDocumentLink = (label: string, href: string) => (
     <li>
-      <Link className="text-gray-600 transition hover:text-gray-900" href={href}>
+      <Link className={footerLinkClass} href={href}>
         {label}
       </Link>
     </li>
@@ -285,7 +287,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
               {renderModalLink("Сообщить об уязвимости", "vulnerability")}
               <li>
                 <a
-                  className="text-gray-600 transition hover:text-gray-900"
+                  className={footerLinkClass}
                   href={supportTelegramUrl}
                   target="_blank"
                   rel="noreferrer"
