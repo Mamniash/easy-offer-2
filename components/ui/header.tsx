@@ -384,7 +384,9 @@ export default function Header() {
                   <path d="M3 12h18" />
                   <path d="M3 18h18" />
                 </svg>
-                <span className="text-lg font-semibold leading-none">PreOffer</span>
+                <span className="text-lg font-semibold leading-none">
+                  PreOffer
+                </span>
               </button>
             </Dropdown>
             <div className="hidden md:block">
@@ -450,12 +452,6 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <div className="flex flex-1 items-center justify-end gap-3">
-            {isTabLoading && (
-              <div className="hidden items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 md:inline-flex">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-sky-500" />
-                Загрузка раздела...
-              </div>
-            )}
             {user ? (
               <>
                 {isPro ? (
@@ -557,7 +553,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-
     </header>
   );
 }
