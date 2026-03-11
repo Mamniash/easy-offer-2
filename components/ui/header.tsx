@@ -230,14 +230,14 @@ export default function Header() {
         ),
       },
       {
-        key: "live-coding",
+        key: "tasks",
         label: (
           <Link
-            href="/live-code"
-            onClick={() => startTabLoading("/live-code")}
+            href="/tasks"
+            onClick={() => startTabLoading("/tasks")}
             className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
-            Live coding
+            Задачи
           </Link>
         ),
       },
@@ -316,14 +316,14 @@ export default function Header() {
         ),
       },
       {
-        key: "live-coding",
+        key: "tasks",
         label: (
           <Link
-            href="/live-code"
-            onClick={() => startTabLoading("/live-code")}
+            href="/tasks"
+            onClick={() => startTabLoading("/tasks")}
             className="flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 hover:text-gray-900"
           >
-            Live coding
+            Задачи
           </Link>
         ),
       },
