@@ -1,0 +1,45 @@
+import TasksDirectory from "@/components/tasks-directory";
+import { getTasksTotal, taskDirectionGroups } from "@/lib/tasks";
+
+export const metadata = {
+  title: "PreOffer — задачи для практики",
+  description:
+    "Практические задачи по направлениям и компаниям для подготовки к техническим интервью.",
+};
+
+export default async function TasksLandingPage() {
+  const totalDirections = taskDirectionGroups.flatMap((group) => group.items).length;
+  const totalTasks = await getTasksTotal();
+
+  return (
+    <section className="pb-20 pt-8 md:pt-10">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white/90 p-10 shadow-xl backdrop-blur">
+          <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.08),transparent_25%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.1),transparent_26%)]" />
+          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-blue-600">Практика интервью</p>
+              <h1 className="mt-3 text-4xl font-bold text-gray-900 md:text-5xl">Выберите направление</h1>
+              <p className="mt-4 max-w-2xl text-lg text-gray-700">
+                Внутри направлений собраны практические задачи с фильтром по компаниям.
+              </p>
+            </div>
+            <div className="flex gap-6 rounded-2xl bg-gray-900 p-6 text-gray-100 shadow-lg">
+              <div className="flex flex-col items-center text-center">
+                <p className="text-sm text-gray-400">Направлений</p>
+                <p className="text-4xl font-semibold">{totalDirections}</p>
+              </div>
+              <div className="h-12 w-px bg-gray-700/60" aria-hidden="true" />
+              <div className="flex flex-col items-center text-center">
+                <p className="text-sm text-gray-400">Задач</p>
+                <p className="text-4xl font-semibold">{totalTasks.toLocaleString("ru-RU")}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <TasksDirectory directionGroups={taskDirectionGroups} />
+      </div>
+    </section>
+  );
+}
