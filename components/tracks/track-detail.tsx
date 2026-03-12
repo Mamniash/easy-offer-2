@@ -39,6 +39,7 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
   const [availableCompanies, setAvailableCompanies] = useState<string[]>([]);
+  const [isLoadingCompanies, setIsLoadingCompanies] = useState(true);
   const [companyQuestions, setCompanyQuestions] = useState<CompanyQuestion[]>([]);
   const [isLoadingCompanyQuestions, setIsLoadingCompanyQuestions] =
     useState(false);
@@ -175,6 +176,8 @@ export default function TrackDetail({ track }: { track: Track }) {
     let isMounted = true;
 
     const fetchCompanies = async () => {
+      setIsLoadingCompanies(true);
+
       try {
         const response = await fetch(`/api/tracks/${track.slug}/company-questions`, {
           cache: "no-store",
@@ -195,6 +198,10 @@ export default function TrackDetail({ track }: { track: Track }) {
         console.error("[TrackDetail] Ошибка загрузки компаний", error);
         if (isMounted) {
           setAvailableCompanies([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingCompanies(false);
         }
       }
     };
@@ -584,16 +591,20 @@ export default function TrackDetail({ track }: { track: Track }) {
           )}
 
           <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
-            {hasCompanySupport && (
-              <Select
-                value={selectedCompany ?? undefined}
-                onChange={(value) => setSelectedCompany(value ?? null)}
-                allowClear
-                placeholder="Компания"
-                options={companyOptions}
-                className="w-full md:w-56"
-                size="large"
-              />
+            {(isLoadingCompanies || hasCompanySupport) && (
+              isLoadingCompanies ? (
+                <CompanySelectSkeleton />
+              ) : (
+                <Select
+                  value={selectedCompany ?? undefined}
+                  onChange={(value) => setSelectedCompany(value ?? null)}
+                  allowClear
+                  placeholder="Компания"
+                  options={companyOptions}
+                  className="w-full md:w-56"
+                  size="middle"
+                />
+              )
             )}
             {skillFilters.length > 0 && (
               <Popover
@@ -816,6 +827,15 @@ function CompanyQuestionRow({ question }: { question: string }) {
   return (
     <div className="px-6 py-5">
       <span className="text-lg font-semibold text-gray-900">{question}</span>
+    </div>
+  );
+}
+
+
+function CompanySelectSkeleton() {
+  return (
+    <div className="w-full animate-pulse md:w-56" aria-hidden>
+      <div className="h-8 rounded-md border border-gray-200 bg-gray-100" />
     </div>
   );
 }
