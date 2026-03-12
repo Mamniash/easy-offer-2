@@ -402,18 +402,17 @@ export default function TrackDetail({ track }: { track: Track }) {
     }
   }, [scrollStorageKey]);
 
-  const totalPages =
-    isPro && !hasCompanyFilter
-      ? Math.max(
-          1,
-          Math.ceil(
-            (hasActiveFilters
-              ? filteredQuestions.length
-              : totalQuestions || filteredQuestions.length || 1) /
-              QUESTIONS_PER_PAGE,
-          ),
-        )
-      : 1;
+  const totalPages = isPro
+    ? Math.max(
+        1,
+        Math.ceil(
+          (hasActiveFilters
+            ? filteredQuestions.length
+            : totalQuestions || filteredQuestions.length || 1) /
+            QUESTIONS_PER_PAGE,
+        ),
+      )
+    : 1;
 
   const scrollToFirstQuestion = useCallback(() => {
     requestAnimationFrame(() => {
@@ -508,7 +507,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     !isFetchingFiltered &&
     !isLoadingCompanyQuestions &&
     paginatedQuestions.length === 0;
-  const hasPagination = isPro && !hasCompanyFilter && totalPages > 1;
+  const hasPagination = isPro && totalPages > 1;
   const totalQuestionsCount = hasCompanyFilter
     ? companyQuestions.length
     : totalQuestions || filteredQuestions.length || questions.length;
