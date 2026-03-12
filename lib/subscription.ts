@@ -3,6 +3,7 @@ type UserMetadata = Record<string, unknown> | null | undefined;
 const PRO_EMAILS = new Set([
   "mamniashvili2003@gmail.com",
   "pokrasov.04@mail.ru",
+  "moontour@yandex.ru",
 ]);
 
 const PRO_IDENTIFIERS = new Set([
@@ -12,6 +13,34 @@ const PRO_IDENTIFIERS = new Set([
   "александр мамниашвили",
   "pokrasov daniil",
   "nedv1ga",
+  "sparfentiev",
+  "alxswappls",
+  "indigo_76",
+  "anikakle",
+  "imvdm",
+  "icekeeperr",
+  "le_aleeee",
+  "karsar951",
+  "redwynco",
+  "vera_salve",
+  "oribast",
+  "monchik322",
+  "sh_mksm",
+  "d873_k",
+  "tonybanderas",
+  "guerendi",
+  "olga_shelekhova",
+  "prodbylev",
+  "normacha1",
+  "mercyein",
+  "whynotiyes",
+  "vandasung",
+  "katelico",
+  "mamin_zver",
+  "may_lights",
+  "mmohnov",
+  "www_3dprintprops_com",
+  "ponytabl",
 ]);
 
 const PRO_TELEGRAM_IDS = new Set([2101651535, 975378496, 337548443]);
