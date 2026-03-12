@@ -9,6 +9,7 @@ type ProPlan = {
   id: string;
   name: string;
   price: string;
+  promoPrice?: string;
   period: string;
   billingCycle: string;
   badge?: string;
@@ -59,15 +60,16 @@ const PLANS: ProPlan[] = [
   {
     id: "year",
     name: "Годовой",
-    price: "5 500 ₽",
+    price: "9 990 ₽",
     period: "на 12 месяцев",
     billingCycle: "каждые 12 месяцев",
     perks: [
       "Все из «Месяц»",
-      "Спец-цена по партнерскому коду",
+      "С промокодом: 7 990 ₽",
       "Ранний доступ к обновлениям",
       "Поддержка в чате",
     ],
+    promoPrice: "7 990 ₽",
   },
 ];
 
@@ -202,10 +204,13 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
               <p className="text-sm font-semibold uppercase tracking-wide text-white/70">
                 {plan.name}
               </p>
-              <p className="mt-3 text-3xl font-bold">{plan.price}</p>
-              <p className="mt-1 text-sm text-white/70">
-                {plan.period}
-              </p>
+              <div className="mt-3 flex items-baseline gap-2">
+                <p className="text-3xl font-bold">{plan.price}</p>
+                {plan.promoPrice ? (
+                  <p className="text-sm text-white/70">по промокоду {plan.promoPrice}</p>
+                ) : null}
+              </div>
+              <p className="mt-1 text-sm text-white/70">{plan.period}</p>
             </div>
 
             <ul className="mt-6 space-y-3 text-sm">
