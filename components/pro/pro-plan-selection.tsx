@@ -174,7 +174,8 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
           Тарифы PreOffer PRO
         </h2>
         <p className="text-sm text-gray-600">
-          Выбери доступ по времени. Годовой — спец-цена по рекомендации партнёра.
+          Выбери доступ по времени. Годовой — спец-цена по рекомендации
+          партнёра.
         </p>
       </div>
 
@@ -206,9 +207,6 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
               </p>
               <div className="mt-3 flex items-baseline gap-2">
                 <p className="text-3xl font-bold">{plan.price}</p>
-                {plan.promoPrice ? (
-                  <p className="text-sm text-white/70">по промокоду {plan.promoPrice}</p>
-                ) : null}
               </div>
               <p className="mt-1 text-sm text-white/70">{plan.period}</p>
             </div>
@@ -259,8 +257,9 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
               Оплата подписки
             </h3>
             <p className="mt-3 text-sm text-gray-600">
-              Вы выбрали тариф «{selectedPlan.name}». Перед оплатой можно указать
-              промокод. После нажатия кнопки вы перейдёте на страницу оплаты.
+              Вы выбрали тариф «{selectedPlan.name}». Перед оплатой можно
+              указать промокод. После нажатия кнопки вы перейдёте на страницу
+              оплаты.
             </p>
             <div className="mt-5 space-y-2">
               <label className="text-xs font-semibold uppercase tracking-wide text-gray-400">
@@ -270,7 +269,9 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                 value={promoCode}
                 onChange={(event) => setPromoCode(event.target.value)}
                 placeholder="Введите промокод"
-                status={isPromoCodeProvided && !isPromoCodeValid ? "error" : undefined}
+                status={
+                  isPromoCodeProvided && !isPromoCodeValid ? "error" : undefined
+                }
               />
               {isPromoCodeProvided && (
                 <p
@@ -284,7 +285,8 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                 </p>
               )}
               <p className="text-xs text-gray-500">
-                Если промокода нет, оставьте поле пустым — можно продолжать оплату.
+                Если промокода нет, оставьте поле пустым — можно продолжать
+                оплату.
               </p>
             </div>
             <div className="mt-5 space-y-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-sm text-gray-700">
@@ -294,8 +296,9 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
                 className="items-start"
               >
                 <span>
-                  Я ознакомлен с Договором публичной оферты и согласен на обработку
-                  персональных данных в соответствии с Политикой конфиденциальности.
+                  Я ознакомлен с Договором публичной оферты и согласен на
+                  обработку персональных данных в соответствии с Политикой
+                  конфиденциальности.
                 </span>
               </Checkbox>
               <div className="ml-6 flex flex-col gap-1 text-xs sm:text-sm">
@@ -314,7 +317,9 @@ export default function ProPlanSelection({ userInfo }: ProPlanSelectionProps) {
               </div>
               <Checkbox
                 checked={hasAcceptedRecurring}
-                onChange={(event) => setHasAcceptedRecurring(event.target.checked)}
+                onChange={(event) =>
+                  setHasAcceptedRecurring(event.target.checked)
+                }
                 className="items-start"
               >
                 <span>
