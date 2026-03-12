@@ -18,44 +18,7 @@ import { supabase } from "@/lib/supabaseClient";
 const QUESTIONS_PER_PAGE = 50;
 const UNAUTHORIZED_QUESTIONS_LIMIT = 20;
 const AUTHORIZED_QUESTIONS_LIMIT = 50;
-const GOLANG_COMPANIES = [
-  "Ozon",
-  "ВК",
-  "ВсеИнструменты",
-  "Wildberries",
-  "XM",
-  "ВкусВилл",
-  "Rutube",
-  "Самокат",
-  "Селектел",
-  "Yadro",
-  "B2Broker",
-  "BetBoom",
-  "Bizone",
-  "Burger-King",
-  "CyberOk",
-  "Домклик",
-  "EMCD",
-  "Employcity",
-  "Evrone",
-  //"Flant",
-  //"Kvando-Technologies",
-  "Ламода",
-  //"МТС",
-  //"Lenvendo",
-  "Магнит",
-  "Сбер",
-  "Тинькофф",
-  //"Касперский",
-  "ЦУМ",
-  //"Positive-Technologies",
-  "Swoyo",
-  "Telespace",
-  "Uplatform",
-  "MIND Software",
-];
-
-type GolangCompanyQuestion = {
+type CompanyQuestion = {
   id: number;
   company_name: string;
   question_text: string;
@@ -75,9 +38,8 @@ export default function TrackDetail({ track }: { track: Track }) {
   const [totalQuestions, setTotalQuestions] = useState(track.stats.questions);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
   const [isFetchingFiltered, setIsFetchingFiltered] = useState(false);
-  const [companyQuestions, setCompanyQuestions] = useState<
-    GolangCompanyQuestion[]
-  >([]);
+  const [availableCompanies, setAvailableCompanies] = useState<string[]>([]);
+  const [companyQuestions, setCompanyQuestions] = useState<CompanyQuestion[]>([]);
   const [isLoadingCompanyQuestions, setIsLoadingCompanyQuestions] =
     useState(false);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -95,6 +57,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     setSearch("");
     setSelectedCompany(null);
     setSelectedSkills([]);
+    setAvailableCompanies([]);
     setCompanyQuestions([]);
     setIsFetchingFiltered(false);
   }, [track]);
@@ -142,7 +105,7 @@ export default function TrackDetail({ track }: { track: Track }) {
     let isMounted = true;
 
     const fetchQuestionMarks = async () => {
-      if ((track.slug === "golang" && selectedCompany) || !userId) {
+      if (selectedCompany || !userId) {
         if (isMounted) {
           setQuestionMarks({});
         }
@@ -197,8 +160,8 @@ export default function TrackDetail({ track }: { track: Track }) {
   );
 
   const normalizedSearch = search.trim().toLowerCase();
-  const isGolangTrack = track.slug === "golang";
-  const hasCompanyFilter = isGolangTrack && Boolean(selectedCompany);
+  const hasCompanySupport = availableCompanies.length > 0;
+  const hasCompanyFilter = hasCompanySupport && Boolean(selectedCompany);
   const hasActiveFilters =
     normalizedSearch.length > 0 ||
     selectedSkills.length > 0 ||
@@ -207,6 +170,41 @@ export default function TrackDetail({ track }: { track: Track }) {
     () => skillFilters.filter((filter) => selectedSkills.includes(filter.id)),
     [selectedSkills, skillFilters],
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCompanies = async () => {
+      try {
+        const response = await fetch(`/api/tracks/${track.slug}/company-questions`, {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Не удалось загрузить список компаний: ${response.statusText}`,
+          );
+        }
+
+        const payload = await response.json();
+
+        if (!isMounted) return;
+
+        setAvailableCompanies(payload.companies ?? []);
+      } catch (error) {
+        console.error("[TrackDetail] Ошибка загрузки компаний", error);
+        if (isMounted) {
+          setAvailableCompanies([]);
+        }
+      }
+    };
+
+    fetchCompanies();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [track.slug]);
 
   useEffect(() => {
     if (!hasCompanyFilter || !selectedCompany) {
@@ -531,8 +529,8 @@ export default function TrackDetail({ track }: { track: Track }) {
   const isSkillFiltersLocked = !isPro;
   const companyOptions = useMemo(
     () =>
-      GOLANG_COMPANIES.map((company) => ({ label: company, value: company })),
-    [],
+      availableCompanies.map((company) => ({ label: company, value: company })),
+    [availableCompanies],
   );
   const handleQuestionNavigate = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -587,7 +585,7 @@ export default function TrackDetail({ track }: { track: Track }) {
           )}
 
           <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-4">
-            {isGolangTrack && (
+            {hasCompanySupport && (
               <Select
                 value={selectedCompany ?? undefined}
                 onChange={(value) => setSelectedCompany(value ?? null)}

@@ -11,12 +11,11 @@ export type QuestionRow = {
   videos: string | null;
 };
 
-export type GolangCompanyQuestionRow = {
+export type CompanyQuestionRow = {
   id: number;
+  direction: string;
   company_name: string;
   question_text: string;
-  sort_order: number;
-  is_active: boolean;
   created_at: string;
 };
 
@@ -174,9 +173,36 @@ export async function getQuestionsTotal(): Promise<number> {
   return count ?? 0;
 }
 
-export async function getGolangCompanyQuestions(
+export async function getCompanyNamesByDirection(slug: string): Promise<string[]> {
+  const direction = slugToDirection(slug);
+
+  const { data, error } = await supabase
+    .from("questions_by_companies")
+    .select("company_name")
+    .eq("direction", direction)
+    .not("company_name", "is", null)
+    .order("company_name", { ascending: true });
+
+  if (error) {
+    console.error("[getCompanyNamesByDirection] Supabase error:", error);
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      (data ?? [])
+        .map((row) => row.company_name)
+        .filter((value): value is string => Boolean(value?.trim()))
+        .map((value) => value.trim()),
+    ),
+  );
+}
+
+export async function getCompanyQuestionsByDirection(
+  slug: string,
   companyName: string,
-): Promise<GolangCompanyQuestionRow[]> {
+): Promise<CompanyQuestionRow[]> {
+  const direction = slugToDirection(slug);
   const normalizedCompany = companyName.trim();
 
   if (!normalizedCompany) {
@@ -184,19 +210,18 @@ export async function getGolangCompanyQuestions(
   }
 
   const { data, error } = await supabase
-    .from("golang_company_questions")
-    .select("id,company_name,question_text,sort_order,is_active,created_at")
+    .from("questions_by_companies")
+    .select("id,direction,company_name,question_text,created_at")
+    .eq("direction", direction)
     .eq("company_name", normalizedCompany)
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true })
     .order("id", { ascending: true });
 
   if (error) {
-    console.error("[getGolangCompanyQuestions] Supabase error:", error);
+    console.error("[getCompanyQuestionsByDirection] Supabase error:", error);
     return [];
   }
 
-  return (data ?? []) as GolangCompanyQuestionRow[];
+  return (data ?? []) as CompanyQuestionRow[];
 }
 
 /**
