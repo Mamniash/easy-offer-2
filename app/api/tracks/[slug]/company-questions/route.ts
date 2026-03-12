@@ -1,7 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-import { getGolangCompanyQuestions } from "@/lib/questions";
+import {
+  getCompanyNamesByDirection,
+  getCompanyQuestionsByDirection,
+} from "@/lib/questions";
 
 export async function GET(
   request: NextRequest,
@@ -9,18 +12,15 @@ export async function GET(
 ) {
   const { slug } = await params;
 
-  if (slug !== "golang") {
-    return NextResponse.json({ questions: [] });
-  }
-
   const { searchParams } = new URL(request.url);
   const company = (searchParams.get("company") ?? "").trim();
 
   if (!company) {
-    return NextResponse.json({ questions: [] });
+    const companies = await getCompanyNamesByDirection(slug);
+    return NextResponse.json({ questions: [], companies });
   }
 
-  const questions = await getGolangCompanyQuestions(company);
+  const questions = await getCompanyQuestionsByDirection(slug, company);
 
   return NextResponse.json({ questions });
 }
