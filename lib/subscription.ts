@@ -43,7 +43,7 @@ const PRO_IDENTIFIERS = new Set([
   "ponytabl",
 ]);
 
-const PRO_TELEGRAM_IDS = new Set([7496006401]);
+const PRO_TELEGRAM_IDS = new Set([1237080670]); // IceKeePeRR
 const TELEGRAM_ID_KEYS = [
   "telegram_id",
   "telegramId",
