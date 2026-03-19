@@ -41,8 +41,7 @@ const PRO_IDENTIFIERS = new Set([
   "mmohnov",
   "www_3dprintprops_com",
   "ponytabl",
-  "Kkorotkovi",
-  "7496006401",
+  "Константин",
 ]);
 
 const PRO_TELEGRAM_IDS = new Set([2101651535, 975378496, 337548443]);
