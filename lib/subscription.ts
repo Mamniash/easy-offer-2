@@ -41,10 +41,9 @@ const PRO_IDENTIFIERS = new Set([
   "mmohnov",
   "www_3dprintprops_com",
   "ponytabl",
-  "7496006401",
 ]);
 
-const PRO_TELEGRAM_IDS = new Set([2101651535, 975378496, 337548443]);
+const PRO_TELEGRAM_IDS = new Set([7496006401]);
 const TELEGRAM_ID_KEYS = [
   "telegram_id",
   "telegramId",
