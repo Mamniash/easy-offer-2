@@ -45,14 +45,37 @@ const PRO_IDENTIFIERS = new Set([
 ]);
 
 const PRO_TELEGRAM_IDS = new Set([2101651535, 975378496, 337548443]);
+const TELEGRAM_ID_KEYS = [
+  "telegram_id",
+  "telegramId",
+  "id",
+  "ID",
+  "tg_id",
+  "tgId",
+  "user_id",
+  "userId",
+];
 
 const normalize = (value?: string | null) => value?.trim().toLowerCase() ?? "";
 
 const getMetadataValue = (metadata: UserMetadata, key: string) =>
   typeof metadata?.[key] === "string" ? metadata[key].trim() : null;
 
-const getTelegramId = (metadata: UserMetadata) =>
-  typeof metadata?.telegram_id === "number" ? metadata.telegram_id : null;
+const parseTelegramId = (value: unknown) => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value !== "string") return null;
+
+  const normalizedValue = value.trim();
+  if (!normalizedValue) return null;
+
+  const parsedValue = Number(normalizedValue);
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+};
+
+const getTelegramIds = (metadata: UserMetadata) =>
+  TELEGRAM_ID_KEYS.map((key) => parseTelegramId(metadata?.[key])).filter(
+    (id): id is number => id !== null,
+  );
 
 export const isProUser = (options?: {
   email?: string | null;
@@ -82,6 +105,6 @@ export const isProUser = (options?: {
     return true;
   }
 
-  const telegramId = getTelegramId(metadata);
-  return telegramId ? PRO_TELEGRAM_IDS.has(telegramId) : false;
+  const telegramIds = getTelegramIds(metadata);
+  return telegramIds.some((telegramId) => PRO_TELEGRAM_IDS.has(telegramId));
 };
